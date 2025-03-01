@@ -10,6 +10,7 @@ public class ShipBoard {
     private static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");
     private static final Tile EMPY_TILE = new Tile(TilesType.EMPTY, "ssss");
 
+    // coordinates of implacable tiles
     private static final Pair<Integer, Integer>[] WALL_POSITION = new Pair[]{
             new Pair<>(0, 0),
             new Pair<>(1, 0),
@@ -33,20 +34,24 @@ public class ShipBoard {
         trashed = new ArrayList<>();
         booked = new ArrayList<>();
 
+        // fill the implacable spaces with WALL, the other are empty
         for(Pair<Integer, Integer> position : WALL_POSITION)
             board.set(position.getKey(), position.getValue(), WALL_TILE);
 
+        // the start of building a ship
         board.set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"));
     }
 
     private boolean checkNear(int x, int y){
         List<Result<Tile>> around = new ArrayList<>();
 
+        // get the 4 adjacent tiles
         around.add(board.get(x+1, y));
         around.add(board.get(x-1, y));
         around.add(board.get(x, y+1));
         around.add(board.get(x, y-1));
 
+        // check if at least one is not a wall or an empty space.
         for(Result<Tile> result : around){
             if(result.isAccepted() && result.getData() != WALL_TILE && result.getData() != EMPY_TILE)
                 return true;
@@ -61,6 +66,7 @@ public class ShipBoard {
         if(!result.isAccepted())
             return result;
 
+        // if the tile is a wall or not empty, the tile cant be placed here
         Tile prev = result.getData();
 
         if(prev == WALL_TILE)
@@ -69,9 +75,11 @@ public class ShipBoard {
         if(prev != EMPY_TILE)
             return new Result<>(false, null, "occupied tile");
 
+        // there is a tile near?
         if(!checkNear(x, y))
             return new Result<>(false, null, "cant be placed in the void");
 
+        // the tile can be placed
         orientation.set(x, y, ori);
         return board.set(x, y, t);
     }
@@ -85,6 +93,7 @@ public class ShipBoard {
     }
 
     public Result<Tile> bookTile(Tile t){
+        // check if there is space left and if its not already present
         if(booked.size() >= 2)
             return new Result<>(false, null, "booked tiles full");
 
