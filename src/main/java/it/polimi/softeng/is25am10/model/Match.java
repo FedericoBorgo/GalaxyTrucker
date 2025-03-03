@@ -1,0 +1,22 @@
+package it.polimi.softeng.is25am10.model;
+
+import java.util.ArrayList;
+
+public class Match {
+    private ArrayList<Player> players;
+    private TilesCollection tilesCollection;
+    private FlightBoard flightBoard;
+
+    public Match() {
+        players = new ArrayList<>();
+        tilesCollection = new TilesCollection();
+        flightBoard = new FlightBoard();
+    }
+
+    public void addPlayer(RocketPawn pawn, String nickname) {
+        // The server checked in the connection phase that the name is unique
+        // The server checks for the number of players added to the game to be right
+        Player player = new Player(pawn, nickname);
+        players.add(player);
+    }
+}
