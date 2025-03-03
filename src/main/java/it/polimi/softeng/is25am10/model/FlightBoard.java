@@ -141,5 +141,4 @@ public class FlightBoard {
         }
         return null; // no available cards
     }
-
 }

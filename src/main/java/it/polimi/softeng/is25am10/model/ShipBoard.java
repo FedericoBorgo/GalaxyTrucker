@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShipBoard {
-
-    private static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");
-    private static final Tile EMPY_TILE = new Tile(TilesType.EMPTY, "ssss");
-
     // coordinates of implacable tiles
     private static final Pair<Integer, Integer>[] WALL_POSITION = new Pair[]{
             new Pair<>(0, 0),
@@ -29,14 +25,14 @@ public class ShipBoard {
     private final List<Tile> trashed;
 
     public ShipBoard(){
-        board = new ShipContainer<>(EMPY_TILE);
+        board = new ShipContainer<>(Tile.EMPY_TILE);
         orientation = new ShipContainer<>('n');
         trashed = new ArrayList<>();
         booked = new ArrayList<>();
 
         // fill the implacable spaces with WALL, the other are empty
         for(Pair<Integer, Integer> position : WALL_POSITION)
-            board.set(position.getKey(), position.getValue(), WALL_TILE);
+            board.set(position.getKey(), position.getValue(), Tile.WALL_TILE);
 
         // the start of building a ship
         board.set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"));
@@ -53,7 +49,7 @@ public class ShipBoard {
 
         // check if at least one is not a wall or an empty space.
         for(Result<Tile> result : around){
-            if(result.isAccepted() && result.getData() != WALL_TILE && result.getData() != EMPY_TILE)
+            if(result.isAccepted() && result.getData() != Tile.WALL_TILE && result.getData() != Tile.EMPY_TILE)
                 return true;
         }
 
@@ -69,10 +65,10 @@ public class ShipBoard {
         // if the tile is a wall or not empty, the tile cant be placed here
         Tile prev = result.getData();
 
-        if(prev == WALL_TILE)
+        if(prev == Tile.WALL_TILE)
             return new Result<>(false, null, "cant place out of bound");
 
-        if(prev != EMPY_TILE)
+        if(prev != Tile.EMPY_TILE)
             return new Result<>(false, null, "occupied tile");
 
         // there is a tile near?
