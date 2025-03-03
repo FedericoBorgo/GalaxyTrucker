@@ -5,37 +5,25 @@ public class Player {
     private String nickname;
     private int cash;
     private final ShipBoard board;
-    private final AstronautBoard astronaut;
-    private final PurpleAlienBoard purpleAlien;
-    private final BrownAlienBoard brownAlien;
-    private final BatteryBoard battery;
-    private final GoodsBoard goods;
+    private final ElementsBoard astronaut;
+    private final ElementsBoard purpleAlien;
+    private final ElementsBoard brownAlien;
+    private final ElementsBoard battery;
+    private final ElementsBoard[] goods;
 
     public Player(RocketPawn pawn, String nickname) {
         this.nickname = nickname;
         this.pawn = pawn;
         board = new ShipBoard();
         astronaut = new AstronautBoard(board);
-        purpleAlien = new PurpleAlienBoard(board);
-        brownAlien = new BrownAlienBoard(board);
+        purpleAlien = new AlienBoard(board);
+        brownAlien = new AlienBoard(board);
         battery = new BatteryBoard(board);
-        goods = new GoodsBoard();
-    }
-
-    public void giveCash(int amount) {
-        cash += amount;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public RocketPawn getPawn() {
-        return pawn;
-    }
-
-    public String getNickname() {
-        return nickname;
+        goods = new GoodsBoard[4];
+        goods[0] = new GoodsBoard(board);
+        goods[1] = new GoodsBoard(board);
+        goods[2] = new GoodsBoard(board);
+        goods[3] = new GoodsBoard(board);
     }
 
     public int getCash() {
@@ -46,23 +34,15 @@ public class Player {
         return board;
     }
 
-    public AstronautBoard getAstronaut() {
-        return astronaut;
+    public RocketPawn getPawn() {
+        return pawn;
     }
 
-    public PurpleAlienBoard getPurpleAlien() {
-        return purpleAlien;
+    public void giveCash(int amount) {
+        cash += amount;
     }
 
-    public BrownAlienBoard getBrownAlien() {
-        return brownAlien;
-    }
-
-    public BatteryBoard getBattery() {
-        return battery;
-    }
-
-    public GoodsBoard getGoods() {
-        return goods;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

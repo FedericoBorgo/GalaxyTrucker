@@ -1,7 +1,7 @@
 package it.polimi.softeng.is25am10.model;
 
-public class BrownAlienBoard extends ElementsBoard{
-    public BrownAlienBoard(ShipBoard board) {
+public class AlienBoard extends ElementsBoard{
+    public AlienBoard(ShipBoard board) {
         super(board);
     }
 
