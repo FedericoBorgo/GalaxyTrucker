@@ -7,11 +7,23 @@ public class BatteryBoard extends ElementsBoard{
 
     @Override
     public Result<Integer> put(int x, int y, int qty) {
-        return null;
-    }
+        Result<Tile> resTile = board.getTile(x, y);
 
-    @Override
-    public Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty) {
-        return null;
+        if(!resTile.isAccepted())
+            return new Result<>(false, null, resTile.getReason());
+
+        TilesType tileType = resTile.getData().getType();
+
+        if(tileType != TilesType.BATTERY_2 && tileType != TilesType.BATTERY_3)
+            return new Result<>(false, null, "cant place in a non battery tile");
+
+        int maxQty = tileType == TilesType.BATTERY_2 ? 2 : 3;
+        int value = location.get(x, y).getData();
+
+        if(value + qty > maxQty)
+            return new Result<>(false, null, "too many batteries");
+
+        total += qty;
+        return location.set(x, y, qty + value);
     }
 }
