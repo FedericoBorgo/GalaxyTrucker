@@ -1,9 +1,12 @@
 package it.polimi.softeng.is25am10.model;
 
+import java.util.List;
+
 public abstract class ElementsBoard {
-    private final ShipContainer<Integer> location;
-    private int total;
+    protected final ShipContainer<Integer> location;
+    protected int total;
     protected final ShipBoard board;
+    protected List<ElementsBoard> other;
 
     public ElementsBoard(ShipBoard board) {
         this.board = board;
@@ -19,6 +22,10 @@ public abstract class ElementsBoard {
         return total;
     }
 
+    public void setBoards(List<ElementsBoard> other){
+        this.other = other;
+    }
+
     public Result<Integer> remove(int x, int y, int qty){
         Result<Integer> response = location.get(x, y);
 
@@ -32,7 +39,23 @@ public abstract class ElementsBoard {
         return location.set(x, y, response.getData() - qty);
     }
 
-    public abstract Result<Integer> put(int x, int y, int qty);
+    public Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty) {
+        Result<Integer> resRemove = remove(fromx, fromy, qty);
 
-    public abstract Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty);
+        if(!resRemove.isAccepted())
+            return resRemove;
+
+        Result<Integer> resMove = put(tox, toy, qty);
+
+        if(!resMove.isAccepted())
+            put(fromx, fromy, qty);
+
+        return resMove;
+    }
+
+    public Result<Integer> get(int x, int y){
+        return location.get(x, y);
+    }
+
+    public abstract Result<Integer> put(int x, int y, int qty);
 }
