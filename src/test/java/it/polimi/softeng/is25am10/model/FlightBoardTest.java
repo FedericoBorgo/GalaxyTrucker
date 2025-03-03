@@ -3,9 +3,8 @@ package it.polimi.softeng.is25am10.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,19 +16,28 @@ class FlightBoardTest {
 
     @Test
     void testSetRocketReady() {
+        // success
+        RocketPawn rocket1 = RocketPawn.YELLOW;
+        RocketPawn rocket2 = RocketPawn.RED;
+        RocketPawn rocket3 = RocketPawn.BLUE;
 
-        Result<String> result = flightBoard.setRocketReady(RocketPawn.RED);
-        assertTrue(result.isAccepted());
-        assertEquals("Rocket RED is ready", result.getData());
-        assertNull(result.getReason());
+        Result<String> result1 = flightBoard.setRocketReady(rocket1);
+        assertTrue(result1.isAccepted());
+        assertEquals("Rocket YELLOW is ready", result1.getData());
+        assertEquals(6, findRocketPosition(rocket1));
 
-        for(int i = 0; i < 24; i++){
-            flightBoard.setRocketReady(RocketPawn.RED);
-        }
-        Result<String> result2 = flightBoard.setRocketReady(RocketPawn.YELLOW);
-        assertFalse(result2.isAccepted());
-        assertNull(result2.getData());
-        assertEquals("No available positions", result2.getReason());
+       Result<String> result2 = flightBoard.setRocketReady(rocket2);
+       assertTrue(result2.isAccepted());
+       assertEquals("Rocket RED is ready", result2.getData());
+       assertEquals(3, findRocketPosition(rocket2));
+
+       // duplicate
+        Result<String> result3 = flightBoard.setRocketReady(rocket3);
+        assertTrue(result3.isAccepted());
+
+        Result<String> result4 = flightBoard.setRocketReady(rocket3);
+        assertFalse(result4.isAccepted());
+        assertEquals("Rocket is already on the board", result4.getReason());
 
     }
 
@@ -77,6 +85,42 @@ class FlightBoardTest {
         assertEquals(2,flightBoard.getHourglassesPosition());
         flightBoard.moveHourglasses();
         assertEquals(2,flightBoard.getHourglassesPosition());
+
+    }
+
+    @Test
+    void testGetLaps(){
+        RocketPawn rocket1 = RocketPawn.YELLOW;
+        RocketPawn rocket2 = RocketPawn.RED;
+
+        // rocket not on the board
+        Result<Integer> result = flightBoard.getLaps(rocket1);
+        assertFalse(result.isAccepted());
+        assertNull(result.getData());
+        assertEquals("Rocket is not on the board", result.getReason());
+
+        // zero laps
+        flightBoard.setRocketReady(rocket1);
+        Result<Integer> result1 = flightBoard.getLaps(rocket1);
+        assertTrue(result1.isAccepted());
+        assertEquals(0, result1.getData());
+
+        // multiple laps
+        flightBoard.moveRocket(rocket1, 24);
+        Result<Integer> result2 = flightBoard.getLaps(rocket1);
+        assertTrue(result2.isAccepted());
+        assertEquals(1, result2.getData());
+
+        //multiple rockets
+        flightBoard.setRocketReady(rocket2);
+        flightBoard.moveRocket(rocket2, 25);
+
+        Result<Integer> result3 = flightBoard.getLaps(rocket1);
+        Result<Integer> result4 = flightBoard.getLaps(rocket2);
+        assertTrue(result3.isAccepted());
+        assertEquals(1, result3.getData());
+        assertTrue(result4.isAccepted());
+        assertEquals(1, result4.getData());
 
     }
 
