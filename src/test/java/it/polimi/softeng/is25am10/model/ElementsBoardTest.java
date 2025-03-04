@@ -18,6 +18,7 @@ class ElementsBoardTest {
     void testSetGet(){
         placeholder.put(3, 2, 10);
         assertEquals(10, placeholder.get(3, 2));
+        assertEquals(10, placeholder.getTotal());
     }
 
     @Test
@@ -25,6 +26,7 @@ class ElementsBoardTest {
         placeholder.put(3, 2, 10);
         placeholder.remove(3, 2, 5);
         assertEquals(5, placeholder.get(3, 2));
+        assertEquals(5, placeholder.getTotal());
     }
 
     @Test
@@ -34,6 +36,7 @@ class ElementsBoardTest {
 
         assertEquals(5, placeholder.get(3, 2));
         assertEquals(5, placeholder.get(2, 2));
+        assertEquals(10, placeholder.getTotal());
         assertEquals(10, placeholder.getTotal());
     }
 

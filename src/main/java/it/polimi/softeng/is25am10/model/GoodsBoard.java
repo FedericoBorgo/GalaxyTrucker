@@ -9,7 +9,6 @@ public class GoodsBoard extends ElementsBoard{
     private static final List<TilesType> GREEN_BOX;
     private static final Map<TilesType, Integer> MAX_VALUE;
 
-    private final char color;
     private final List<TilesType> box;
 
     static {
@@ -40,7 +39,6 @@ public class GoodsBoard extends ElementsBoard{
     }
 
     public GoodsBoard(ShipBoard board, char color) { super(board);
-        this.color = color;
         this.box = switch (color){
             case 'r' -> RED_BOX;
             case 'y' -> YELLOW_BOX;
@@ -60,24 +58,23 @@ public class GoodsBoard extends ElementsBoard{
 
     @Override
     public Result<Integer> put(int x, int y, int qty) {
-        Result<Tile> resTile = board.getTile(x, y);
+        Result<Tile> res = board.getTile(x, y);
 
-        if(!resTile.isOk())
-            return new Result<>(false, null, resTile.getReason());
+        if(res.isErr())
+            return Result.err(res.getReason());
 
-        TilesType tile = resTile.getData().getType();
+        TilesType tile = res.getData().getType();
 
         if(!box.contains(tile))
-            return new Result<>(false, null, "cant place here");
+            return Result.err("cant place here");
 
         int sum = getNBox(x, y) + get(x, y) + qty;
 
         if(sum > MAX_VALUE.get(tile))
-            return new Result<>(false, null, "too many boxes");
+            return Result.err("too many boxes");
 
         set(x, y, get(x, y) + qty);
 
-        return new Result<>(true, qty, null);
+        return Result.ok(sum);
     }
-
 }
