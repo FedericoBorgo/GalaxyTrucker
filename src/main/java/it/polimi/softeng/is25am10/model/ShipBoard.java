@@ -16,76 +16,97 @@ public class ShipBoard {
             new Pair<>(0, 1),
             new Pair<>(6, 1),
             new Pair<>(3, 4),
-
     };
 
-    private final ShipContainer<Tile> board;
-    private final ShipContainer<Character> orientation;
+    public static final int BOARD_WIDTH = 7;
+    public static final int BOARD_HEIGHT = 5;
+
+    private Tile[][] board;
+    private char[][] orientation;
     private final List<Tile> booked;
     private final List<Tile> trashed;
 
     public ShipBoard(){
-        board = new ShipContainer<>(Tile.EMPY_TILE);
-        orientation = new ShipContainer<>('n');
+        board = new Tile[BOARD_WIDTH][BOARD_HEIGHT];
+        orientation = new char[BOARD_WIDTH][BOARD_HEIGHT];
         trashed = new ArrayList<>();
         booked = new ArrayList<>();
 
+        for(int i = 0; i < BOARD_WIDTH; i++)
+            for(int j = 0; j < BOARD_HEIGHT; j++)
+                board[i][j] = Tile.EMPY_TILE;
+
         // fill the implacable spaces with WALL, the other are empty
-        for(Pair<Integer, Integer> position : WALL_POSITION)
-            board.set(position.getKey(), position.getValue(), Tile.WALL_TILE);
+        for(Pair<Integer, Integer> coord : WALL_POSITION)
+            set(coord.getKey(), coord.getValue(), Tile.WALL_TILE, ' ');
 
         // the start of building a ship
-        board.set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"));
+        set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"), ' ');
+    }
+
+    private boolean set(int x, int y, Tile tile, char ori){
+        if(x <= 0 || x > BOARD_WIDTH || y <= 0 || y > BOARD_HEIGHT)
+            return false;
+
+        orientation[x][y] = ori;
+        board[x][y] = tile;
+        return true;
+    }
+
+    private Tile get(int x, int y){
+        if(x <= 0 || x >= BOARD_WIDTH || y <= 0 || y >= BOARD_HEIGHT)
+            return null;
+
+        return board[x][y];
     }
 
     private boolean checkNear(int x, int y){
-        List<Result<Tile>> around = new ArrayList<>();
+        List<Tile> around = new ArrayList<>();
 
         // get the 4 adjacent tiles
-        around.add(board.get(x+1, y));
-        around.add(board.get(x-1, y));
-        around.add(board.get(x, y+1));
-        around.add(board.get(x, y-1));
+        around.add(get(x+1, y));
+        around.add(get(x-1, y));
+        around.add(get(x, y+1));
+        around.add(get(x, y-1));
 
         // check if at least one is not a wall or an empty space.
-        for(Result<Tile> result : around){
-            if(result.isAccepted() && result.getData() != Tile.WALL_TILE && result.getData() != Tile.EMPY_TILE)
+        for(Tile tile: around)
+            if(tile != null && tile != Tile.WALL_TILE && tile != Tile.EMPY_TILE)
                 return true;
-        }
 
         return false;
     }
 
     public Result<Tile> setTile(int x, int y, Tile t, char ori){
-        Result<Tile> result = board.get(x, y);
+        Tile result = get(x, y);
 
-        if(!result.isAccepted())
-            return result;
-
-        // if the tile is a wall or not empty, the tile cant be placed here
-        Tile prev = result.getData();
-
-        if(prev == Tile.WALL_TILE)
+        if(result == null || result == Tile.WALL_TILE)
             return new Result<>(false, null, "cant place out of bound");
 
-        if(prev != Tile.EMPY_TILE)
+        if(result != Tile.EMPY_TILE)
             return new Result<>(false, null, "occupied tile");
 
         // there is a tile near?
         if(!checkNear(x, y))
             return new Result<>(false, null, "cant be placed in the void");
 
-        // the tile can be placed
-        orientation.set(x, y, ori);
-        return board.set(x, y, t);
+        set(x, y, t, ori);
+        return new Result<>(true, t, null);
     }
 
     public Result<Tile> getTile(int x, int y) {
-        return board.get(x, y);
+        Tile t = get(x, y);
+
+        if(t == null || t == Tile.WALL_TILE)
+            return new Result<>(false, null, "out of bound");
+
+        return new Result<>(true, t, null);
     }
 
-    public Result<Character> getOrientation(int x, int y) {
-        return orientation.get(x, y);
+    public Result<Character> getOri(int x, int y) {
+        if(x <= 0 || x >= BOARD_WIDTH || y <= 0 || y >= BOARD_HEIGHT)
+            return new Result<>(false, null, "out of bound");
+        return new Result<>(true, orientation[x][y], null);
     }
 
     public Result<Tile> bookTile(Tile t){
