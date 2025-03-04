@@ -28,26 +28,31 @@ class AstronautBoardTest {
 
 
         astronaut = new AstronautBoard(board);
-        astronaut.setBoards(other);
+        astronaut.setOthers(other);
     }
 
     @Test
-    void testPut(){
+    void testPutGet(){
         Result<Integer> result = astronaut.put(2, 2, 2);
-
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(2, astronaut.get(2, 2));
 
+        result = astronaut.put(3, 2, 2);
+        assertTrue(result.isOk());
+        assertEquals(2, astronaut.get(2, 2));
+
+        assertEquals(4, astronaut.getTotal());
+
         result = astronaut.put(2, 2, 1);
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("too many astronauts", result.getReason());
 
         result = astronaut.put(1, 2, 1);
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("occupied by alien", result.getReason());
 
         result = astronaut.put(0, 2, 1);
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("cant place here", result.getReason());
     }
 

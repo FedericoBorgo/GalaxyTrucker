@@ -8,13 +8,7 @@ class ConnectorTypeTest {
 
     @Test
     void connectorTypeTest(){
-        ConnectorType t1 = ConnectorType.ONE_PIPE;
-        ConnectorType t2 = ConnectorType.TWO_PIPE;
-        assertNotNull(t1);
-        assertEquals(t1, ConnectorType.ONE_PIPE);
-        assertEquals(t2, ConnectorType.TWO_PIPE);
-        assertNotEquals(t1, t2);
-        assertEquals('o', t1.toChar());
+        assertEquals('o', ConnectorType.ONE_PIPE.toChar());
         assertEquals(ConnectorType.UNIVERSAL, ConnectorType.fromChar('u'));
     }
 }

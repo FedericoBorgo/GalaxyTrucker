@@ -4,26 +4,26 @@ public class Tile {
     public static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");
     public static final Tile EMPY_TILE = new Tile(TilesType.EMPTY, "ssss");
 
-    private TilesType tileType;
-    private ConnectorType[] connectorType;
+    private TilesType type;
+    private ConnectorType[] connectors;
 
     // Constructor Method
-    public Tile(TilesType tileType, String connectors) {
-        this.tileType = tileType;
-        this.connectorType = new ConnectorType[4];//we have 4 types of connector
+    public Tile(TilesType type, String connectors) {
+        this.type = type;
+        this.connectors = new ConnectorType[4];//we have 4 types of connector
 
         for (int i = 0; i < connectors.length(); i++) {
-            this.connectorType[i] = ConnectorType.fromChar(connectors.charAt(i));
+            this.connectors[i] = ConnectorType.fromChar(connectors.charAt(i));
         }
     }
 
     // Return the tile's type
     public TilesType getType() {
-        return tileType;
+        return type;
     }
 
     // Return the connector's type
-    public ConnectorType[] getConnectorType() {
-        return connectorType;
+    public ConnectorType[] getConnectors() {
+        return connectors;
     }
 }

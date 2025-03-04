@@ -30,28 +30,28 @@ class AlienBoardTest {
 
 
         alien = new AlienBoard(board, 'p');
-        alien.setBoards(other);
+        alien.setOthers(other);
     }
 
     @Test
     void testPut(){
         Result<Integer> res = alien.put(2, 1, 1);
-        assertFalse(res.isAccepted());
+        assertTrue(res.isErr());
 
         res = alien.put(2, 2, 1);
         assertEquals(1, alien.get(2, 2));
-        assertTrue(res.isAccepted());
+        assertTrue(res.isOk());
 
         res = alien.put(2, 2, 1);
         assertEquals(1, alien.get(2, 2));
-        assertFalse(res.isAccepted());
+        assertTrue(res.isErr());
 
         res = alien.put(0, 2, 1);
         assertEquals(0, alien.get(0, 2));
-        assertFalse(res.isAccepted());
+        assertTrue(res.isErr());
 
         res = alien.put(0, 3, 1);
         assertEquals(0, alien.get(0, 3));
-        assertFalse(res.isAccepted());
+        assertTrue(res.isErr());
     }
 }

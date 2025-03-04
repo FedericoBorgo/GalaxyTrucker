@@ -44,28 +44,28 @@ public abstract class ElementsBoard {
         int value = get(x, y);
 
         if(value < qty)
-            return new Result<>(false, null, "not enough items in board");
+            return Result.err("not enough items in board");
 
         set(x, y, value - qty);
 
-        return new Result<>(true, value - qty, null);
+        return Result.ok(value - qty);
     }
     // Move units from one position to another
     public Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty) {
-        Result<Integer> resRemove = remove(fromx, fromy, qty);
+        Result<Integer> res = remove(fromx, fromy, qty);
 
-        if(!resRemove.isAccepted())
-            return resRemove;
+        if(res.isErr())
+            return res;
 
-        Result<Integer> resMove = put(tox, toy, qty);
+        res = put(tox, toy, qty);
 
-        if(!resMove.isAccepted())
+        if(res.isErr())
             put(fromx, fromy, qty);
 
-        return resMove;
+        return res;
     }
     // Set the list of other boards needed for the operation of this board
-    public void setBoards(List<ElementsBoard> other){
+    public void setOthers(List<ElementsBoard> other){
         this.other = other;
     }
 

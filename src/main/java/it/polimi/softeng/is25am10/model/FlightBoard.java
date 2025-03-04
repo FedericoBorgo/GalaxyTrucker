@@ -19,38 +19,30 @@ public class FlightBoard {
         this.visibleCards = new Card[3][3];
         this.cardsDeck = new ArrayList<>();
         this.laps = new HashMap<>();
+
+        for(int i = 0; i < positions.length; i++)
+            this.positions[i] = null;
     }
 
     // The Rocket pawn is positioned on the flight board
     public Result<String> setRocketReady(RocketPawn pawn) {
+        final int[] POSITIONS = {6, 3, 1, 0};
 
         // Check that the pawn isn't already set
         for (int i = 0; i < positions.length; i++) {
             if (positions[i] == pawn) {
-                return new Result<>(false, null, "Rocket is already on the board");
+                return Result.err("Rocket is already on the board");
             }
         }
 
-        if(positions[6] == null){
-                positions[6] = pawn;
+        for(int i = 0; i < POSITIONS.length; i++) {
+            if(positions[POSITIONS[i]] == null) {
+                positions[POSITIONS[i]] = pawn;
                 laps.put(pawn, 0);
-                return new Result<>(true, "Rocket " + pawn + " is ready", null);
-        }else if(positions[3] == null){
-                positions[3] = pawn;
-                laps.put(pawn, 0);
-                return new Result<>(true, "Rocket " + pawn + " is ready", null);
-        }else if(positions[1] == null){
-                 positions[1] = pawn;
-                 laps.put(pawn, 0);
-                return new Result<>(true, "Rocket " + pawn + " is ready", null);
-        }else if(positions[0] == null){
-                 positions[0] = pawn;
-                 laps.put(pawn, 0);
-                return new Result<>(true, "Rocket " + pawn + " is ready", null);
-        }else {
-                return new Result<>(false, null, "No available positions");
+                return Result.ok("rocket ready");
+            }
         }
-
+        return Result.err("No available positions");
     }
 
     // Increases the position of the hourglass
@@ -115,11 +107,11 @@ public class FlightBoard {
         }
 
         // if the pawn isn't on the board
-        if (currentIndex == -1) return new Result<>(false, null, "Rocket is not on the board");
+        if (currentIndex == -1) return Result.err("Rocket is not on the board");
 
         int completedLaps = laps.getOrDefault(pawn, 0);
 
-        return new Result<>(true, completedLaps, null);
+        return Result.ok(completedLaps);
     }
 
     public RocketPawn[] getPositions() {

@@ -26,7 +26,7 @@ class GoodsBoardTest {
         other.add(boxes);
 
         blockRed = new GoodsBoard(board, 'r');
-        blockRed.setBoards(other);
+        blockRed.setOthers(other);
     }
 
     @Test
@@ -34,16 +34,16 @@ class GoodsBoardTest {
         Result<Integer> res;
 
         res = blockRed.put(2, 2, 1);
-        assertFalse(res.isAccepted());
+        assertTrue(res.isErr());
         assertEquals("cant place here", res.getReason());
         assertEquals(0, blockRed.get(2, 2));
 
         res = blockRed.put(1, 2, 1);
-        assertTrue(res.isAccepted());
+        assertTrue(res.isOk());
         assertEquals(1, blockRed.get(1, 2));
 
         res = blockRed.put(1, 2, 1);
-        assertFalse(res.isAccepted());
+        assertTrue(res.isErr());
         assertEquals(1, blockRed.get(1, 2));
     }
 }

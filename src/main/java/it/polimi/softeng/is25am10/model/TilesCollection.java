@@ -43,12 +43,10 @@ public class TilesCollection {
         return seen;
     }
 
-    public Tile getFromSeen(int pos){
-        if(pos >= seen.size())
+    public Tile getFromSeen(Tile tile){
+        if(!seen.remove(tile))
             return Tile.EMPY_TILE;
 
-        Tile tile = seen.get(pos);
-        seen.remove(pos);
         return tile;
     }
 
