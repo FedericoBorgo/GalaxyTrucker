@@ -20,29 +20,29 @@ class BatteryBoardTest {
 
     @Test
     void testPut(){
-        Result<Integer> result = batteries.put(2, 2, 2);
-        assertTrue(result.isOk());
+        Result<Integer> res = batteries.put(2, 2, 2);
+        assertTrue(res.isOk());
         assertEquals(2, batteries.get(2, 2));
 
-        result = batteries.put(2, 2, 3);
-        assertFalse(result.isOk());
-        assertEquals("too many batteries", result.getReason());
+        res = batteries.put(2, 2, 3);
+        assertTrue(res.isErr());
+        assertEquals("too many batteries", res.getReason());
 
-        result = batteries.put(0, 2, 3);
-        assertFalse(result.isOk());
-        assertEquals("too many batteries", result.getReason());
+        res = batteries.put(0, 2, 3);
+        assertTrue(res.isErr());
+        assertEquals("too many batteries", res.getReason());
 
-        result = batteries.put(0, 2, 1);
-        assertTrue(result.isOk());
+        res = batteries.put(0, 2, 1);
+        assertTrue(res.isOk());
         assertEquals(1, batteries.get(0, 2));
 
-        result = batteries.put(0, 2, 1);
-        assertTrue(result.isOk());
+        res = batteries.put(0, 2, 1);
+        assertTrue(res.isOk());
         assertEquals(2, batteries.get(0, 2));
 
-        result = batteries.put(1, 2, 1);
-        assertFalse(result.isOk());
-        assertEquals("tile is not a Battery Tile", result.getReason());
+        res = batteries.put(1, 2, 1);
+        assertTrue(res.isErr());
+        assertEquals("tile is not a Battery Tile", res.getReason());
     }
 
 }

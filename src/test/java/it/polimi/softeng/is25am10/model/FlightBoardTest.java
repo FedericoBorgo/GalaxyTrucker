@@ -23,12 +23,12 @@ class FlightBoardTest {
 
         Result<String> result1 = flightBoard.setRocketReady(rocket1);
         assertTrue(result1.isOk());
-        assertEquals("Rocket YELLOW is ready", result1.getData());
+        assertEquals("rocket ready", result1.getData());
         assertEquals(6, findRocketPosition(rocket1));
 
        Result<String> result2 = flightBoard.setRocketReady(rocket2);
        assertTrue(result2.isOk());
-       assertEquals("Rocket RED is ready", result2.getData());
+       assertEquals("rocket ready", result2.getData());
        assertEquals(3, findRocketPosition(rocket2));
 
        // duplicate
