@@ -27,6 +27,7 @@ public abstract class ElementsBoard {
     }
 
     protected void set(int x, int y, int value) {
+        total += (value - get(x, y));
         positions.put(new Pair<>(x, y), value);
     }
 
