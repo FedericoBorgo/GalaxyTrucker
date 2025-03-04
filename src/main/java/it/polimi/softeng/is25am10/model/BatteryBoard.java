@@ -14,14 +14,16 @@ public class BatteryBoard extends ElementsBoard {
             return new Result<>(false,null,resBoard.getReason());
         Tile tile = board.getTile(x, y).getData();
 
-        // Add batteries
-        if (tile.getType() == TilesType.BATTERY_2) {
-            set(x, y, 2 + get(x, y)); // get(x, y) should always be 0
-        } else if (tile.getType() == TilesType.BATTERY_3) {
-            set(x, y, 3 + get(x, y)); // get(x, y) should always be 0
-        } else {
+        // Check tile type
+        if(tile.getType() != TilesType.BATTERY_2 && tile.getType() != TilesType.BATTERY_3)
             return new Result<>(false, null, "tile is not a Battery Tile");
-        }
-        return null;
+
+        // Add batteries
+        int nBatteries = get(x, y) + qty;
+        // Check qty to be added
+        if ((tile.getType() == TilesType.BATTERY_2 && nBatteries > 2) || (tile.getType() == TilesType.BATTERY_3 && nBatteries > 3))
+            return new Result<>(false,null, "too many batteries");
+        set(x, y, qty + get(x, y));
+        return new Result<>(true, nBatteries, null);
     }
 }

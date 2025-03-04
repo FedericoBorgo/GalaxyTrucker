@@ -45,7 +45,7 @@ public class ShipBoard {
     }
 
     private boolean set(int x, int y, Tile tile, char ori){
-        if(x <= 0 || x > BOARD_WIDTH || y <= 0 || y > BOARD_HEIGHT)
+        if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
             return false;
 
         orientation[x][y] = ori;
@@ -54,7 +54,7 @@ public class ShipBoard {
     }
 
     private Tile get(int x, int y){
-        if(x <= 0 || x >= BOARD_WIDTH || y <= 0 || y >= BOARD_HEIGHT)
+        if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
             return null;
 
         return board[x][y];
