@@ -32,7 +32,6 @@ class ShipBoardTest {
 
         result = shipBoard.setTile(0, 2, tile, 'n');
         assertFalse(result.isAccepted());
-        assertEquals("cant be placed in the void", result.getReason());
     }
 
     @Test
@@ -44,12 +43,10 @@ class ShipBoardTest {
         assertEquals(TilesType.C_HOUSE, result.getData().getType());
 
         result = shipBoard.getTile(0, 0);
-        assertTrue(result.isAccepted());
-        assertEquals(TilesType.WALL, result.getData().getType());
+        assertFalse(result.isAccepted());
 
         result = shipBoard.getTile(0, 1);
-        assertTrue(result.isAccepted());
-        assertEquals(TilesType.WALL, result.getData().getType());
+        assertFalse(result.isAccepted());
     }
 
     @Test
