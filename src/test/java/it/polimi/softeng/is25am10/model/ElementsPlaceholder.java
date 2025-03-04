@@ -9,7 +9,6 @@ class ElementsPlaceholder extends ElementsBoard {
     @Override
     public Result<Integer> put(int x, int y, int qty) {
         set(x, y, qty);
-        total += qty;
         return new Result<>(true, qty, null);
     }
 }
