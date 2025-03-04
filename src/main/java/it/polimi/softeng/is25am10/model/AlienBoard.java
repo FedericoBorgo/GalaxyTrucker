@@ -21,7 +21,7 @@ public class AlienBoard extends ElementsBoard{
         tiles.add(board.getTile(x, y+1));
 
         for(Result<Tile> result: tiles)
-            if(result.isAccepted() && result.getData().getType() == type)
+            if(result.isOk() && result.getData().getType() == type)
                 return true;
 
         return false;
@@ -32,7 +32,7 @@ public class AlienBoard extends ElementsBoard{
         Result<Tile> resBoard = board.getTile(x, y);
 
         // out of bound
-        if(!resBoard.isAccepted())
+        if(!resBoard.isOk())
             return new Result<>(false, null, resBoard.getReason());
 
         TilesType type = resBoard.getData().getType();

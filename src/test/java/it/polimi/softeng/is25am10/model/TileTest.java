@@ -11,14 +11,10 @@ class TileTest {
 
         assertEquals(TilesType.ROCKET, tile.getType());
 
-        ConnectorType[] connectors = tile.getConnectorType();
+        ConnectorType[] connectors = tile.getConnectors();
         assertEquals(ConnectorType.SMOOTH, connectors[0] );
         assertEquals(ConnectorType.UNIVERSAL, connectors[1] );
         assertEquals(ConnectorType.TWO_PIPE, connectors[2] );
         assertEquals(ConnectorType.ONE_PIPE, connectors[3] );
-
-
     }
-
-
 }

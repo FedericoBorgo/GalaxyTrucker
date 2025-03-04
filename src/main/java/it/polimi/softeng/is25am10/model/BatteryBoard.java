@@ -10,7 +10,7 @@ public class BatteryBoard extends ElementsBoard {
 
         // Get Tile from ShipBoard and do an out-of-bound check
         Result<Tile> resBoard = board.getTile(x, y);
-        if(!resBoard.isAccepted())
+        if(!resBoard.isOk())
             return new Result<>(false,null,resBoard.getReason());
         Tile tile = board.getTile(x, y).getData();
 

@@ -54,12 +54,12 @@ public abstract class ElementsBoard {
     public Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty) {
         Result<Integer> resRemove = remove(fromx, fromy, qty);
 
-        if(!resRemove.isAccepted())
+        if(!resRemove.isOk())
             return resRemove;
 
         Result<Integer> resMove = put(tox, toy, qty);
 
-        if(!resMove.isAccepted())
+        if(!resMove.isOk())
             put(fromx, fromy, qty);
 
         return resMove;

@@ -19,19 +19,20 @@ class ShipBoardTest {
         Result<Tile> result;
 
         result = shipBoard.setTile(3, 2, tile, 'n');
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("occupied tile", result.getReason());
 
         result = shipBoard.setTile(0, 0, tile, 'n');
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("cant place out of bound", result.getReason());
 
         result = shipBoard.setTile(2, 2, tile, 'n');
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(TilesType.ROCKET, shipBoard.getTile(2, 2).getData().getType());
+        assertEquals('n', shipBoard.getOri(2, 2).getData());
 
         result = shipBoard.setTile(0, 2, tile, 'n');
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
     }
 
     @Test
@@ -39,14 +40,14 @@ class ShipBoardTest {
         Result<Tile> result;
 
         result = shipBoard.getTile(3, 2);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(TilesType.C_HOUSE, result.getData().getType());
 
         result = shipBoard.getTile(0, 0);
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
 
-        result = shipBoard.getTile(0, 1);
-        assertFalse(result.isAccepted());
+        result = shipBoard.getTile(-1, 0);
+        assertTrue(result.isErr());
     }
 
     @Test
@@ -58,19 +59,19 @@ class ShipBoardTest {
         Result<Tile> result;
 
         result = shipBoard.bookTile(tile1);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertTrue(shipBoard.getBooked().contains(tile1));
 
         result = shipBoard.bookTile(tile1);
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("already booked", result.getReason());
 
         result = shipBoard.bookTile(tile2);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertTrue(shipBoard.getBooked().contains(tile2));
 
         result = shipBoard.bookTile(tile3);
-        assertFalse(result.isAccepted());
+        assertTrue(result.isErr());
         assertEquals("booked tiles full", result.getReason());
     }
 
@@ -82,11 +83,11 @@ class ShipBoardTest {
         shipBoard.bookTile(tile);
         result = shipBoard.useBookedTile(tile, 'n',2, 2);
 
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertFalse(shipBoard.getBooked().contains(tile));
 
         result = shipBoard.getTile(2, 2);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(TilesType.ROCKET, result.getData().getType());
     }
 

@@ -62,7 +62,7 @@ public class GoodsBoard extends ElementsBoard{
     public Result<Integer> put(int x, int y, int qty) {
         Result<Tile> resTile = board.getTile(x, y);
 
-        if(!resTile.isAccepted())
+        if(!resTile.isOk())
             return new Result<>(false, null, resTile.getReason());
 
         TilesType tile = resTile.getData().getType();

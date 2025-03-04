@@ -35,19 +35,19 @@ class AstronautBoardTest {
     void testPut(){
         Result<Integer> result = astronaut.put(2, 2, 2);
 
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(2, astronaut.get(2, 2));
 
         result = astronaut.put(2, 2, 1);
-        assertFalse(result.isAccepted());
+        assertFalse(result.isOk());
         assertEquals("too many astronauts", result.getReason());
 
         result = astronaut.put(1, 2, 1);
-        assertFalse(result.isAccepted());
+        assertFalse(result.isOk());
         assertEquals("occupied by alien", result.getReason());
 
         result = astronaut.put(0, 2, 1);
-        assertFalse(result.isAccepted());
+        assertFalse(result.isOk());
         assertEquals("cant place here", result.getReason());
     }
 

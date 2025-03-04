@@ -22,21 +22,21 @@ class FlightBoardTest {
         RocketPawn rocket3 = RocketPawn.BLUE;
 
         Result<String> result1 = flightBoard.setRocketReady(rocket1);
-        assertTrue(result1.isAccepted());
+        assertTrue(result1.isOk());
         assertEquals("Rocket YELLOW is ready", result1.getData());
         assertEquals(6, findRocketPosition(rocket1));
 
        Result<String> result2 = flightBoard.setRocketReady(rocket2);
-       assertTrue(result2.isAccepted());
+       assertTrue(result2.isOk());
        assertEquals("Rocket RED is ready", result2.getData());
        assertEquals(3, findRocketPosition(rocket2));
 
        // duplicate
         Result<String> result3 = flightBoard.setRocketReady(rocket3);
-        assertTrue(result3.isAccepted());
+        assertTrue(result3.isOk());
 
         Result<String> result4 = flightBoard.setRocketReady(rocket3);
-        assertFalse(result4.isAccepted());
+        assertFalse(result4.isOk());
         assertEquals("Rocket is already on the board", result4.getReason());
 
     }
@@ -95,20 +95,19 @@ class FlightBoardTest {
 
         // rocket not on the board
         Result<Integer> result = flightBoard.getLaps(rocket1);
-        assertFalse(result.isAccepted());
-        assertNull(result.getData());
+        assertFalse(result.isOk());
         assertEquals("Rocket is not on the board", result.getReason());
 
         // zero laps
         flightBoard.setRocketReady(rocket1);
         Result<Integer> result1 = flightBoard.getLaps(rocket1);
-        assertTrue(result1.isAccepted());
+        assertTrue(result1.isOk());
         assertEquals(0, result1.getData());
 
         // multiple laps
         flightBoard.moveRocket(rocket1, 24);
         Result<Integer> result2 = flightBoard.getLaps(rocket1);
-        assertTrue(result2.isAccepted());
+        assertTrue(result2.isOk());
         assertEquals(1, result2.getData());
 
         //multiple rockets
@@ -117,9 +116,9 @@ class FlightBoardTest {
 
         Result<Integer> result3 = flightBoard.getLaps(rocket1);
         Result<Integer> result4 = flightBoard.getLaps(rocket2);
-        assertTrue(result3.isAccepted());
+        assertTrue(result3.isOk());
         assertEquals(1, result3.getData());
-        assertTrue(result4.isAccepted());
+        assertTrue(result4.isOk());
         assertEquals(1, result4.getData());
 
     }

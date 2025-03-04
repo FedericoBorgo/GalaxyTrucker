@@ -21,27 +21,27 @@ class BatteryBoardTest {
     @Test
     void testPut(){
         Result<Integer> result = batteries.put(2, 2, 2);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(2, batteries.get(2, 2));
 
         result = batteries.put(2, 2, 3);
-        assertFalse(result.isAccepted());
+        assertFalse(result.isOk());
         assertEquals("too many batteries", result.getReason());
 
         result = batteries.put(0, 2, 3);
-        assertFalse(result.isAccepted());
+        assertFalse(result.isOk());
         assertEquals("too many batteries", result.getReason());
 
         result = batteries.put(0, 2, 1);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(1, batteries.get(0, 2));
 
         result = batteries.put(0, 2, 1);
-        assertTrue(result.isAccepted());
+        assertTrue(result.isOk());
         assertEquals(2, batteries.get(0, 2));
 
         result = batteries.put(1, 2, 1);
-        assertFalse(result.isAccepted());
+        assertFalse(result.isOk());
         assertEquals("tile is not a Battery Tile", result.getReason());
     }
 

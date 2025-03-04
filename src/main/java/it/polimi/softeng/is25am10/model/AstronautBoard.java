@@ -10,7 +10,7 @@ public class AstronautBoard extends ElementsBoard{
         Result<Tile> resBoard = board.getTile(x, y);
 
         // out of bound
-        if(!resBoard.isAccepted())
+        if(!resBoard.isOk())
             return new Result<>(false, null, resBoard.getReason());
 
         TilesType type = resBoard.getData().getType();
