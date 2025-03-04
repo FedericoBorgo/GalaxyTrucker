@@ -1,14 +1,83 @@
 package it.polimi.softeng.is25am10.model;
 
+import java.util.*;
+
 public class GoodsBoard extends ElementsBoard{
-    public GoodsBoard(ShipBoard board) { super(board); }
-    @Override
-    public Result<Integer> put(int x, int y, int qty) {
-        return null;
+    private static final List<TilesType> BLUE_BOX;
+    private static final List<TilesType> RED_BOX;
+    private static final List<TilesType> YELLOW_BOX;
+    private static final List<TilesType> GREEN_BOX;
+    private static final Map<TilesType, Integer> MAX_VALUE;
+
+    private final char color;
+    private final List<TilesType> box;
+
+    static {
+        BLUE_BOX = new ArrayList<>();
+        RED_BOX = new ArrayList<>();
+        YELLOW_BOX = new ArrayList<>();
+        GREEN_BOX = new ArrayList<>();
+        MAX_VALUE = new HashMap<>();
+
+        BLUE_BOX.add(TilesType.B_BOX_3);
+        BLUE_BOX.add(TilesType.B_BOX_2);
+
+        RED_BOX.add(TilesType.R_BOX_1);
+        RED_BOX.add(TilesType.R_BOX_2);
+
+        YELLOW_BOX.add(TilesType.B_BOX_3);
+        YELLOW_BOX.add(TilesType.B_BOX_2);
+
+        GREEN_BOX.add(TilesType.R_BOX_1);
+        GREEN_BOX.add(TilesType.R_BOX_2);
+        GREEN_BOX.add(TilesType.B_BOX_3);
+        GREEN_BOX.add(TilesType.B_BOX_2);
+
+        MAX_VALUE.put(TilesType.B_BOX_2, 2);
+        MAX_VALUE.put(TilesType.B_BOX_3, 3);
+        MAX_VALUE.put(TilesType.R_BOX_1, 1);
+        MAX_VALUE.put(TilesType.R_BOX_2, 2);
+    }
+
+    public GoodsBoard(ShipBoard board, char color) { super(board);
+        this.color = color;
+        this.box = switch (color){
+            case 'r' -> RED_BOX;
+            case 'y' -> YELLOW_BOX;
+            case 'b' -> BLUE_BOX;
+            case 'g' -> GREEN_BOX;
+            default -> null;
+        };
+    }
+
+    private int getNBox(int x, int y){
+        int total = 0;
+
+        for(ElementsBoard b: other)
+            total += b.get(x, y);
+        return total;
     }
 
     @Override
-    public Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty) {
-        return null;
+    public Result<Integer> put(int x, int y, int qty) {
+        Result<Tile> resTile = board.getTile(x, y);
+
+        if(!resTile.isAccepted())
+            return new Result<>(false, null, resTile.getReason());
+
+        TilesType tile = resTile.getData().getType();
+
+        if(!box.contains(tile))
+            return new Result<>(false, null, "cant place here");
+
+        int sum = getNBox(x, y) + get(x, y) + qty;
+
+        if(sum > MAX_VALUE.get(tile))
+            return new Result<>(false, null, "too many boxes");
+
+        set(x, y, get(x, y) + qty);
+
+        return new Result<>(true, qty, null);
     }
+
 }

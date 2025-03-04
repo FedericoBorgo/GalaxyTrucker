@@ -20,10 +20,10 @@ public class Player {
         brownAlien = new AlienBoard(board, 'b');
         battery = new BatteryBoard(board);
         goods = new GoodsBoard[4];
-        goods[0] = new GoodsBoard(board);
-        goods[1] = new GoodsBoard(board);
-        goods[2] = new GoodsBoard(board);
-        goods[3] = new GoodsBoard(board);
+        goods[0] = new GoodsBoard(board, 'r');
+        goods[1] = new GoodsBoard(board, 'b');
+        goods[2] = new GoodsBoard(board, 'y');
+        goods[3] = new GoodsBoard(board, 'g');
     }
 
     public int getCash() {
