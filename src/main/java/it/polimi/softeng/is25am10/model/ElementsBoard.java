@@ -45,7 +45,6 @@ public abstract class ElementsBoard {
         if(value < qty)
             return new Result<>(false, null, "not enough items in board");
 
-        total -= qty;
         set(x, y, value - qty);
 
         return new Result<>(true, value - qty, null);

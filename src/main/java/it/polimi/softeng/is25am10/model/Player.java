@@ -16,8 +16,8 @@ public class Player {
         this.pawn = pawn;
         board = new ShipBoard();
         astronaut = new AstronautBoard(board);
-        purpleAlien = new AlienBoard(board);
-        brownAlien = new AlienBoard(board);
+        purpleAlien = new AlienBoard(board, 'p');
+        brownAlien = new AlienBoard(board, 'b');
         battery = new BatteryBoard(board);
         goods = new GoodsBoard[4];
         goods[0] = new GoodsBoard(board);
