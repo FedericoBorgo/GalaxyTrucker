@@ -5,20 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ElementsPlaceholder extends ElementsBoard {
-
-    public ElementsPlaceholder(ShipBoard board) {
-        super(board);
-    }
-
-    @Override
-    public Result<Integer> put(int x, int y, int qty) {
-        set(x, y, qty);
-        total += qty;
-        return new Result<>(true, qty, null);
-    }
-}
-
 
 class ElementsBoardTest {
     ElementsPlaceholder placeholder;
