@@ -6,6 +6,13 @@ public enum ConnectorType {
     UNIVERSAL,
     SMOOTH;
 
+    /**
+     * Converts a character into the corresponding {@code ConnectorType}.
+     *
+     * @param c the character to be converted, which represents a connector type.
+     * @return the {@code ConnectorType} corresponding to the specified character,
+     *         or {@code null} if the character does not match any valid connector type.
+     */
     public static ConnectorType fromChar(char c) {
         return switch (c) {
             case 'o' -> ONE_PIPE;
@@ -16,6 +23,11 @@ public enum ConnectorType {
         };
     }
 
+    /**
+     * Converts the current ConnectorType instance to its corresponding character.
+     *
+     * @return a character representing the ConnectorType:
+     */
     public char toChar() {
         return switch (this) {
             case ONE_PIPE -> 'o';

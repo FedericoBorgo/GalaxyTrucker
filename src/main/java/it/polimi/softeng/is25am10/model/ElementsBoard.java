@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ElementsBoard {
-    // Positions is a map storing how many units of a certain type are present in each tile (with defaultValue=0)
+    // Positions is a map storing how many units of a certain type
+    // are present in each tile (with defaultValue=0)
     protected final Map<Pair<Integer, Integer>, Integer> positions;
-    // Total stores the total number of units of a certain type are present on the board
+    // Total stores the total number of units of a certain type that are present on the board
     protected int total;
     // The matrix containing all the tiles (including empty spaces)
     protected final ShipBoard board;
@@ -23,9 +24,11 @@ public abstract class ElementsBoard {
         positions = new HashMap<>();
     }
     // Get methods
+
     public Map<Pair<Integer, Integer>, Integer> getPositions() {
         return positions;
     }
+
     public int getTotal() {
         return total;
     }
