@@ -2,6 +2,12 @@ package it.polimi.softeng.is25am10.model;
 
 import java.util.Arrays;
 
+/**
+ * Player is the class that models the game's participants and their state. It is identified by a nickname, it holds a pawn,
+ * game currency and ElementBoards that contain the different types of tiles that make up the ship
+ * and their position. A separate array is allotted for every type of good.
+ */
+
 public class Player {
     private final RocketPawn pawn;
     private String nickname;
@@ -13,6 +19,12 @@ public class Player {
     private final ElementsBoard battery;
     private final ElementsBoard[] goods;
 
+    /**
+     * Constructs a Player with the specified RocketPawn and nickname.
+     *
+     * @param pawn the RocketPawn associated with the player
+     * @param nickname the player's nickname
+     */
     public Player(RocketPawn pawn, String nickname) {
         this.nickname = nickname;
         this.pawn = pawn;
@@ -24,6 +36,7 @@ public class Player {
         battery = new BatteryBoard(board);
         goods = new GoodsBoard[4];
 
+        // a GoodsBoard for every type of good
         goods[0] = new GoodsBoard(board, 'r');
         goods[1] = new GoodsBoard(board, 'b');
         goods[2] = new GoodsBoard(board, 'y');
@@ -38,22 +51,47 @@ public class Player {
         goods[3].setOthers(Arrays.asList(goods[0], goods[1], goods[2]));
     }
 
+    /**
+     * Retrieves the current amount of cash the player has.
+     *
+     * @return the current cash amount as an integer
+     */
     public int getCash() {
         return cash;
     }
 
+    /**
+     * Retrieves the ShipBoard associated with the player.
+     *
+     * @return the ShipBoard instance linked to the player
+     */
     public ShipBoard getBoard() {
         return board;
     }
 
+    /**
+     * Retrieves the player's RocketPawn.
+     *
+     * @return the RocketPawn instance linked to the player
+     */
     public RocketPawn getPawn() {
         return pawn;
     }
 
+    /**
+     * Adds the specified amount of cash to the player's balance.
+     *
+     * @param amount the amount of cash to add.
+     */
     public void giveCash(int amount) {
         cash += amount;
     }
 
+    /**
+     * Sets the nickname of the player.
+     *
+     * @param nickname the nickname to be assigned
+     */
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
