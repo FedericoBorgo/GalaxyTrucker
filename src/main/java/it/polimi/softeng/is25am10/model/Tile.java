@@ -3,7 +3,8 @@ package it.polimi.softeng.is25am10.model;
 /**
  * Represents a tile used within the game structure. A tile has a specific type
  * identified by a {@code TilesType} and an array of four connectors described
- * by {@code ConnectorType}s.
+ * by {@code ConnectorType}s. The methods in this class reveal the nature of a tile: its type
+ * and the connectors that it exposes.
  */
 public class Tile {
     public static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");

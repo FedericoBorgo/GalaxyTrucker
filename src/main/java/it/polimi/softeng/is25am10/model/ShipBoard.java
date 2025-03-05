@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a ship board where tiles can be placed, booked, or trashed.
+ * ShipBoard Represents a ship board where tiles can be placed, booked, or trashed.
  * The ship board maintains a grid, restrictions on tile placement,
- * and the ability to manage tile states such as booking or using booked tiles.
+ * and the ability to manage tiles: it offers methods to place a tile, to get it, to read its orientation,
+ * to check if there are tiles nearby and to manage the booking process of tiles.
  */
 public class ShipBoard {
     // coordinates of unplaceable tiles

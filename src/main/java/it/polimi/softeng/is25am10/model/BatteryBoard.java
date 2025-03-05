@@ -1,5 +1,9 @@
 package it.polimi.softeng.is25am10.model;
 
+/**
+ * This class offers the capacity to change the number of units held in a battery tile.
+ */
+
 public class BatteryBoard extends ElementsBoard {
 
     public BatteryBoard(ShipBoard board) {

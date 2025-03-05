@@ -2,6 +2,14 @@ package it.polimi.softeng.is25am10.model;
 
 import java.util.NoSuchElementException;
 
+/**
+ * Result is basically an enhanced Optional. It is intended to be used as the type of
+ * the return value in many of the project's functions. It provides a boolean value to describe
+ * the type of answer, a reason to signal why some process failed and the data intended to be returned
+ * by the function.
+ *
+ */
+
 public class Result<T> {
     private final boolean ok;
     private final T data;
