@@ -118,7 +118,7 @@ public abstract class ElementsBoard {
         if(res.isErr())
             put(fromx, fromy, qty);
 
-        return res;
+        return Result.ok(qty);
     }
 
     /**

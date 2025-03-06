@@ -8,7 +8,7 @@ package it.polimi.softeng.is25am10.model;
  */
 public class Tile {
     public static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");
-    public static final Tile EMPY_TILE = new Tile(TilesType.EMPTY, "ssss");
+    public static final Tile EMPTY_TILE = new Tile(TilesType.EMPTY, "ssss");
 
     private TilesType type;
     private ConnectorType[] connectors;

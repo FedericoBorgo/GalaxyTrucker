@@ -40,12 +40,12 @@ public class TilesCollection {
     /**
      * Retrieves a new tile from the face-down tiles by taking the first one
      * in the {@code tiles} list and removing it from the list.
-     * Checks if the list is empty and returns an {@code EMPY_TILE} in that case.
-     * @return tile at the head of the list or {@code EMPY_TILE}
+     * Checks if the list is empty and returns an {@code EMPTY_TILE} in that case.
+     * @return tile at the head of the list or {@code EMPTY_TILE}
      */
     public Tile getNew(){
         if(tiles.isEmpty())
-            return Tile.EMPY_TILE;
+            return Tile.EMPTY_TILE;
 
         Tile tile = tiles.getFirst();
         tiles.removeFirst();
@@ -66,11 +66,11 @@ public class TilesCollection {
      * Uses remove method from the interface Collections.
      *
      * @param tile the tile to be retrieved from the seen list.
-     * @return parameter {@code tile} or {@code EMPY_LIST}.
+     * @return parameter {@code tile} or {@code EMPTY_LIST}.
      */
     public Tile getFromSeen(Tile tile){
         if(!seen.remove(tile))
-            return Tile.EMPY_TILE;
+            return Tile.EMPTY_TILE;
 
         return tile;
     }

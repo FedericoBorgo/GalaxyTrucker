@@ -32,7 +32,7 @@ public class ShipBoard {
     private final List<Tile> trashed;
 
     /**
-     * Initializes {@code ShipBoard} with {@code EMPY_TILE} and {@code WALL_TILE}
+     * Initializes {@code ShipBoard} with {@code EMPTY_TILE} and {@code WALL_TILE}
      * Places the Central housing unit on the board
      *
      */
@@ -45,7 +45,7 @@ public class ShipBoard {
         // fill with empty tiles (on which can be placed the game tiles)
         for(int i = 0; i < BOARD_WIDTH; i++)
             for(int j = 0; j < BOARD_HEIGHT; j++)
-                set(i, j, Tile.EMPY_TILE, 'n');
+                set(i, j, Tile.EMPTY_TILE, 'n');
 
         // fill the implacable spaces with WALL
         for(Pair<Integer, Integer> coord : WALL_POSITION)
@@ -56,13 +56,9 @@ public class ShipBoard {
     }
 
     //Places a tile at the specified coordinates on the board with a given orientation.
-    private boolean set(int x, int y, Tile tile, char ori){
-        if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
-            return false;
-
+    private void set(int x, int y, Tile tile, char ori){
         orientation[x][y] = ori;
         board[x][y] = tile;
-        return true;
     }
 
     // Retrieves a tile from the board at the specified coordinates.
@@ -88,7 +84,7 @@ public class ShipBoard {
 
         // check if at least one is not a wall or an empty space.
         for(Tile tile: around)
-            if(tile != null && tile != Tile.WALL_TILE && tile != Tile.EMPY_TILE)
+            if(tile != null && tile != Tile.WALL_TILE && tile != Tile.EMPTY_TILE)
                 return true;
 
         return false;
@@ -112,7 +108,7 @@ public class ShipBoard {
         if(result == null || result == Tile.WALL_TILE)
             return Result.err("cant place out of bound");
 
-        if(result != Tile.EMPY_TILE)
+        if(result != Tile.EMPTY_TILE)
             return Result.err("occupied tile");
 
         // is there a tile nearby?
