@@ -18,12 +18,12 @@ public class Tile {
      *
      * @param type the type of the tile, represented by a {@code TilesType} enum.
      * @param connectors a string representing the types of connectors on the tile.
-     *                   It is assumed to have a length of 4, with each character
-     *                   corresponding to a specific {@code ConnectorType}.
+     * It is assumed to have a length of 4, with each character corresponding
+     * to a specific {@code ConnectorType}.
      */
     public Tile(TilesType type, String connectors) {
         this.type = type;
-        this.connectors = new ConnectorType[4];//we have 4 types of connectors
+        this.connectors = new ConnectorType[4]; //we have 4 types of connectors
 
         for (int i = 0; i < connectors.length(); i++) {
             this.connectors[i] = ConnectorType.fromChar(connectors.charAt(i));

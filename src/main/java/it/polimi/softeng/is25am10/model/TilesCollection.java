@@ -2,10 +2,18 @@ package it.polimi.softeng.is25am10.model;
 
 import java.util.*;
 
+/**
+ * Represents the entire set of tiles used for one game.
+ * Stores the tiles in 2 lists: {@code tiles} for the face-down ones,
+ * {@code seen} for the face-up ones.
+ */
 public class TilesCollection {
     private final List<Tile> tiles;
     private final List<Tile> seen;
 
+    /**
+     * Creates a deck of tiles for a match and shuffles it.
+     */
     TilesCollection() {
         tiles = new ArrayList<>();
         seen = new ArrayList<>();
@@ -29,6 +37,12 @@ public class TilesCollection {
         Collections.shuffle(tiles);
     }
 
+    /**
+     * Retrieves a new tile from the face-down tiles by taking the first one
+     * in the {@code tiles} list and removing it from the list.
+     * Checks if the list is empty and returns an {@code EMPY_TILE} in that case.
+     * @return tile at the head of the list or {@code EMPY_TILE}
+     */
     public Tile getNew(){
         if(tiles.isEmpty())
             return Tile.EMPY_TILE;
@@ -39,10 +53,21 @@ public class TilesCollection {
         return tile;
     }
 
+    /**
+     * Retrieves the list containing all the face-up tiles.
+     * @return The seen list.
+     */
     public List<Tile> getSeen() {
         return seen;
     }
 
+    /**
+     * Retrieves a single tile from the face-up tiles, removing it from the face-up tiles.
+     * Uses remove method from the interface Collections.
+     *
+     * @param tile the tile to be retrieved from the seen list.
+     * @return parameter {@code tile} or {@code EMPY_LIST}.
+     */
     public Tile getFromSeen(Tile tile){
         if(!seen.remove(tile))
             return Tile.EMPY_TILE;
@@ -50,11 +75,16 @@ public class TilesCollection {
         return tile;
     }
 
+    /**
+     * Adds a tile to the face-up tiles.
+     * @param tile the tile to be added to the seen list.
+     */
     public void give(Tile tile){
         seen.add(tile);
     }
 
     /*
+        Initialization of all the tiles:
         The sides are stored in a clockwise order.
         "north-east-south-west"
      */
@@ -207,6 +237,7 @@ public class TilesCollection {
         new Tile(TilesType.R_BOX_1, "ttut"),
     };
 
+    // Alien add-ons for purple aliens
     private static Tile[] P_ADDON = new Tile[]{
         new Tile(TilesType.P_ADDON, "tstt"),
         new Tile(TilesType.P_ADDON, "ssut"),
@@ -216,6 +247,7 @@ public class TilesCollection {
         new Tile(TilesType.P_ADDON, "otst"),
     };
 
+    // Alien add-ons for brown aliens
     private static Tile[] B_ADDON = new Tile[]{
         new Tile(TilesType.B_ADDON, "sooo"),
         new Tile(TilesType.B_ADDON, "toso"),
@@ -225,6 +257,7 @@ public class TilesCollection {
         new Tile(TilesType.B_ADDON, "ssus"),
     };
 
+    // Power centers with 3 slots
     private static Tile[] BATTERY_3 = new Tile[]{
         new Tile(TilesType.BATTERY_3, "sost"),
         new Tile(TilesType.BATTERY_3, "toss"),
@@ -234,6 +267,7 @@ public class TilesCollection {
         new Tile(TilesType.BATTERY_3, "otso"),
     };
 
+    // Power centers with 2 slots
     private static Tile[] BATTERY_2 = new Tile[]{
         new Tile(TilesType.BATTERY_2, "otsu"),
         new Tile(TilesType.BATTERY_2, "ussu"),

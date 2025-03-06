@@ -11,6 +11,7 @@ public class BatteryBoard extends ElementsBoard {
     }
 
     /**
+     * Places a specified quantity {@code qty} of batteries at the given coordinates on the board.
      * The method verifies that the tile can hold batteries and ensures
      * the quantity does not exceed the allowed limit based on the tile's type.
      *
