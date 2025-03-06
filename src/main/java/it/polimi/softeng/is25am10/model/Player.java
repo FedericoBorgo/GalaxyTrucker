@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.model;
 import java.util.Arrays;
 
 /**
+ * TO BE CHECKED
  * Player is the class that models the game's participants and their state. It is identified by a nickname, it holds a pawn,
  * game currency and ElementBoards that contain the different types of tiles that make up the ship
  * and their position. A separate array is allotted for every type of good.

@@ -1,8 +1,8 @@
 package it.polimi.softeng.is25am10.model;
 
 /**
- * Represents the different types of Rocket Pawns that players can choose
- * in the game. Each constant signifies either a unique color or the empty state.
+ * Enumerates the different rocket pawns which can be used by the player.
+ * Includes an {@code EMPTY} value.
  */
 
 public enum RocketPawn {

@@ -3,6 +3,9 @@ package it.polimi.softeng.is25am10.model;
 import java.util.*;
 import java.util.ArrayList;
 
+/**
+ * AWAITING REVISION
+ */
 public class AlienBoard extends ElementsBoard{
     private final TilesType type;
 

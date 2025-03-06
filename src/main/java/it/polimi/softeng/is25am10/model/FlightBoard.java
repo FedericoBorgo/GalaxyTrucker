@@ -3,6 +3,9 @@ package it.polimi.softeng.is25am10.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TO BE WRITTEN
+ */
 public class FlightBoard {
     private int timer;
     private final Card[][] visible;

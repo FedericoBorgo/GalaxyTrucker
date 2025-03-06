@@ -1,5 +1,8 @@
 package it.polimi.softeng.is25am10.model;
 
+/**
+ * AWAITING REVISION
+ */
 public class AstronautBoard extends ElementsBoard{
     public AstronautBoard(ShipBoard board) {
         super(board);

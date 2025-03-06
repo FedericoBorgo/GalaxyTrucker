@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ShipBoard Represents a ship board where tiles can be placed, booked, or trashed.
- * The ship board maintains a grid, restrictions on tile placement,
- * and the ability to manage tiles: it offers methods to place a tile, to get it, to read its orientation,
- * to check if there are tiles nearby and to manage the booking process of tiles.
+ * ShipBoard Represents a ship board where tiles can be placed, booked, (or trashed).
+ * It offers methods to place a tile, to get it, to read its orientation,
+ * to manage the booking process of tiles (and to manage trashed tiles). To be added.
  */
 public class ShipBoard {
     // coordinates of unplaceable tiles
@@ -33,17 +32,9 @@ public class ShipBoard {
     private final List<Tile> trashed;
 
     /**
-     * Initializes a new instance of the ShipBoard class, representing the game board.
+     * Initializes {@code ShipBoard} with {@code EMPY_TILE} and {@code WALL_TILE}
+     * Places the Central housing unit on the board
      *
-     * The board is initialized with a predefined BOARD_WIDTH and BOARD_HEIGHT.
-     * Each tile on the board is initially set to an
-     * empty tile with a neutral orientation ('n'). Any implacable spaces are filled
-     * with wall tiles based on the WALL_POSITION configuration.
-     *
-     * The constructor also reserves space for trashed and booked tiles, represented
-     * as separate ArrayLists. It also sets the starting configuration of the board by placing a
-     * specific tile (TilesType.C_HOUSE) at a designated position with a neutral
-     * orientation.
      */
     public ShipBoard(){
         board = new Tile[BOARD_WIDTH][BOARD_HEIGHT];
@@ -51,11 +42,12 @@ public class ShipBoard {
         trashed = new ArrayList<>();
         booked = new ArrayList<>();
 
+        // fill with empty tiles (on which can be placed the game tiles)
         for(int i = 0; i < BOARD_WIDTH; i++)
             for(int j = 0; j < BOARD_HEIGHT; j++)
                 set(i, j, Tile.EMPY_TILE, 'n');
 
-        // fill the implacable spaces with WALL, the other are empty
+        // fill the implacable spaces with WALL
         for(Pair<Integer, Integer> coord : WALL_POSITION)
             set(coord.getKey(), coord.getValue(), Tile.WALL_TILE, ' ');
 
@@ -63,15 +55,7 @@ public class ShipBoard {
         set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"), 'n');
     }
 
-    /**
-     * Places a tile at the specified coordinates on the board with a given orientation.
-     *
-     * @param x the x-coordinate where the tile is to be placed
-     * @param y the y-coordinate where the tile is to be placed
-     * @param tile the tile to be placed
-     * @param ori the orientation of the tile
-     * @return true if the tile placement was successful, false otherwise (out fo bound)
-     */
+    //Places a tile at the specified coordinates on the board with a given orientation.
     private boolean set(int x, int y, Tile tile, char ori){
         if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
             return false;
@@ -81,14 +65,8 @@ public class ShipBoard {
         return true;
     }
 
-    /**
-     * Retrieves a tile from the board at the specified coordinates.
-     * If the specified coordinates are out of bounds, returns null.
-     *
-     * @param x the x-coordinate of the tile to retrieve
-     * @param y the y-coordinate of the tile to retrieve
-     * @return the tile located at the specified coordinates, or null if out of bounds
-     */
+    // Retrieves a tile from the board at the specified coordinates.
+    // If the specified coordinates are out of bounds, returns null.
     private Tile get(int x, int y){
         if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
             return null;
@@ -96,15 +74,9 @@ public class ShipBoard {
         return board[x][y];
     }
 
-    /**
-     * Checks if there is at least one tile adjacent to the specified position
-     * that is not a wall or an empty space.
-     *
-     * @param x the x-coordinate of the position to check
-     * @param y the y-coordinate of the position to check
-     * @return true if there is at least one adjacent tile that is not a wall
-     *         or an empty space, otherwise false
-     */
+
+    // Checks if there is at least one tile adjacent to the specified position
+    // that is not a wall or an empty space.
     private boolean checkNear(int x, int y){
         List<Tile> around = new ArrayList<>();
 
@@ -124,7 +96,8 @@ public class ShipBoard {
 
     /**
      * Attempts to place a tile at the specified coordinates on the board with a given orientation.
-     * Ensures the placement is valid based on the board's constraints and adjacency rules.
+     * Checks if the target position is valid (not out of bound), if the position is free and
+     * if there are tiles nearby (tiles can't be placed in the void, they need an adjacent tile).
      *
      * @param x the x-coordinate where the tile is to be placed
      * @param y the y-coordinate where the tile is to be placed
@@ -184,15 +157,15 @@ public class ShipBoard {
     }
 
     /**
-     * Attempts to book a tile for later use. A tile can only be booked if there is
-     * capacity available and the tile is not already booked.
+     * Attempts to book a tile for later use. A maximum of 2 tiles can stay booked
+     * at the same time.
+     * Checks if there is space left (less than 2 booked tiles) and if {@code t} is not already booked.
      *
      * @param t the tile to be booked
      * @return a {@code Result} containing the booked tile if successful, or an error
      *         {@code Result} with a message explaining why the booking failed
      */
-    public Result<Tile> bookTile(Tile t){
-        // check if there is space left and if its not already present
+    public Result<Tile> bookTile(Tile t) {
         if(booked.size() >= 2)
             return Result.err("booked tiles full");
 
@@ -204,9 +177,10 @@ public class ShipBoard {
     }
 
     /**
-     * Attempts to use a booked tile by placing it on the board at the specified
+     * Attempts to use a booked tile {@code t} by placing it on the board at the specified
      * coordinates with the given orientation. If the tile is successfully placed,
      * it is removed from the booked tiles list.
+     * Checks if {@code t} is in the booked list using the contains method in the Collections interface.
      *
      * @param t   the tile to be placed
      * @param ori the orientation of the tile

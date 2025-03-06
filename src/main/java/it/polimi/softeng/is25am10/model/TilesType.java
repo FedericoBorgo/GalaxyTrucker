@@ -1,6 +1,8 @@
 package it.polimi.softeng.is25am10.model;
 
-//This class enumerates the types of tiles.
+/**
+ * This class enumerates the types of tiles.
+ */
 public enum TilesType {
     PIPES,
     DRILLS,

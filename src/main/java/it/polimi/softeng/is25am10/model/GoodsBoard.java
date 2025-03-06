@@ -2,6 +2,9 @@ package it.polimi.softeng.is25am10.model;
 
 import java.util.*;
 
+/**
+ * TO BE WRITTEN
+ */
 public class GoodsBoard extends ElementsBoard{
     private static final List<TilesType> BLUE_BOX;
     private static final List<TilesType> RED_BOX;

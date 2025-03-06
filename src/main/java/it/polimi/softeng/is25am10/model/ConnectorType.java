@@ -1,7 +1,7 @@
 package it.polimi.softeng.is25am10.model;
 
 /**
- * This class provides an interface to dela with the tile's connectors and check their type.
+ * This class provides an interface to deal with the tile's connectors and check their type.
  */
 
 public enum ConnectorType {

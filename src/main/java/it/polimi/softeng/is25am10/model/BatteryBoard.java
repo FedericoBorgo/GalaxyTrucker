@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model;
 
 /**
+ * TO BE CHECKED
  * This class offers the capacity to change the number of units held in a battery tile.
  */
 
