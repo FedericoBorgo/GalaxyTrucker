@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.ArrayList;
 
 /**
- * AWAITING REVISION
+ * This class offers the capacity to change the number of aliens held on a tile
  */
 public class AlienBoard extends ElementsBoard{
     private final TilesType type;
@@ -37,7 +37,10 @@ public class AlienBoard extends ElementsBoard{
     }
 
     /**
-     * Places an amount of aliens on the specified coordinates of the board if the placement conditions are met.
+     * Places a specified quantity {@code qty} of aliens at the given coordinates on the board.
+     * The method verifies that the tile can hold aliens and ensures the quantity does not exceed
+     * the allowed limit (1), while also checking for the presence of other aliens or astronauts on this
+     * tile through the {@code other} list.
      *
      * @param x the x-coordinate on the board where the entity is to be placed
      * @param y the y-coordinate on the board where the entity is to be placed

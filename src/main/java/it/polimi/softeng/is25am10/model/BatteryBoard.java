@@ -1,7 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
 /**
- * TO BE CHECKED
  * This class offers the capacity to change the number of units held in a battery tile.
  */
 
@@ -12,6 +11,7 @@ public class BatteryBoard extends ElementsBoard {
     }
 
     /**
+     * Places a specified quantity {@code qty} of batteries at the given coordinates on the board.
      * The method verifies that the tile can hold batteries and ensures
      * the quantity does not exceed the allowed limit based on the tile's type.
      *

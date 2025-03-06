@@ -3,9 +3,8 @@ package it.polimi.softeng.is25am10.model;
 import java.util.ArrayList;
 
 /**
- * TO BE CHECKED
- * Match is a class that models the game being played. It stores the player, the game's flightboard
- * and the collection of tiles that can be placed on the spaceships.
+ * Stores all the information of a single game including the players and all their data,
+ * the tiles for that game and the flightboard.
  */
 
 public class Match {
