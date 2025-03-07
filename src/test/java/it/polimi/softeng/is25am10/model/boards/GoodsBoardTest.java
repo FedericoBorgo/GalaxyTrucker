@@ -1,5 +1,8 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,13 +12,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GoodsBoardTest {
-    ShipBoard board;
+    TilesBoard board;
     GoodsBoard blockRed;
     List<ElementsBoard> other;
 
     @BeforeEach
     void setUp() {
-        board = new ShipBoard();
+        board = new TilesBoard();
         board.setTile(2, 2, new Tile(TilesType.B_BOX_3, "uuuu"), 'n');
         board.setTile(1, 2, new Tile(TilesType.R_BOX_1, "uuuu"), 'n');
 

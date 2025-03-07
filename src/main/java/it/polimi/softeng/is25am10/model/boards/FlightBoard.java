@@ -1,4 +1,7 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
+
+import it.polimi.softeng.is25am10.model.Card;
+import it.polimi.softeng.is25am10.model.RocketPawn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ public class FlightBoard {
 
     private final List<RocketPawn> order;
     private final List<Integer> offset;
+    //TODO make max 24
     private int leaderPosition;
 
     // Constructor method
@@ -33,6 +37,7 @@ public class FlightBoard {
      * @param pawn The pawn to be added
      */
     public void setRocketReady(RocketPawn pawn) {
+        //TODO the player can chose which position
         int[] OFFSET = {0, -3, -5, -6};
         order.addLast(pawn);
         offset.addLast(OFFSET[offset.size()]);

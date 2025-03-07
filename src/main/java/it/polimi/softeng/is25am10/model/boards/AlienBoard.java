@@ -1,4 +1,8 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
+
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
 
 import java.util.*;
 import java.util.ArrayList;
@@ -9,7 +13,7 @@ import java.util.ArrayList;
 public class AlienBoard extends ElementsBoard{
     private final TilesType type;
 
-    public AlienBoard(ShipBoard board, char alienType) {
+    public AlienBoard(TilesBoard board, char alienType) {
         super(board);
         this.type = alienType == 'p'? TilesType.P_ADDON : TilesType.B_ADDON;
     }

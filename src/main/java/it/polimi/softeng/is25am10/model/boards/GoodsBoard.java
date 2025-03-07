@@ -1,4 +1,8 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
+
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
 
 import java.util.*;
 
@@ -42,7 +46,7 @@ public class GoodsBoard extends ElementsBoard{
         MAX_VALUE.put(TilesType.R_BOX_2, 2);
     }
 
-    public GoodsBoard(ShipBoard board, char color) { super(board);
+    public GoodsBoard(TilesBoard board, char color) { super(board);
         this.box = switch (color){
             case 'r' -> RED_BOX;
             case 'y' -> YELLOW_BOX;

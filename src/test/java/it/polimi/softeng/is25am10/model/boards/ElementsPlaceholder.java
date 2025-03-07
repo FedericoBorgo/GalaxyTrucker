@@ -1,8 +1,10 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
+
+import it.polimi.softeng.is25am10.model.Result;
 
 class ElementsPlaceholder extends ElementsBoard {
 
-    public ElementsPlaceholder(ShipBoard board) {
+    public ElementsPlaceholder(TilesBoard board) {
         super(board);
     }
 

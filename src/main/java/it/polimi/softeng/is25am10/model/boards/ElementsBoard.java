@@ -1,5 +1,6 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Result;
 import javafx.util.Pair;
 
 import java.util.HashMap;
@@ -16,15 +17,15 @@ public abstract class ElementsBoard {
     protected final Map<Pair<Integer, Integer>, Integer> positions;
     protected int total;
     // The matrix containing all the tiles (including empty spaces); board is associated with a specific player
-    protected final ShipBoard board;
+    protected final TilesBoard board;
     // List of other boards containing units which interact with the units we are working on
     protected List<ElementsBoard> other;
 
     /**
      * Constructor method that can be used in the subclasses.
-     * @param board The ShipBoard of a certain player
+     * @param board The TilesBoard of a certain player
      */
-    public ElementsBoard(ShipBoard board) {
+    public ElementsBoard(TilesBoard board) {
         this.board = board;
         total = 0;
         positions = new HashMap<>();

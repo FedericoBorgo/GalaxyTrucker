@@ -1,5 +1,7 @@
 package it.polimi.softeng.is25am10.model;
 
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+
 import java.util.ArrayList;
 
 /**

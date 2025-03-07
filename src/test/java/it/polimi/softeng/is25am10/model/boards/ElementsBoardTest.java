@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ class ElementsBoardTest {
 
     @BeforeEach
     void setUp() {
-        placeholder = new ElementsPlaceholder(new ShipBoard());
+        placeholder = new ElementsPlaceholder(new TilesBoard());
     }
 
     @Test

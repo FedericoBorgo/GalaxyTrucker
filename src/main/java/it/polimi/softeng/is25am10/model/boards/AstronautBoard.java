@@ -1,10 +1,14 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
+
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
 
 /**
  * This class offers the capacity to change the number of astronauts held on a tile
  */
 public class AstronautBoard extends ElementsBoard{
-    public AstronautBoard(ShipBoard board) {
+    public AstronautBoard(TilesBoard board) {
         super(board);
     }
 

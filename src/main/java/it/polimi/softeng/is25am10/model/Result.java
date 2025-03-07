@@ -66,7 +66,7 @@ public class Result<T> {
      * @param reason the reason or message explaining the error
      * @return a {@code Result} instance marked as an error with the provided reason
      */
-    static <T> Result<T> err(String reason){
+    public static <T> Result<T> err(String reason){
         return new Result<>(false, null, reason);
     }
 
@@ -76,7 +76,7 @@ public class Result<T> {
      * @param data the data {@code T} to be included in the successful result
      * @return a {@code Result} instance marked as successful with the provided data
      */
-    static <T> Result<T> ok(T data){
+    public static <T> Result<T> ok(T data){
         return new Result<>(true, data, null);
     }
 }

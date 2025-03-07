@@ -1,16 +1,19 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ShipBoard Represents a ship board where tiles can be placed, booked, (or trashed).
+ * TilesBoard Represents a ship board where tiles can be placed, booked, (or trashed).
  * It offers methods to place a tile, to get it, to read its orientation,
  * to manage the booking process of tiles (and to manage trashed tiles). To be added.
  */
-public class ShipBoard {
+public class TilesBoard {
     // coordinates of unplaceable tiles
     private static final Pair<Integer, Integer>[] WALL_POSITION = new Pair[]{
             new Pair<>(0, 0),
@@ -32,11 +35,11 @@ public class ShipBoard {
     private final List<Tile> trashed;
 
     /**
-     * Initializes {@code ShipBoard} with {@code EMPTY_TILE} and {@code WALL_TILE}
+     * Initializes {@code TilesBoard} with {@code EMPTY_TILE} and {@code WALL_TILE}
      * Places the Central housing unit on the board
      *
      */
-    public ShipBoard(){
+    public TilesBoard(){
         board = new Tile[BOARD_WIDTH][BOARD_HEIGHT];
         orientation = new char[BOARD_WIDTH][BOARD_HEIGHT];
         trashed = new ArrayList<>();

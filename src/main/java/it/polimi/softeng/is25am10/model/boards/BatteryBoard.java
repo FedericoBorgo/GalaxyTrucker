@@ -1,4 +1,8 @@
-package it.polimi.softeng.is25am10.model;
+package it.polimi.softeng.is25am10.model.boards;
+
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
 
 /**
  * This class offers the capacity to change the number of units held in a battery tile.
@@ -6,7 +10,7 @@ package it.polimi.softeng.is25am10.model;
 
 public class BatteryBoard extends ElementsBoard {
 
-    public BatteryBoard(ShipBoard board) {
+    public BatteryBoard(TilesBoard board) {
         super(board);
     }
 
@@ -24,7 +28,7 @@ public class BatteryBoard extends ElementsBoard {
     @Override
     public Result<Integer> put(int x, int y, int qty) {
 
-        // Get Tile from ShipBoard and do an out-of-bound check
+        // Get Tile from TilesBoard and do an out-of-bound check
         Result<Tile> res = board.getTile(x, y);
         if(res.isErr())
             return Result.err(res.getReason());
