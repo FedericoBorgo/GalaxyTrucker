@@ -21,20 +21,20 @@ class TilesBoardTest {
         Tile tile = new Tile(TilesType.ROCKET, "otus");
         Result<Tile> result;
 
-        result = tilesBoard.setTile(3, 2, tile, 'n');
+        result = tilesBoard.setTile(3, 2, tile, 0);
         assertTrue(result.isErr());
         assertEquals("occupied tile", result.getReason());
 
-        result = tilesBoard.setTile(0, 0, tile, 'n');
+        result = tilesBoard.setTile(0, 0, tile, 0);
         assertTrue(result.isErr());
         assertEquals("cant place out of bound", result.getReason());
 
-        result = tilesBoard.setTile(2, 2, tile, 'n');
+        result = tilesBoard.setTile(2, 2, tile, 0);
         assertTrue(result.isOk());
         assertEquals(TilesType.ROCKET, tilesBoard.getTile(2, 2).getData().getType());
-        assertEquals('n', tilesBoard.getOri(2, 2).getData());
+        assertEquals(0, tilesBoard.getOri(2, 2).getData());
 
-        result = tilesBoard.setTile(0, 2, tile, 'n');
+        result = tilesBoard.setTile(0, 2, tile, 0);
         assertTrue(result.isErr());
     }
 
@@ -84,7 +84,7 @@ class TilesBoardTest {
         Result<Tile> result;
 
         tilesBoard.bookTile(tile);
-        result = tilesBoard.useBookedTile(tile, 'n',2, 2);
+        result = tilesBoard.useBookedTile(tile, 0,2, 2);
 
         assertTrue(result.isOk());
         assertFalse(tilesBoard.getBooked().contains(tile));
@@ -92,6 +92,20 @@ class TilesBoardTest {
         result = tilesBoard.getTile(2, 2);
         assertTrue(result.isOk());
         assertEquals(TilesType.ROCKET, result.getData().getType());
+    }
+
+    @Test
+    void testIsOk(){
+        tilesBoard.setTile(2, 2, new Tile(TilesType.HOUSE, "uuuu"), 0);
+        assertTrue(tilesBoard.isOK());
+        tilesBoard.setTile(1, 2, new Tile(TilesType.HOUSE, "suuu"), 1);
+        assertFalse(tilesBoard.isOK());
+        tilesBoard.remove(1, 2);
+        tilesBoard.setTile(2, 1, new Tile(TilesType.HOUSE, "osss"), 2);
+        assertTrue(tilesBoard.isOK());
+        tilesBoard.remove(2, 1);
+        tilesBoard.setTile(2, 1, new Tile(TilesType.HOUSE, "osss"), 1);
+        assertFalse(tilesBoard.isOK());
     }
 
 }

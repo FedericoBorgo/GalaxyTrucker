@@ -1,5 +1,9 @@
 package it.polimi.softeng.is25am10.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Represents a tile used within the game structure. A tile has a specific type
  * identified by a {@code TilesType} and an array of four connectors described
@@ -46,5 +50,32 @@ public class Tile {
      */
     public ConnectorType[] getConnectors() {
         return connectors;
+    }
+
+    /**
+     * Get the side of a tile rotated clockwise n times.
+     *
+     * @param t the tile
+     * @param rotation the number of rotation to make before getting the side
+     * @param side the side to get
+     * @return the rotated side
+     */
+    static public ConnectorType getSide(Tile t, int rotation, int side){
+        List<ConnectorType> connectors = new ArrayList<>(Arrays.asList(t.getConnectors()));
+
+        for(int i = 0; i < rotation; i++)
+            connectors.addFirst(connectors.removeLast());
+
+        return connectors.get(side);
+    }
+
+    /**
+     * Check if a tile is not a placeholder.
+     *
+     * @param t the tile to check
+     * @return  true if its real false if its placeholder
+     */
+    static public boolean real(Tile t){
+        return t.type != TilesType.WALL && t.type != TilesType.EMPTY;
     }
 }

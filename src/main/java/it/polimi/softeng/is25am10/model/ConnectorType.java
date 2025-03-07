@@ -40,5 +40,31 @@ public enum ConnectorType {
             case SMOOTH -> 's';
         };
     }
+
+    /**
+     * Check if two connector are compatible.
+     *
+     * @param other
+     * @return
+     */
+    public boolean connectable(ConnectorType other){
+        if(this == SMOOTH){
+            return other == SMOOTH;
+        }
+
+        if(other == SMOOTH){
+            return false;
+        }
+
+        if(this == UNIVERSAL || other == UNIVERSAL){
+            return true;
+        }
+
+        if(this == ONE_PIPE && other == ONE_PIPE){
+            return true;
+        }
+
+        return this == TWO_PIPE && other == TWO_PIPE;
+    }
 }
 
