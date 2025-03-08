@@ -78,4 +78,13 @@ public class Tile {
     static public boolean real(Tile t){
         return t.type != TilesType.WALL && t.type != TilesType.EMPTY;
     }
+
+    static public boolean rocket(Tile t){
+        return t.type == TilesType.ROCKET || t.type == TilesType.D_ROCKET;
+    }
+
+    static public boolean drills(Tile t){
+        return t.type == TilesType.DRILLS || t.type == TilesType.D_DRILLS;
+    }
 }
+

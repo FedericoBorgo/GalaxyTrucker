@@ -3,8 +3,12 @@ package it.polimi.softeng.is25am10.model.boards;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.TilesType;
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,17 +99,46 @@ class TilesBoardTest {
     }
 
     @Test
-    void testIsOk(){
-        tilesBoard.setTile(2, 2, new Tile(TilesType.HOUSE, "uuuu"), 0);
-        assertTrue(tilesBoard.isOK());
-        tilesBoard.setTile(1, 2, new Tile(TilesType.HOUSE, "suuu"), 1);
-        assertFalse(tilesBoard.isOK());
-        tilesBoard.remove(1, 2);
-        tilesBoard.setTile(2, 1, new Tile(TilesType.HOUSE, "osss"), 2);
-        assertTrue(tilesBoard.isOK());
-        tilesBoard.remove(2, 1);
-        tilesBoard.setTile(2, 1, new Tile(TilesType.HOUSE, "osss"), 1);
-        assertFalse(tilesBoard.isOK());
+    void testDrillsRocket(){
+        tilesBoard.setTile(3, 1, new Tile(TilesType.DRILLS, "sstu"), 3);
+        tilesBoard.setTile(3, 3, new Tile(TilesType.ROCKET, "suss"), 3);
+
+        tilesBoard.setTile(2, 2, new Tile(TilesType.PIPES, "tusu"), 0);
+        tilesBoard.setTile(2, 1, new Tile(TilesType.D_DRILLS, "sssu"), 3);
+        tilesBoard.setTile(2, 3, new Tile(TilesType.SHIELD, "ssou"), 0);
+        tilesBoard.setTile(2, 4, new Tile(TilesType.ROCKET, "otst"), 0);
+
+        tilesBoard.setTile(1, 2, new Tile(TilesType.BATTERY_2, "otot"), 0);
+        tilesBoard.setTile(1, 3, new Tile(TilesType.D_ROCKET, "uoss"), 0);
+        tilesBoard.setTile(1, 4, new Tile(TilesType.P_ADDON, "sttt"), 0);
+
+        tilesBoard.setTile(0, 2, new Tile(TilesType.DRILLS, "stuo"), 0);
+        tilesBoard.setTile(0, 3, new Tile(TilesType.B_BOX_2, "usos"), 0);
+        tilesBoard.setTile(0, 4, new Tile(TilesType.PIPES, "ouou"), 0);
+
+        Set<Pair<Integer, Integer>> result = tilesBoard.isOK();
+        assertFalse(result.isEmpty());
+        assertTrue(result.contains(new Pair<>(3, 1)));
+        assertTrue(result.contains(new Pair<>(3, 3)));
+        assertTrue(result.contains(new Pair<>(1, 3)));
+    }
+
+    @Test
+    void testConnectors(){
+        tilesBoard.setTile(3, 1, new Tile(TilesType.DRILLS, "stuo"), 0);
+        tilesBoard.setTile(3, 3, new Tile(TilesType.PIPES, "tusu"), 0);
+
+        tilesBoard.setTile(2, 2, new Tile(TilesType.B_BOX_2, "usos"), 0);
+        tilesBoard.setTile(2, 3, new Tile(TilesType.ROCKET, "otst"), 0);
+
+        tilesBoard.setTile(4, 1, new Tile(TilesType.PIPES, "uouo"), 0);
+        tilesBoard.setTile(4, 2, new Tile(TilesType.P_ADDON, "tstt"), 0);
+        tilesBoard.setTile(4, 3, new Tile(TilesType.DRILLS, "sstu"), 1);
+
+        Set<Pair<Integer, Integer>> result = tilesBoard.isOK();
+        assertFalse(result.isEmpty());
+        assertTrue(result.contains(new Pair<>(3, 1)));
+        assertTrue(result.contains(new Pair<>(2, 2)));
     }
 
 }

@@ -6,10 +6,10 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.TilesType;
 import javafx.util.Pair;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * TilesBoard Represents a ship board where tiles can be placed, booked, (or trashed).
@@ -71,7 +71,7 @@ public class TilesBoard {
     // If the specified coordinates are out of bounds, returns null.
     private Tile get(int x, int y){
         if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
-            return null;
+            return Tile.WALL_TILE;
 
         return board[x][y];
     }
@@ -228,9 +228,41 @@ public class TilesBoard {
     /**
      * Check if the board is a correct board.
      *
-     * @return true if its correctly connected, false if not.
+     * @return the set of wrong tiles at the specified coordinate
      */
-    public boolean isOK(){
+    public Set<Pair<Integer, Integer>> isOK(){
+        Set<Pair<Integer, Integer>> result  = new HashSet<>();
+        checkConnectors(result);
+        checkTiles(result);
+
+        return result;
+    }
+
+    private void checkTiles(Set<Pair<Integer, Integer>> result){
+        for(int i = 0; i < BOARD_WIDTH; i++) {
+            for (int j = 0; j < BOARD_HEIGHT; j++) {
+                if(Tile.rocket(board[i][j])){
+                    if(orientation[i][j] != 0 || Tile.real(get(i, j+1)))
+                        result.add(new Pair<>(i, j));
+                }
+                else if(Tile.drills(board[i][j])){
+                    Tile t = switch(orientation[i][j]){
+                        case 0 -> get(i, j-1);
+                        case 1 -> get(i+1, j);
+                        case 2 -> get(i, j+1);
+                        case 3 -> get(i-1, j);
+                        default -> throw new IllegalStateException("Unexpected value: " + orientation[i][j]);
+                    };
+
+                    if(Tile.real(t))
+                        result.add(new Pair<>(i, j));
+                }
+            }
+        }
+    }
+
+
+    private void checkConnectors(Set<Pair<Integer, Integer>> result){
         ConnectorType upper;
         ConnectorType lower;
         ConnectorType left;
@@ -243,7 +275,7 @@ public class TilesBoard {
                     lower = Tile.getSide(board[i][j+1], orientation[i][j+1], 0);
 
                     if(!upper.connectable(lower))
-                        return false;
+                        result.add(new Pair<>(i, j));
                 }
             }
         }
@@ -255,13 +287,9 @@ public class TilesBoard {
                     right = Tile.getSide(board[j+1][i], orientation[j+1][i], 3);
 
                     if(!left.connectable(right))
-                        return false;
+                        result.add(new Pair<>(j, i));
                 }
             }
         }
-
-        //TODO check rockets and drills.
-
-        return true;
     }
 }
