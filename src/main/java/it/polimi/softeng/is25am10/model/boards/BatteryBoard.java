@@ -14,39 +14,10 @@ public class BatteryBoard extends ElementsBoard {
         super(board);
     }
 
-    /**
-     * Places a specified quantity {@code qty} of batteries at the given coordinates on the board.
-     * The method verifies that the tile can hold batteries and ensures
-     * the quantity does not exceed the allowed limit based on the tile's type.
-     *
-     * @param x the x-coordinate of the tile where the batteries are to be added
-     * @param y the y-coordinate of the tile where the batteries are to be added
-     * @param qty the quantity of batteries to place on the tile
-     * @return a Result containing the updated total number of batteries at the specified location
-     *         if the operation is successful, or an error result if the operation fails
-     */
     @Override
-    public Result<Integer> put(int x, int y, int qty) {
-
-        // Get Tile from TilesBoard and do an out-of-bound check
-        Result<Tile> res = board.getTile(x, y);
-        if(res.isErr())
-            return Result.err(res.getReason());
-
-        Tile tile = board.getTile(x, y).getData();
-
-        // Check tile type
-        if(tile.getType() != TilesType.BATTERY_2 && tile.getType() != TilesType.BATTERY_3)
-            return Result.err("tile is not a Battery Tile");
-
-        // Add batteries
-        int nBatteries = get(x, y) + qty;
-        int max = tile.getType() == TilesType.BATTERY_2 ? 2 : 3;
-        // Check qty to be added
-        if (nBatteries > max)
-            return Result.err("too many batteries");
-
-        set(x, y, qty + get(x, y));
-        return Result.ok(nBatteries);
+    public boolean check(int x, int y, int qty) {
+        Tile t = board.getTile(x, y).getData();
+        return Tile.battery(t) &&
+                (qty + get(x, y) <= (t.getType() == TilesType.BATTERY_2 ? 2 : 3));
     }
 }

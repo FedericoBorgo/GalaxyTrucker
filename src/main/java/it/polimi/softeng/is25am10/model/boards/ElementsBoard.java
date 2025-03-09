@@ -1,8 +1,10 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
 import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,7 @@ public abstract class ElementsBoard {
         this.board = board;
         total = 0;
         positions = new HashMap<>();
+        other = new ArrayList<>();
     }
     // Get methods
 
@@ -132,8 +135,52 @@ public abstract class ElementsBoard {
     }
 
     /**
+     * Remove all the qty in a list of positions. If some remove fails, undo
+     * all the changes and return err.
+     *
+     * @param positions the list of the coordinates and qty
+     * @return
+     */
+    public Result<Integer> remove(List<Pair<Pair<Integer, Integer>, Integer>> positions) {
+        int i;
+        Pair<Pair<Integer, Integer>, Integer> val;
+        Result<Integer> res = Result.ok(0);
+        int x, y, qty;
+        int total = 0;
+
+        for(i = 0; i < positions.size(); i++){
+            val = positions.get(i);
+            x = val.getKey().getKey();
+            y = val.getKey().getValue();
+            qty = val.getValue();
+
+            res = remove(x, y, qty);
+
+            if(res.isErr())
+                break;
+
+            total += qty;
+        }
+
+        if(res.isErr()){
+            for(int j = 0; j < i; j++){
+                val = positions.get(i);
+                x = val.getKey().getKey();
+                y = val.getKey().getValue();
+                qty = val.getValue();
+
+                set(x, y, qty + get(x, y));
+            }
+
+            return Result.err("unable to remove all the qty");
+        }
+
+        return Result.ok(total);
+    }
+
+    /**
      * Adds a number {@code qty} of units to the tile specified though the coordinates {@code x}
-     * and {@code y}. The method is implemented in the subclasses.
+     * and {@code y}.
      * Result.data should not be accessed.
      * @param x the x-coordinate of the tile to retrieve
      * @param y the y-coordinate of the tile to retrieve
@@ -141,5 +188,43 @@ public abstract class ElementsBoard {
      * @return a successful {@code Result} or an error {@code Result} with a message explaining
      * why the operation failed
      */
-    public abstract Result<Integer> put(int x, int y, int qty);
+    public Result<Integer> put(int x, int y, int qty){
+        Result<Tile> resBoard = board.getTile(x, y);
+
+        // out of bound
+        if(resBoard.isErr())
+            return Result.err(resBoard.getReason());
+
+        for(ElementsBoard b: other)
+            if(b.get(x, y) > 0)
+                return Result.err("occupied by others");
+
+        if(!check(x, y, qty))
+            return Result.err("cant place here");
+
+        set(x, y, get(x, y) + qty);
+        return Result.ok(get(x, y));
+    }
+
+
+    /**
+     * Remove all the illegals elements in a board.
+     *
+     * @return the list f removed elements
+     */
+    public List<Pair<Integer, Integer>> removeIllegals() {
+        List<Pair<Integer, Integer>> toRemove = new ArrayList<>();
+        positions.forEach((pair, qty) -> {
+            int x = pair.getKey();
+            int y = pair.getValue();
+
+            if(!check(x, y, 0))
+                toRemove.add(pair);
+        });
+
+        toRemove.forEach(positions::remove);
+        return toRemove;
+    }
+
+    public abstract boolean check(int x, int y, int qty);
 }

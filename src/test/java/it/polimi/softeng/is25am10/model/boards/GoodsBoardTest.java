@@ -38,7 +38,7 @@ class GoodsBoardTest {
 
         res = blockRed.put(2, 2, 1);
         assertTrue(res.isErr());
-        assertEquals("cant place here", res.getReason());
+        assertEquals("occupied by others", res.getReason());
         assertEquals(0, blockRed.get(2, 2));
 
         res = blockRed.put(1, 2, 1);

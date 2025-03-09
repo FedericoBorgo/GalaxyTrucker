@@ -48,11 +48,11 @@ class AstronautBoardTest {
 
         result = astronaut.put(2, 2, 1);
         assertTrue(result.isErr());
-        assertEquals("too many astronauts", result.getReason());
+        assertEquals("cant place here", result.getReason());
 
         result = astronaut.put(1, 2, 1);
         assertTrue(result.isErr());
-        assertEquals("occupied by alien", result.getReason());
+        assertEquals("occupied by others", result.getReason());
 
         result = astronaut.put(0, 2, 1);
         assertTrue(result.isErr());

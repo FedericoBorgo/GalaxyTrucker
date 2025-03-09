@@ -86,5 +86,13 @@ public class Tile {
     static public boolean drills(Tile t){
         return t.type == TilesType.DRILLS || t.type == TilesType.D_DRILLS;
     }
+
+    static public boolean house(Tile t){
+        return t.type == TilesType.HOUSE || t.type == TilesType.C_HOUSE;
+    }
+
+    static public boolean battery(Tile t){
+        return t.type == TilesType.BATTERY_2 || t.type == TilesType.BATTERY_3;
+    }
 }
 
