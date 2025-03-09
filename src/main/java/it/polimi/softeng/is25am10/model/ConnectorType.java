@@ -23,7 +23,7 @@ public enum ConnectorType {
             case 't' -> TWO_PIPE;
             case 'u' -> UNIVERSAL;
             case 's' -> SMOOTH;
-            default -> null; // Should never come here
+            default -> throw new IllegalStateException("Unexpected ConnectorType "+ c);
         };
     }
 

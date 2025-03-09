@@ -141,4 +141,24 @@ class TilesBoardTest {
         assertTrue(result.contains(new Pair<>(2, 2)));
     }
 
+    @Test
+    void testUnreachable(){
+        tilesBoard.setTile(2, 2, new Tile(TilesType.DRILLS, "suso"), 0);
+
+        tilesBoard.setTile(1, 2, new Tile(TilesType.HOUSE, "ouos"), 0);
+        tilesBoard.setTile(1, 1, new Tile(TilesType.DRILLS, "ssos"), 0);
+        tilesBoard.setTile(1, 3, new Tile(TilesType.ROCKET, "osss"), 0);
+
+        tilesBoard.setTile(3, 3, new Tile(TilesType.R_BOX_1, "tutt"), 0);
+
+        tilesBoard.setTile(4, 2, new Tile(TilesType.BATTERY_2, "ssut"), 0);
+        tilesBoard.setTile(4, 3, new Tile(TilesType.ROCKET, "ossu"), 0);
+
+        tilesBoard.remove(2, 2);
+
+        Set<Pair<Integer, Integer>> result = tilesBoard.isOK();
+        assertFalse(result.isEmpty());
+        assertTrue(result.contains(new Pair<>(-1, -1)));
+    }
+
 }

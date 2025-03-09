@@ -1,13 +1,21 @@
 package it.polimi.softeng.is25am10.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TilesCollectionTest {
+    TilesCollection tilesCollection;
+
+    @BeforeEach
+    void setUp() {
+        tilesCollection = new TilesCollection();
+    }
+
+
     @Test
     void testDraw() {
-        TilesCollection tilesCollection = new TilesCollection();
         Tile tile1 = tilesCollection.getNew();
         assertNotNull(tile1);
         assertNotSame(Tile.EMPTY_TILE, tile1);
@@ -15,8 +23,6 @@ class TilesCollectionTest {
 
     @Test
     void testSeen(){
-        TilesCollection tilesCollection = new TilesCollection();
-
         Tile tile1 = tilesCollection.getFromSeen(new Tile(TilesType.HOUSE, "uuuu"));
         assertEquals(Tile.EMPTY_TILE, tile1);
         tilesCollection.give(tile1);

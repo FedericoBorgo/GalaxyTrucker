@@ -6,10 +6,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.TilesType;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TilesBoard Represents a ship board where tiles can be placed, booked, (or trashed).
@@ -32,8 +29,8 @@ public class TilesBoard {
     public static final int BOARD_WIDTH = 7;
     public static final int BOARD_HEIGHT = 5;
 
-    private Tile[][] board;
-    private int[][] orientation;
+    private final Tile[][] board;
+    private final int[][] orientation;
     private final List<Tile> booked;
     private final List<Tile> trashed;
 
@@ -227,6 +224,9 @@ public class TilesBoard {
 
     /**
      * Check if the board is a correct board.
+     * The combination Pair(-1, -1) in the return means
+     * that the board contains disconnected groups of tiles.
+     * The player must choose one by removing the tiles.
      *
      * @return the set of wrong tiles at the specified coordinate
      */
@@ -234,8 +234,59 @@ public class TilesBoard {
         Set<Pair<Integer, Integer>> result  = new HashSet<>();
         checkConnectors(result);
         checkTiles(result);
-
+        checkUnreachable(result);
         return result;
+    }
+
+    /**
+     * From a specified coordinate, if the corresponding tiles is already
+     * seen do nothing. Otherwise it marks and seen and call itself around
+     * the tile.
+     *
+     * @param marked
+     * @param x
+     * @param y
+     */
+    private void mark(boolean[][] marked, int x, int y){
+        if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
+            return;
+
+        if(marked[x][y] || !Tile.real(board[x][y]))
+            return;
+
+        marked[x][y] = true;
+
+        mark(marked, x-1, y);
+        mark(marked, x+1, y);
+        mark(marked, x, y-1);
+        mark(marked, x, y+1);
+    }
+
+    private void checkUnreachable(Set<Pair<Integer, Integer>> result){
+        boolean[][] marked = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
+        boolean found = false;
+
+        for(boolean[] m: marked)
+            Arrays.fill(m, false);
+
+        for(int i = 0; i < BOARD_WIDTH && !found; i++) {
+            for (int j = 0; j < BOARD_HEIGHT && !found; j++){
+                if(Tile.real(board[i][j])){
+                    found = true;
+                    mark(marked, i, j);
+                }
+            }
+        }
+
+        found = false;
+        for(int i = 0; i < BOARD_WIDTH && !found; i++) {
+            for (int j = 0; j < BOARD_HEIGHT && !found; j++) {
+                if(Tile.real(board[i][j]) && !marked[i][j]){
+                    found = true;
+                    result.add(new Pair<>(-1, -1));
+                }
+            }
+        }
     }
 
     private void checkTiles(Set<Pair<Integer, Integer>> result){
