@@ -226,5 +226,14 @@ public abstract class ElementsBoard {
         return toRemove;
     }
 
+    /**
+     * Check if a quantity is placeable in a specified coordinate.
+     * This depends on the specified pawn. The check is implemented in
+     * subclasses.
+     * @param x
+     * @param y
+     * @param qty
+     * @return
+     */
     public abstract boolean check(int x, int y, int qty);
 }
