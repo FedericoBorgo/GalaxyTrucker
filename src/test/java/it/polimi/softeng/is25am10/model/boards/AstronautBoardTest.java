@@ -19,12 +19,12 @@ class AstronautBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
-        board.setTile(2, 2, new Tile(TilesType.HOUSE, "uuuu"), 'n');
-        board.setTile(1, 2, new Tile(TilesType.HOUSE, "uuuu"), 'n');
-        board.setTile(0, 2, new Tile(TilesType.ROCKET, "uuuu"), 'n');
+        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(1, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(TilesType.ROCKET, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder alien = new ElementsPlaceholder(board);
-        alien.set(1, 2, 1);
+        alien.set(new Coordinate(1, 2), 1);
 
         other = new ArrayList<>();
         other.add(alien);
@@ -36,25 +36,25 @@ class AstronautBoardTest {
 
     @Test
     void testPutGet(){
-        Result<Integer> result = astronaut.put(2, 2, 2);
+        Result<Integer> result = astronaut.put(new Coordinate(2, 2), 2);
         assertTrue(result.isOk());
-        assertEquals(2, astronaut.get(2, 2));
+        assertEquals(2, astronaut.get(new Coordinate(2, 2)));
 
-        result = astronaut.put(3, 2, 2);
+        result = astronaut.put(new Coordinate(3, 2), 2);
         assertTrue(result.isOk());
-        assertEquals(2, astronaut.get(2, 2));
+        assertEquals(2, astronaut.get(new Coordinate(2, 2)));
 
         assertEquals(4, astronaut.getTotal());
 
-        result = astronaut.put(2, 2, 1);
+        result = astronaut.put(new Coordinate(2, 2), 1);
         assertTrue(result.isErr());
         assertEquals("cant place here", result.getReason());
 
-        result = astronaut.put(1, 2, 1);
+        result = astronaut.put(new Coordinate(1, 2), 1);
         assertTrue(result.isErr());
         assertEquals("occupied by others", result.getReason());
 
-        result = astronaut.put(0, 2, 1);
+        result = astronaut.put(new Coordinate(0, 2), 1);
         assertTrue(result.isErr());
         assertEquals("cant place here", result.getReason());
     }

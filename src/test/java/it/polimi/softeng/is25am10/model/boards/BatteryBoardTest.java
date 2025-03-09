@@ -15,35 +15,35 @@ class BatteryBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
-        board.setTile(2, 2, new Tile(TilesType.BATTERY_3, "uuuu"), 'n');
-        board.setTile(1, 2, new Tile(TilesType.HOUSE, "uuuu"), 'n');
-        board.setTile(0, 2, new Tile(TilesType.BATTERY_2, "uuuu"), 'n');
+        board.setTile(new Coordinate(2, 2), new Tile(TilesType.BATTERY_3, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(1, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(TilesType.BATTERY_2, "uuuu"), Tile.Rotation.NONE);
         batteries = new BatteryBoard(board);
     }
 
     @Test
     void testPut(){
-        Result<Integer> res = batteries.put(2, 2, 2);
+        Result<Integer> res = batteries.put(new Coordinate(2, 2), 2);
         assertTrue(res.isOk());
-        assertEquals(2, batteries.get(2, 2));
+        assertEquals(2, batteries.get(new Coordinate(2, 2)));
 
-        res = batteries.put(2, 2, 3);
+        res = batteries.put(new Coordinate(2, 2), 3);
         assertTrue(res.isErr());
         assertEquals("cant place here", res.getReason());
 
-        res = batteries.put(0, 2, 3);
+        res = batteries.put(new Coordinate(0, 2), 3);
         assertTrue(res.isErr());
         assertEquals("cant place here", res.getReason());
 
-        res = batteries.put(0, 2, 1);
+        res = batteries.put(new Coordinate(0, 2), 1);
         assertTrue(res.isOk());
-        assertEquals(1, batteries.get(0, 2));
+        assertEquals(1, batteries.get(new Coordinate(0, 2)));
 
-        res = batteries.put(0, 2, 1);
+        res = batteries.put(new Coordinate(0, 2), 1);
         assertTrue(res.isOk());
-        assertEquals(2, batteries.get(0, 2));
+        assertEquals(2, batteries.get(new Coordinate(0, 2)));
 
-        res = batteries.put(1, 2, 1);
+        res = batteries.put(new Coordinate(1, 2), 1);
         assertTrue(res.isErr());
         assertEquals("cant place here", res.getReason());
     }

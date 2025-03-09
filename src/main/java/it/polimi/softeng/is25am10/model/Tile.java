@@ -1,8 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a tile used within the game structure. A tile has a specific type
@@ -11,11 +9,20 @@ import java.util.List;
  * and the connectors that it exposes.
  */
 public class Tile {
+    public enum Side{
+        UP, RIGHT, DOWN, LEFT;
+        public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
+    }
+
+    public enum Rotation{
+        CLOCK, INV, DOUBLE, NONE;
+    }
+
     public static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");
     public static final Tile EMPTY_TILE = new Tile(TilesType.EMPTY, "ssss");
 
-    private TilesType type;
-    private ConnectorType[] connectors;
+    private final TilesType type;
+    private final Map<Side, ConnectorType> connectors;
 
     /**
      * Constructs a Tile with a specified type and connector configuration.
@@ -27,11 +34,13 @@ public class Tile {
      */
     public Tile(TilesType type, String connectors) {
         this.type = type;
-        this.connectors = new ConnectorType[4]; //we have 4 types of connectors
+        HashMap<Side, ConnectorType> map = new HashMap<>();
 
-        for (int i = 0; i < connectors.length(); i++) {
-            this.connectors[i] = ConnectorType.fromChar(connectors.charAt(i));
-        }
+        Arrays.stream(Side.order).forEach(side -> {
+            map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal())));
+        });
+
+        this.connectors = Collections.unmodifiableMap(map);
     }
 
     /**
@@ -46,9 +55,9 @@ public class Tile {
     /**
      * Retrieves the array of connector types associated with the tile.
      *
-     * @return an array of {@code ConnectorType} representing the connectors of the tile.
+     * @return The map of {@code ConnectorType} representing the connectors of the tile.
      */
-    public ConnectorType[] getConnectors() {
+    public Map<Side, ConnectorType> getConnectors() {
         return connectors;
     }
 
@@ -60,13 +69,32 @@ public class Tile {
      * @param side the side to get
      * @return the rotated side
      */
-    static public ConnectorType getSide(Tile t, int rotation, int side){
-        List<ConnectorType> connectors = new ArrayList<>(Arrays.asList(t.getConnectors()));
+    static public ConnectorType getSide(Tile t, Rotation rotation, Side side){
+        HashMap<Side, ConnectorType> map = new HashMap<>(t.connectors);
+        ConnectorType temp;
 
-        for(int i = 0; i < rotation; i++)
-            connectors.addFirst(connectors.removeLast());
+        if(rotation == Rotation.DOUBLE){
+            temp = map.get(Side.UP);
+            map.put(Side.UP, map.get(Side.DOWN));
+            map.put(Side.DOWN, temp);
+            temp = map.get(Side.LEFT);
+            map.put(Side.LEFT, map.get(Side.RIGHT));
+            map.put(Side.RIGHT, temp);
+        } else if (rotation == Rotation.CLOCK) {
+            temp = map.get(Side.UP);
+            map.put(Side.UP, map.get(Side.LEFT));
+            map.put(Side.LEFT, map.get(Side.DOWN));
+            map.put(Side.DOWN, map.get(Side.RIGHT));
+            map.put(Side.RIGHT, temp);
+        } else if (rotation == Rotation.INV) {
+            temp = map.get(Side.UP);
+            map.put(Side.UP, map.get(Side.RIGHT));
+            map.put(Side.RIGHT, map.get(Side.DOWN));
+            map.put(Side.DOWN, map.get(Side.LEFT));
+            map.put(Side.LEFT, temp);
+        }
 
-        return connectors.get(side);
+        return map.get(side);
     }
 
     /**

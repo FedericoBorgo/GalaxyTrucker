@@ -16,7 +16,7 @@ import java.util.Map;
  * removing units or moving units between tiles.
  */
 public abstract class ElementsBoard {
-    protected final Map<Pair<Integer, Integer>, Integer> positions;
+    protected final Map<Coordinate, Integer> positions;
     protected int total;
     // The matrix containing all the tiles (including empty spaces); board is associated with a specific player
     protected final TilesBoard board;
@@ -40,7 +40,7 @@ public abstract class ElementsBoard {
      * are present in each tile (with defaultValue=0 for each tile)
      * @return {@code positions}
      */
-    public Map<Pair<Integer, Integer>, Integer> getPositions() {
+    public Map<Coordinate, Integer> getPositions() {
         return positions;
     }
 
@@ -55,25 +55,23 @@ public abstract class ElementsBoard {
     /**
      * Retrieves the number of units on a certain tile, specified though the coordinates {@code x} and {@code y}.
      * Uses the method getOrDefault of the Map class.
-     * @param x the x-coordinate of the tile to retrieve
-     * @param y the y-coordinate of the tile to retrieve
+     * @param c
      * @return number of units on a certain tile
      */
-    public int get(int x, int y){
-        return positions.getOrDefault(new Pair<>(x, y), 0);
+    public int get(Coordinate c){
+        return positions.getOrDefault(c, 0);
     }
 
     /**
      * Sets the number of units on a certain tile, specified though the coordinates
      * {@code x} and {@code y} to {@code value}. It modifies the total number of units based
      * on the previous number of units on that tile.
-     * @param x the x-coordinate of the tile to retrieve
-     * @param y the y-coordinate of the tile to retrieve
+     * @param c
      * @param value the new number of units on the tile
      */
-    protected void set(int x, int y, int value) {
-        total += (value - get(x, y));
-        positions.put(new Pair<>(x, y), value);
+    protected void set(Coordinate c, int value) {
+        total += (value - get(c));
+        positions.put(c, value);
     }
 
     // Remove units from a position
@@ -82,19 +80,18 @@ public abstract class ElementsBoard {
      * Removes units from a certain tile, specified though the coordinates {@code x}
      * and {@code y}, by the quantity {@code qty}. Uses the get and set methods from this class.
      * Checks if there are enough units to be removed on the tile
-     * @param x the x-coordinate of the tile to retrieve
-     * @param y the y-coordinate of the tile to retrieve
+     * @param c
      * @param qty the number of units to be removed from the tile.
      * @return a {@code Result} containing the number of units remaining on the tile,
      * or an error {@code Result} with a message explaining why the operation failed
      */
-    public Result<Integer> remove(int x, int y, int qty){
-        int value = get(x, y);
+    public Result<Integer> remove(Coordinate c, int qty){
+        int value = get(c);
 
         if(value < qty)
             return Result.err("not enough items in board");
 
-        set(x, y, value - qty);
+        set(c, value - qty);
 
         return Result.ok(value - qty);
     }
@@ -103,24 +100,22 @@ public abstract class ElementsBoard {
      * Move units from one position to another. Does not change the total number of units on the board.
      * Uses the remove and put method from this class. Put is implemented in the subclasses.
      * Result.data should not be accessed.
-     * @param fromx the x-coordinate of the tile the units are from
-     * @param fromy the y-coordinate of the tile the units are from
-     * @param tox the x-coordinate of the tile the units are being moved to
-     * @param toy the y-coordinate of the tile the units are being moved to
+     * @param fromc
+     * @param toc
      * @param qty the number of units being moved
      * @return a successful {@code Result} or an error {@code Result} with a message explaining
      * why the operation failed
      */
-    public Result<Integer> move(int fromx, int fromy, int tox, int toy, int qty) {
-        Result<Integer> res = remove(fromx, fromy, qty);
+    public Result<Integer> move(Coordinate fromc, Coordinate toc, int qty) {
+        Result<Integer> res = remove(fromc, qty);
 
         if(res.isErr())
             return res;
 
-        res = put(tox, toy, qty);
+        res = put(toc, qty);
 
         if(res.isErr())
-            put(fromx, fromy, qty);
+            put(fromc, qty);
 
         return Result.ok(qty);
     }
@@ -141,20 +136,18 @@ public abstract class ElementsBoard {
      * @param positions the list of the coordinates and qty
      * @return
      */
-    public Result<Integer> remove(List<Pair<Pair<Integer, Integer>, Integer>> positions) {
+    public Result<Integer> remove(List<Pair<Coordinate, Integer>> positions) {
         int i;
-        Pair<Pair<Integer, Integer>, Integer> val;
+        Pair<Coordinate, Integer> val;
         Result<Integer> res = Result.ok(0);
-        int x, y, qty;
+        int qty;
         int total = 0;
 
         for(i = 0; i < positions.size(); i++){
             val = positions.get(i);
-            x = val.getKey().getKey();
-            y = val.getKey().getValue();
             qty = val.getValue();
 
-            res = remove(x, y, qty);
+            res = remove(val.getKey(), qty);
 
             if(res.isErr())
                 break;
@@ -165,11 +158,9 @@ public abstract class ElementsBoard {
         if(res.isErr()){
             for(int j = 0; j < i; j++){
                 val = positions.get(i);
-                x = val.getKey().getKey();
-                y = val.getKey().getValue();
                 qty = val.getValue();
 
-                set(x, y, qty + get(x, y));
+                set(val.getKey(), qty + get(val.getKey()));
             }
 
             return Result.err("unable to remove all the qty");
@@ -182,28 +173,27 @@ public abstract class ElementsBoard {
      * Adds a number {@code qty} of units to the tile specified though the coordinates {@code x}
      * and {@code y}.
      * Result.data should not be accessed.
-     * @param x the x-coordinate of the tile to retrieve
-     * @param y the y-coordinate of the tile to retrieve
+     * @param c
      * @param qty the number of units to be added to the tile
      * @return a successful {@code Result} or an error {@code Result} with a message explaining
      * why the operation failed
      */
-    public Result<Integer> put(int x, int y, int qty){
-        Result<Tile> resBoard = board.getTile(x, y);
+    public Result<Integer> put(Coordinate c, int qty){
+        Result<Tile> resBoard = board.getTile(c);
 
         // out of bound
         if(resBoard.isErr())
             return Result.err(resBoard.getReason());
 
         for(ElementsBoard b: other)
-            if(b.get(x, y) > 0)
+            if(b.get(c) > 0)
                 return Result.err("occupied by others");
 
-        if(!check(x, y, qty))
+        if(!check(c, qty))
             return Result.err("cant place here");
 
-        set(x, y, get(x, y) + qty);
-        return Result.ok(get(x, y));
+        set(c, get(c) + qty);
+        return Result.ok(get(c));
     }
 
 
@@ -212,14 +202,12 @@ public abstract class ElementsBoard {
      *
      * @return the list f removed elements
      */
-    public List<Pair<Integer, Integer>> removeIllegals() {
-        List<Pair<Integer, Integer>> toRemove = new ArrayList<>();
-        positions.forEach((pair, qty) -> {
-            int x = pair.getKey();
-            int y = pair.getValue();
+    public List<Coordinate> removeIllegals() {
+        List<Coordinate> toRemove = new ArrayList<>();
+        positions.forEach((c, qty) -> {
 
-            if(!check(x, y, 0))
-                toRemove.add(pair);
+            if(!check(c, 0))
+                toRemove.add(c);
         });
 
         toRemove.forEach(positions::remove);
@@ -230,10 +218,9 @@ public abstract class ElementsBoard {
      * Check if a quantity is placeable in a specified coordinate.
      * This depends on the specified pawn. The check is implemented in
      * subclasses.
-     * @param x
-     * @param y
+     * @param c
      * @param qty
      * @return
      */
-    public abstract boolean check(int x, int y, int qty);
+    public abstract boolean check(Coordinate c, int qty);
 }

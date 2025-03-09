@@ -2,6 +2,8 @@ package it.polimi.softeng.is25am10.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TileTest {
@@ -11,10 +13,10 @@ class TileTest {
 
         assertEquals(TilesType.ROCKET, tile.getType());
 
-        ConnectorType[] connectors = tile.getConnectors();
-        assertEquals(ConnectorType.SMOOTH, connectors[0] );
-        assertEquals(ConnectorType.UNIVERSAL, connectors[1] );
-        assertEquals(ConnectorType.TWO_PIPE, connectors[2] );
-        assertEquals(ConnectorType.ONE_PIPE, connectors[3] );
+        Map<Tile.Side, ConnectorType> connectors = tile.getConnectors();
+        assertEquals(ConnectorType.SMOOTH, connectors.get(Tile.Side.UP));
+        assertEquals(ConnectorType.UNIVERSAL, connectors.get(Tile.Side.RIGHT));
+        assertEquals(ConnectorType.TWO_PIPE, connectors.get(Tile.Side.DOWN));
+        assertEquals(ConnectorType.ONE_PIPE, connectors.get(Tile.Side.LEFT));
     }
 }

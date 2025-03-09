@@ -57,17 +57,17 @@ public class GoodsBoard extends ElementsBoard{
     }
 
     // Returns the number of boxes of other colors on this tile
-    private int getNBox(int x, int y){
+    private int getNBox(Coordinate c){
         int total = 0;
 
         for(ElementsBoard b: other)
-            total += b.get(x, y);
+            total += b.get(c);
         return total;
     }
 
     @Override
-    public boolean check(int x, int y, int qty) {
-        TilesType tile = board.getTile(x,y).getData().getType();
-        return box.contains(tile) && (getNBox(x, y) + get(x, y) + qty) <= MAX_VALUE.get(tile);
+    public boolean check(Coordinate c, int qty) {
+        TilesType tile = board.getTile(c).getData().getType();
+        return box.contains(tile) && (getNBox(c) + get(c) + qty) <= MAX_VALUE.get(tile);
     }
 }
