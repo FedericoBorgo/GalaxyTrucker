@@ -1,17 +1,24 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesType;
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 class ElementsBoardTest {
     ElementsPlaceholder placeholder;
+    TilesBoard board;
 
     @BeforeEach
     void setUp() {
-        placeholder = new ElementsPlaceholder(new TilesBoard());
+        board = new TilesBoard();
+        placeholder = new ElementsPlaceholder(board);
     }
 
     @Test
@@ -40,5 +47,12 @@ class ElementsBoardTest {
         assertEquals(10, placeholder.getTotal());
     }
 
-
+    @Test
+    void testRemoveIllegals(){
+        board.setTile(2, 2, new Tile(TilesType.HOUSE, "uuuu"), 0);
+        placeholder.put(2, 2, 10);
+        board.remove(2, 2);
+        List<Pair<Integer, Integer>> res = placeholder.removeIllegals();
+        assertTrue(res.contains(new Pair<>(2, 2)));
+    }
 }

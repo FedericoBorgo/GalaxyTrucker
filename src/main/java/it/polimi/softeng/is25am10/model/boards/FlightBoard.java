@@ -17,7 +17,6 @@ public class FlightBoard {
 
     private final List<RocketPawn> order;
     private final List<Integer> offset;
-    //TODO make max 24
     private int leaderPosition;
 
     // Constructor method
@@ -85,6 +84,7 @@ public class FlightBoard {
         int shift = offset.getFirst();
         offset.replaceAll(val -> val - shift);
         leaderPosition += shift;
+        leaderPosition %= 24;
     }
 
     private static <T> void swap(int x, int y, List <T> list) {

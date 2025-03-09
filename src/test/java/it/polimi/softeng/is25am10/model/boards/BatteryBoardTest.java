@@ -29,11 +29,11 @@ class BatteryBoardTest {
 
         res = batteries.put(2, 2, 3);
         assertTrue(res.isErr());
-        assertEquals("too many batteries", res.getReason());
+        assertEquals("cant place here", res.getReason());
 
         res = batteries.put(0, 2, 3);
         assertTrue(res.isErr());
-        assertEquals("too many batteries", res.getReason());
+        assertEquals("cant place here", res.getReason());
 
         res = batteries.put(0, 2, 1);
         assertTrue(res.isOk());
@@ -45,7 +45,7 @@ class BatteryBoardTest {
 
         res = batteries.put(1, 2, 1);
         assertTrue(res.isErr());
-        assertEquals("tile is not a Battery Tile", res.getReason());
+        assertEquals("cant place here", res.getReason());
     }
 
 }

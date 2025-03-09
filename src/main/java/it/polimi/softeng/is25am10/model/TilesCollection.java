@@ -182,7 +182,7 @@ public class TilesCollection {
     };
 
     private static Tile[] HOUSE = new Tile[]{
-        new Tile(TilesType.HOUSE, "sowo"),
+        new Tile(TilesType.HOUSE, "soto"),
         new Tile(TilesType.HOUSE, "toto"),
         new Tile(TilesType.HOUSE, "stot"),
         new Tile(TilesType.HOUSE, "stus"),

@@ -40,42 +40,9 @@ public class AlienBoard extends ElementsBoard{
         return false;
     }
 
-    /**
-     * Places a specified quantity {@code qty} of aliens at the given coordinates on the board.
-     * The method verifies that the tile can hold aliens and ensures the quantity does not exceed
-     * the allowed limit (1), while also checking for the presence of other aliens or astronauts on this
-     * tile through the {@code other} list.
-     *
-     * @param x the x-coordinate on the board where the entity is to be placed
-     * @param y the y-coordinate on the board where the entity is to be placed
-     * @param qty the quantity of the entity to be placed at the specified coordinates
-     * @return a {@code Result<Integer>} object indicating success (1) or failure with a relevant error message
-     */
     @Override
-    public Result<Integer> put(int x, int y, int qty) {
-        Result<Tile> res = board.getTile(x, y);
-
-        // out of bound
-        if(res.isErr())
-            return Result.err(res.getReason());
-
-        // not a house
-        if(res.getData().getType() != TilesType.HOUSE)
-            return Result.err("cant place in not a house");
-
-        if(!thereIsAddon(x, y))
-            return Result.err("there is not addon");
-
-        // is there another alien or astronaut?
-        for(ElementsBoard b: other)
-            if(b.get(x, y) > 0)
-                return Result.err("occupied");
-
-        // is an alien already there? or, are there too many aliens?
-        if(get(x, y) > 0 || qty > 1)
-            return Result.err("too many aliens");
-
-        set(x, y, 1);
-        return Result.ok(1);
+    public boolean check(int x, int y, int qty) {
+        return board.getTile(x, y).getData().getType() == TilesType.HOUSE
+                && thereIsAddon(x, y) && qty <= 1 && (get(x, y) + qty <= 1);
     }
 }

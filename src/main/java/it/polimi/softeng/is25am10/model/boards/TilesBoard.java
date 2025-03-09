@@ -1,12 +1,12 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.ConnectorType;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.TilesType;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * TilesBoard Represents a ship board where tiles can be placed, booked, (or trashed).
@@ -29,8 +29,8 @@ public class TilesBoard {
     public static final int BOARD_WIDTH = 7;
     public static final int BOARD_HEIGHT = 5;
 
-    private Tile[][] board;
-    private char[][] orientation;
+    private final Tile[][] board;
+    private final int[][] orientation;
     private final List<Tile> booked;
     private final List<Tile> trashed;
 
@@ -41,7 +41,7 @@ public class TilesBoard {
      */
     public TilesBoard(){
         board = new Tile[BOARD_WIDTH][BOARD_HEIGHT];
-        orientation = new char[BOARD_WIDTH][BOARD_HEIGHT];
+        orientation = new int[BOARD_WIDTH][BOARD_HEIGHT];
         trashed = new ArrayList<>();
         booked = new ArrayList<>();
 
@@ -52,14 +52,14 @@ public class TilesBoard {
 
         // fill the implacable spaces with WALL
         for(Pair<Integer, Integer> coord : WALL_POSITION)
-            set(coord.getKey(), coord.getValue(), Tile.WALL_TILE, ' ');
+            set(coord.getKey(), coord.getValue(), Tile.WALL_TILE, 0);
 
         // the start of building a ship
-        set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"), 'n');
+        set(3, 2, new Tile(TilesType.C_HOUSE, "uuuu"), 0);
     }
 
     //Places a tile at the specified coordinates on the board with a given orientation.
-    private void set(int x, int y, Tile tile, char ori){
+    private void set(int x, int y, Tile tile, int ori){
         orientation[x][y] = ori;
         board[x][y] = tile;
     }
@@ -68,7 +68,7 @@ public class TilesBoard {
     // If the specified coordinates are out of bounds, returns null.
     private Tile get(int x, int y){
         if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
-            return null;
+            return Tile.WALL_TILE;
 
         return board[x][y];
     }
@@ -87,7 +87,7 @@ public class TilesBoard {
 
         // check if at least one is not a wall or an empty space.
         for(Tile tile: around)
-            if(tile != null && tile != Tile.WALL_TILE && tile != Tile.EMPTY_TILE)
+            if(tile != null && Tile.real(tile))
                 return true;
 
         return false;
@@ -105,7 +105,7 @@ public class TilesBoard {
      * @return a Result object containing the placed tile if the placement is successful,
      *         or an error Result with a reason explaining why the placement failed
      */
-    public Result<Tile> setTile(int x, int y, Tile t, char ori){
+    public Result<Tile> setTile(int x, int y, Tile t, int ori){
         Tile result = get(x, y);
 
         if(result == null || result == Tile.WALL_TILE)
@@ -146,10 +146,10 @@ public class TilesBoard {
      *
      * @param x the x-coordinate of the tile
      * @param y the y-coordinate of the tile
-     * @return a Result containing the orientation character of the tile if the coordinates are valid,
+     * @return a Result containing the orientation integer of the tile if the coordinates are valid,
      *         or an error Result with a message indicating the coordinates are out of bounds
      */
-    public Result<Character> getOri(int x, int y) {
+    public Result<Integer> getOri(int x, int y) {
         return (x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)?
                 Result.err("out of bound") :
                 Result.ok(orientation[x][y]);
@@ -189,7 +189,7 @@ public class TilesBoard {
      *         error {@code Result} with a message explaining why the operation
      *         failed
      */
-    public Result<Tile> useBookedTile(Tile t, char ori, int x, int y){
+    public Result<Tile> useBookedTile(Tile t, int ori, int x, int y){
         if(!booked.contains(t))
             return Result.err("not booked");
 
@@ -208,5 +208,139 @@ public class TilesBoard {
      */
     public List<Tile> getBooked() {
         return booked;
+    }
+
+    /**
+     * Remove a tile
+     * @param x
+     * @param y
+     */
+    public void remove(int x, int y){
+        if (x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT && board[x][y] != Tile.WALL_TILE) {
+            board[x][y] = Tile.EMPTY_TILE;
+            orientation[x][y] = 0;
+        }
+    }
+
+    /**
+     * Check if the board is a correct board.
+     * The combination Pair(-1, -1) in the return means
+     * that the board contains disconnected groups of tiles.
+     * The player must choose one by removing the tiles.
+     *
+     * @return the set of wrong tiles at the specified coordinate
+     */
+    public Set<Pair<Integer, Integer>> isOK(){
+        Set<Pair<Integer, Integer>> result  = new HashSet<>();
+        checkConnectors(result);
+        checkTiles(result);
+        checkUnreachable(result);
+        return result;
+    }
+
+    /**
+     * From a specified coordinate, if the corresponding tiles is already
+     * seen do nothing. Otherwise it marks and seen and call itself around
+     * the tile.
+     *
+     * @param marked
+     * @param x
+     * @param y
+     */
+    private void mark(boolean[][] marked, int x, int y){
+        if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT)
+            return;
+
+        if(marked[x][y] || !Tile.real(board[x][y]))
+            return;
+
+        marked[x][y] = true;
+
+        mark(marked, x-1, y);
+        mark(marked, x+1, y);
+        mark(marked, x, y-1);
+        mark(marked, x, y+1);
+    }
+
+    private void checkUnreachable(Set<Pair<Integer, Integer>> result){
+        boolean[][] marked = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
+        boolean found = false;
+
+        for(boolean[] m: marked)
+            Arrays.fill(m, false);
+
+        for(int i = 0; i < BOARD_WIDTH && !found; i++) {
+            for (int j = 0; j < BOARD_HEIGHT && !found; j++){
+                if(Tile.real(board[i][j])){
+                    found = true;
+                    mark(marked, i, j);
+                }
+            }
+        }
+
+        found = false;
+        for(int i = 0; i < BOARD_WIDTH && !found; i++) {
+            for (int j = 0; j < BOARD_HEIGHT && !found; j++) {
+                if(Tile.real(board[i][j]) && !marked[i][j]){
+                    found = true;
+                    result.add(new Pair<>(-1, -1));
+                }
+            }
+        }
+    }
+
+    private void checkTiles(Set<Pair<Integer, Integer>> result){
+        for(int i = 0; i < BOARD_WIDTH; i++) {
+            for (int j = 0; j < BOARD_HEIGHT; j++) {
+                if(Tile.rocket(board[i][j])){
+                    if(orientation[i][j] != 0 || Tile.real(get(i, j+1)))
+                        result.add(new Pair<>(i, j));
+                }
+                else if(Tile.drills(board[i][j])){
+                    Tile t = switch(orientation[i][j]){
+                        case 0 -> get(i, j-1);
+                        case 1 -> get(i+1, j);
+                        case 2 -> get(i, j+1);
+                        case 3 -> get(i-1, j);
+                        default -> throw new IllegalStateException("Unexpected value: " + orientation[i][j]);
+                    };
+
+                    if(Tile.real(t))
+                        result.add(new Pair<>(i, j));
+                }
+            }
+        }
+    }
+
+
+    private void checkConnectors(Set<Pair<Integer, Integer>> result){
+        ConnectorType upper;
+        ConnectorType lower;
+        ConnectorType left;
+        ConnectorType right;
+
+        for(int i = 0; i < BOARD_WIDTH; i++){
+            for(int j = 0; j < BOARD_HEIGHT-1; j++){
+                if(Tile.real(board[i][j]) && Tile.real(board[i][j+1])){
+                    upper = Tile.getSide(board[i][j], orientation[i][j], 2);
+                    lower = Tile.getSide(board[i][j+1], orientation[i][j+1], 0);
+
+                    if(!upper.connectable(lower))
+                        result.add(new Pair<>(i, j));
+                }
+            }
+        }
+
+        for(int i = 0; i < BOARD_HEIGHT; i++){
+            for(int j = 0; j < BOARD_WIDTH-1; j++){
+                if(Tile.real(board[j][i]) && Tile.real(board[j+1][i])){
+                    left = Tile.getSide(board[j][i], orientation[j][i], 1);
+                    right = Tile.getSide(board[j+1][i], orientation[j+1][i], 3);
+
+                    if(!left.connectable(right))
+                        result.add(new Pair<>(j, i));
+                }
+            }
+        }
     }
 }
