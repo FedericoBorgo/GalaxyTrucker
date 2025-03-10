@@ -35,18 +35,18 @@ public class Coordinate {
     }
     public Coordinate right() throws IOException{
         if(check(x+1, y))
-            throw new IOException("left coordinate out of bounds");
+            throw new IOException("right coordinate out of bounds");
         return new Coordinate(x+1, y);
     }
 
     public Coordinate up() throws IOException{
         if(check(x, y-1))
-            throw new IOException("left coordinate out of bounds");
+            throw new IOException("up coordinate out of bounds");
         return new Coordinate(x, y-1);
     }
     public Coordinate down() throws IOException{
         if(check(x, y+1))
-            throw new IOException("left coordinate out of bounds");
+            throw new IOException("down coordinate out of bounds");
         return new Coordinate(x, y+1);
     }
 
