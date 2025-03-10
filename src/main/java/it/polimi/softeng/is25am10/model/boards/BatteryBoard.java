@@ -15,9 +15,9 @@ public class BatteryBoard extends ElementsBoard {
     }
 
     @Override
-    public boolean check(int x, int y, int qty) {
-        Tile t = board.getTile(x, y).getData();
+    public boolean check(Coordinate c, int qty) {
+        Tile t = board.getTile(c).getData();
         return Tile.battery(t) &&
-                (qty + get(x, y) <= (t.getType() == TilesType.BATTERY_2 ? 2 : 3));
+                (qty + get(c) <= (t.getType() == TilesType.BATTERY_2 ? 2 : 3));
     }
 }

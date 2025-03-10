@@ -18,41 +18,43 @@ class ElementsBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
+
         placeholder = new ElementsPlaceholder(board);
     }
 
     @Test
     void testSetGet(){
-        placeholder.put(3, 2, 10);
-        assertEquals(10, placeholder.get(3, 2));
+        placeholder.put(new Coordinate(3, 2), 10);
+        assertEquals(10, placeholder.get(new Coordinate(3, 2)));
         assertEquals(10, placeholder.getTotal());
     }
 
     @Test
     void testRemove(){
-        placeholder.put(3, 2, 10);
-        placeholder.remove(3, 2, 5);
-        assertEquals(5, placeholder.get(3, 2));
+        placeholder.put(new Coordinate(3, 2), 10);
+        placeholder.remove(new Coordinate(3, 2), 5);
+        assertEquals(5, placeholder.get(new Coordinate(3, 2)));
         assertEquals(5, placeholder.getTotal());
     }
 
     @Test
     void testMove(){
-        placeholder.put(3, 2, 10);
-        placeholder.move(3, 2, 2, 2, 5);
+        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        placeholder.put(new Coordinate(3, 2), 10);
+        placeholder.move(new Coordinate(3, 2), new Coordinate(2, 2), 5);
 
-        assertEquals(5, placeholder.get(3, 2));
-        assertEquals(5, placeholder.get(2, 2));
+        assertEquals(5, placeholder.get(new Coordinate(3, 2)));
+        assertEquals(5, placeholder.get(new Coordinate(2, 2)));
         assertEquals(10, placeholder.getTotal());
         assertEquals(10, placeholder.getTotal());
     }
 
     @Test
     void testRemoveIllegals(){
-        board.setTile(2, 2, new Tile(TilesType.HOUSE, "uuuu"), 0);
-        placeholder.put(2, 2, 10);
-        board.remove(2, 2);
-        List<Pair<Integer, Integer>> res = placeholder.removeIllegals();
-        assertTrue(res.contains(new Pair<>(2, 2)));
+        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        placeholder.put(new Coordinate(2, 2), 10);
+        board.remove(new Coordinate(2, 2));
+        List<Coordinate> res = placeholder.removeIllegals();
+        assertTrue(res.contains(new Coordinate(2, 2)));
     }
 }

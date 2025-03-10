@@ -12,7 +12,7 @@ public class AstronautBoard extends ElementsBoard{
     }
 
     @Override
-    public boolean check(int x, int y, int qty) {
-        return Tile.house(board.getTile(x, y).getData()) && (get(x, y) + qty <= 2);
+    public boolean check(Coordinate c, int qty) {
+        return Tile.house(board.getTile(c).getData()) && (get(c) + qty <= 2);
     }
 }

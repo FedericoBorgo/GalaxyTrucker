@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.TilesType;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.ArrayList;
 
@@ -21,17 +22,17 @@ public class AlienBoard extends ElementsBoard{
     /**
      * Checks if there is an addon of the specified type in the tiles adjacent to the given coordinates.
      *
-     * @param x the x-coordinate of the tile to check
-     * @param y the y-coordinate of the tile to check
+     * @param c
      * @return true if an adjacent tile contains an addon of the specified type, false otherwise
      */
-    private boolean thereIsAddon(int x, int y){
+    private boolean thereIsAddon(Coordinate c){
         List<Result<Tile>> tiles = new ArrayList<>();
 
-        tiles.add(board.getTile(x-1, y));
-        tiles.add(board.getTile(x+1, y));
-        tiles.add(board.getTile(x, y-1));
-        tiles.add(board.getTile(x, y+1));
+        try{tiles.add(board.getTile(c.left()));}catch(IOException _){}
+        try{tiles.add(board.getTile(c.right()));}catch(IOException _){}
+        try{tiles.add(board.getTile(c.up()));}catch(IOException _){}
+        try{tiles.add(board.getTile(c.down()));}catch(IOException _){}
+
 
         for(Result<Tile> result: tiles)
             if(result.isOk() && result.getData().getType() == type)
@@ -41,8 +42,8 @@ public class AlienBoard extends ElementsBoard{
     }
 
     @Override
-    public boolean check(int x, int y, int qty) {
-        return board.getTile(x, y).getData().getType() == TilesType.HOUSE
-                && thereIsAddon(x, y) && qty <= 1 && (get(x, y) + qty <= 1);
+    public boolean check(Coordinate c, int qty) {
+        return board.getTile(c).getData().getType() == TilesType.HOUSE
+                && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1);
     }
 }

@@ -19,14 +19,14 @@ class AlienBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
-        board.setTile(2, 2, new Tile(TilesType.HOUSE, "uuuu"), 'n');
-        board.setTile(2, 1, new Tile(TilesType.HOUSE, "uuuu"), 'n');
-        board.setTile(1, 2, new Tile(TilesType.P_ADDON, "uuuu"), 'n');
-        board.setTile(0, 2, new Tile(TilesType.ROCKET, "uuuu"), 'n');
-        board.setTile(0, 3, new Tile(TilesType.HOUSE, "uuuu"), 'n');
+        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 1), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(1, 2), new Tile(TilesType.P_ADDON, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(TilesType.ROCKET, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 3), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder astronaut = new ElementsPlaceholder(board);
-        astronaut.set(2, 1, 1);
+        astronaut.set(new Coordinate(2, 1), 1);
 
         other = new ArrayList<>();
         other.add(astronaut);
@@ -38,23 +38,23 @@ class AlienBoardTest {
 
     @Test
     void testPut(){
-        Result<Integer> res = alien.put(2, 1, 1);
+        Result<Integer> res = alien.put(new Coordinate(2, 1), 1);
         assertTrue(res.isErr());
 
-        res = alien.put(2, 2, 1);
-        assertEquals(1, alien.get(2, 2));
+        res = alien.put(new Coordinate(2, 2), 1);
+        assertEquals(1, alien.get(new Coordinate(2, 2)));
         assertTrue(res.isOk());
 
-        res = alien.put(2, 2, 1);
-        assertEquals(1, alien.get(2, 2));
+        res = alien.put(new Coordinate(2, 2), 1);
+        assertEquals(1, alien.get(new Coordinate(2, 2)));
         assertTrue(res.isErr());
 
-        res = alien.put(0, 2, 1);
-        assertEquals(0, alien.get(0, 2));
+        res = alien.put(new Coordinate(0, 2), 1);
+        assertEquals(0, alien.get(new Coordinate(0, 2)));
         assertTrue(res.isErr());
 
-        res = alien.put(0, 3, 1);
-        assertEquals(0, alien.get(0, 3));
+        res = alien.put(new Coordinate(0, 3), 1);
+        assertEquals(0, alien.get(new Coordinate(0, 3)));
         assertTrue(res.isErr());
     }
 }
