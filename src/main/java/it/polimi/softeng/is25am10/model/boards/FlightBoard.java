@@ -1,5 +1,4 @@
 package it.polimi.softeng.is25am10.model.boards;
-import it.polimi.softeng.is25am10.model.Card;
 import it.polimi.softeng.is25am10.model.Result;
 import java.util.ArrayList;
 import java.util.List;
