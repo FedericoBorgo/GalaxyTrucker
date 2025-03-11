@@ -8,23 +8,23 @@ class ConnectorTypeTest {
 
     @Test
     void connectorTypeTest(){
-        assertEquals('o', ConnectorType.ONE_PIPE.toChar());
-        assertEquals(ConnectorType.UNIVERSAL, ConnectorType.fromChar('u'));
+        assertEquals('o', Tile.ConnectorType.ONE_PIPE.toChar());
+        assertEquals(Tile.ConnectorType.UNIVERSAL, Tile.ConnectorType.fromChar('u'));
     }
 
     @Test
     void testConnectable(){
-        assertTrue(ConnectorType.SMOOTH.connectable(ConnectorType.SMOOTH));
-        assertTrue(ConnectorType.UNIVERSAL.connectable(ConnectorType.UNIVERSAL));
-        assertTrue(ConnectorType.ONE_PIPE.connectable(ConnectorType.ONE_PIPE));
-        assertTrue(ConnectorType.TWO_PIPE.connectable(ConnectorType.TWO_PIPE));
-        assertTrue(ConnectorType.UNIVERSAL.connectable(ConnectorType.ONE_PIPE));
-        assertTrue(ConnectorType.UNIVERSAL.connectable(ConnectorType.TWO_PIPE));
+        assertTrue(Tile.ConnectorType.SMOOTH.connectable(Tile.ConnectorType.SMOOTH));
+        assertTrue(Tile.ConnectorType.UNIVERSAL.connectable(Tile.ConnectorType.UNIVERSAL));
+        assertTrue(Tile.ConnectorType.ONE_PIPE.connectable(Tile.ConnectorType.ONE_PIPE));
+        assertTrue(Tile.ConnectorType.TWO_PIPE.connectable(Tile.ConnectorType.TWO_PIPE));
+        assertTrue(Tile.ConnectorType.UNIVERSAL.connectable(Tile.ConnectorType.ONE_PIPE));
+        assertTrue(Tile.ConnectorType.UNIVERSAL.connectable(Tile.ConnectorType.TWO_PIPE));
 
-        assertFalse(ConnectorType.ONE_PIPE.connectable(ConnectorType.SMOOTH));
-        assertFalse(ConnectorType.TWO_PIPE.connectable(ConnectorType.SMOOTH));
-        assertFalse(ConnectorType.UNIVERSAL.connectable(ConnectorType.SMOOTH));
+        assertFalse(Tile.ConnectorType.ONE_PIPE.connectable(Tile.ConnectorType.SMOOTH));
+        assertFalse(Tile.ConnectorType.TWO_PIPE.connectable(Tile.ConnectorType.SMOOTH));
+        assertFalse(Tile.ConnectorType.UNIVERSAL.connectable(Tile.ConnectorType.SMOOTH));
 
-        assertFalse(ConnectorType.ONE_PIPE.connectable(ConnectorType.TWO_PIPE));
+        assertFalse(Tile.ConnectorType.ONE_PIPE.connectable(Tile.ConnectorType.TWO_PIPE));
     }
 }

@@ -1,7 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Card;
-import it.polimi.softeng.is25am10.model.RocketPawn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,5 +145,14 @@ public class FlightBoard {
      */
     public int getLeaderPosition() {
         return leaderPosition;
+    }
+
+    /**
+     * Enumerates the different rocket pawns which can be used by the player.
+     * Includes an {@code EMPTY} value.
+     */
+
+    public enum RocketPawn {
+        YELLOW, GREEN, BLUE, RED, EMPTY;
     }
 }

@@ -18,10 +18,34 @@ public class Tile {
         CLOCK, INV, DOUBLE, NONE;
     }
 
-    public static final Tile WALL_TILE = new Tile(TilesType.WALL, "ssss");
-    public static final Tile EMPTY_TILE = new Tile(TilesType.EMPTY, "ssss");
+    /**
+     * This class enumerates the types of tiles.
+     */
+    public enum Type {
+        PIPES,
+        DRILLS,
+        D_DRILLS,
+        ROCKET,
+        D_ROCKET,
+        HOUSE,
+        C_HOUSE,
+        B_BOX_3,
+        B_BOX_2,
+        R_BOX_2,
+        R_BOX_1,
+        P_ADDON,
+        B_ADDON,
+        BATTERY_3,
+        BATTERY_2,
+        SHIELD,
+        EMPTY,
+        WALL;
+    }
 
-    private final TilesType type;
+    public static final Tile WALL_TILE = new Tile(Type.WALL, "ssss");
+    public static final Tile EMPTY_TILE = new Tile(Type.EMPTY, "ssss");
+
+    private final Type type;
     private final Map<Side, ConnectorType> connectors;
 
     /**
@@ -32,7 +56,7 @@ public class Tile {
      * It is assumed to have a length of 4, with each character corresponding
      * to a specific {@code ConnectorType}.
      */
-    public Tile(TilesType type, String connectors) {
+    public Tile(Type type, String connectors) {
         this.type = type;
         HashMap<Side, ConnectorType> map = new HashMap<>();
 
@@ -48,7 +72,7 @@ public class Tile {
      *
      * @return the {@code TilesType} representing the type of the tile.
      */
-    public TilesType getType() {
+    public Type getType() {
         return type;
     }
 
@@ -104,23 +128,90 @@ public class Tile {
      * @return  true if its real false if its placeholder
      */
     static public boolean real(Tile t){
-        return t.type != TilesType.WALL && t.type != TilesType.EMPTY;
+        return t.type != Type.WALL && t.type != Type.EMPTY;
     }
 
     static public boolean rocket(Tile t){
-        return t.type == TilesType.ROCKET || t.type == TilesType.D_ROCKET;
+        return t.type == Type.ROCKET || t.type == Type.D_ROCKET;
     }
 
     static public boolean drills(Tile t){
-        return t.type == TilesType.DRILLS || t.type == TilesType.D_DRILLS;
+        return t.type == Type.DRILLS || t.type == Type.D_DRILLS;
     }
 
     static public boolean house(Tile t){
-        return t.type == TilesType.HOUSE || t.type == TilesType.C_HOUSE;
+        return t.type == Type.HOUSE || t.type == Type.C_HOUSE;
     }
 
     static public boolean battery(Tile t){
-        return t.type == TilesType.BATTERY_2 || t.type == TilesType.BATTERY_3;
+        return t.type == Type.BATTERY_2 || t.type == Type.BATTERY_3;
+    }
+
+    /**
+     * This class provides an interface to deal with the tile's connectors and check their type.
+     */
+    public enum ConnectorType {
+        ONE_PIPE,
+        TWO_PIPE,
+        UNIVERSAL,
+        SMOOTH;
+
+        /**
+         * Converts a character into the corresponding {@code ConnectorType}.
+         *
+         * @param c the character to be converted, which represents a connector type.
+         * @return the {@code ConnectorType} corresponding to the specified character,
+         *         or {@code null} if the character does not match any valid connector type.
+         */
+        public static ConnectorType fromChar(char c) {
+            return switch (c) {
+                case 'o' -> ONE_PIPE;
+                case 't' -> TWO_PIPE;
+                case 'u' -> UNIVERSAL;
+                case 's' -> SMOOTH;
+                default -> throw new IllegalStateException("Unexpected ConnectorType "+ c);
+            };
+        }
+
+        /**
+         * Converts the current ConnectorType instance to its corresponding character.
+         *
+         * @return a character representing the ConnectorType:
+         */
+        public char toChar() {
+            return switch (this) {
+                case ONE_PIPE -> 'o';
+                case TWO_PIPE -> 't';
+                case UNIVERSAL -> 'u';
+                case SMOOTH -> 's';
+            };
+        }
+
+        /**
+         * Check if two connector are compatible.
+         *
+         * @param other
+         * @return
+         */
+        public boolean connectable(ConnectorType other){
+            if(this == SMOOTH){
+                return other == SMOOTH;
+            }
+
+            if(other == SMOOTH){
+                return false;
+            }
+
+            if(this == UNIVERSAL || other == UNIVERSAL){
+                return true;
+            }
+
+            if(this == ONE_PIPE && other == ONE_PIPE){
+                return true;
+            }
+
+            return this == TWO_PIPE && other == TWO_PIPE;
+        }
     }
 }
 

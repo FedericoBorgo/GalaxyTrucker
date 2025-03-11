@@ -23,7 +23,7 @@ class TilesCollectionTest {
 
     @Test
     void testSeen(){
-        Tile tile1 = tilesCollection.getFromSeen(new Tile(TilesType.HOUSE, "uuuu"));
+        Tile tile1 = tilesCollection.getFromSeen(new Tile(Tile.Type.HOUSE, "uuuu"));
         assertEquals(Tile.EMPTY_TILE, tile1);
         tilesCollection.give(tile1);
         assertEquals(tile1, tilesCollection.getSeen().getFirst());

@@ -2,7 +2,6 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +18,11 @@ class AlienBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
-        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(2, 1), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(1, 2), new Tile(TilesType.P_ADDON, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(0, 2), new Tile(TilesType.ROCKET, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(0, 3), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 1), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(1, 2), new Tile(Tile.Type.P_ADDON, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.ROCKET, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 3), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder astronaut = new ElementsPlaceholder(board);
         astronaut.set(new Coordinate(2, 1), 1);
@@ -32,7 +31,7 @@ class AlienBoardTest {
         other.add(astronaut);
 
 
-        alien = new AlienBoard(board, 'p');
+        alien = new AlienBoard(board, AlienBoard.Type.PURPLE);
         alien.setOthers(other);
     }
 

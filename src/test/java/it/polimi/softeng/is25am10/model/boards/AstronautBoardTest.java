@@ -2,7 +2,6 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +18,9 @@ class AstronautBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
-        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(1, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(0, 2), new Tile(TilesType.ROCKET, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(1, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.ROCKET, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder alien = new ElementsPlaceholder(board);
         alien.set(new Coordinate(1, 2), 1);

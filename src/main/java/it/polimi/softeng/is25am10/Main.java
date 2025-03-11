@@ -1,7 +1,5 @@
 package it.polimi.softeng.is25am10;
 
-import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.RocketPawn;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 
 public class Main {

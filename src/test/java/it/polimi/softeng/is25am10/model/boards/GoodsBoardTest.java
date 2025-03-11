@@ -2,7 +2,6 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +18,8 @@ class GoodsBoardTest {
     @BeforeEach
     void setUp() {
         board = new TilesBoard();
-        board.setTile(new Coordinate(2, 2), new Tile(TilesType.B_BOX_3, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(1, 2), new Tile(TilesType.R_BOX_1, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.B_BOX_3, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(1, 2), new Tile(Tile.Type.R_BOX_1, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder boxes = new ElementsPlaceholder(board);
         boxes.set(new Coordinate(2, 2), 2);
@@ -28,7 +27,7 @@ class GoodsBoardTest {
         other = new ArrayList<>();
         other.add(boxes);
 
-        blockRed = new GoodsBoard(board, 'r');
+        blockRed = new GoodsBoard(board, GoodsBoard.Type.RED);
         blockRed.setOthers(other);
     }
 
