@@ -7,22 +7,26 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 
 import java.util.EventListenerProxy;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static it.polimi.softeng.is25am10.model.boards.TilesBoard.BOARD_HEIGHT;
 import static it.polimi.softeng.is25am10.model.boards.TilesBoard.BOARD_WIDTH;
 
 public class Epidemic extends Card {
+    private final Set<Player> players;
 
    //constructor
     public Epidemic() {
         super( false, null);
+        players = new HashSet<>();
     }
 
 
     @Override
     public Result<List<String>> set(Player player, List<String> input) {
-        playerChoice.put(player, null);
+        players.add(player);
         return Result.ok(null);
     }
 
@@ -32,13 +36,12 @@ public class Epidemic extends Card {
      */
     @Override
     public Result<String> play() {
-        if(board.getOrder().size()== playerChoice.size()) {
-            playerChoice.keySet().forEach(p -> {
+        if(board.getOrder().size()== players.size()) {
+            players.forEach(p -> {
                 p.getBoard().epidemic();
             });
             return Result.ok(null);
         }
-            return Result.err("not all players are declared");
+        return Result.err("not all players are declared");
     };
-
 }

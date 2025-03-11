@@ -12,18 +12,17 @@ public abstract class Card {
     // does the player need to declare something?
     private final boolean needPlayerChoice;
     protected FlightBoard board;
-    protected final Map<Player, List<String>> playerChoice;
     protected final List<InputType> inputOrder;
 
     public enum InputType {
         BOOLEAN,
-        COORD_PAIR
+        COORD_PAIR,
+        PLANET
     }
 
     public Card(boolean needPlayerChoice, List<InputType> inputOrder) {
         this.needPlayerChoice = needPlayerChoice;
         this.inputOrder = inputOrder;
-        playerChoice = new HashMap<>();
     }
 
     public void setBoard(FlightBoard board) {
