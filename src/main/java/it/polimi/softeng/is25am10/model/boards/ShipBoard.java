@@ -78,4 +78,6 @@ public class ShipBoard {
 
         return rocket;
     }
+
+    public void epidemic(){}
 }
