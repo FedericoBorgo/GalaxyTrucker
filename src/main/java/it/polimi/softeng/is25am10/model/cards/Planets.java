@@ -4,14 +4,14 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import javafx.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Planets extends Card{
-    private List<String> planets;
-    private List<String> availableGoods;
     private Map<Planet, List<GoodsBoard.Type>> goods;
+    private Map<Player, Pair<Boolean, Planet>> playerChoice;
     private List<Planet> occupiedPlanets;
 
     static private final List<InputType> inputPlanet;
@@ -38,21 +38,27 @@ public class Planets extends Card{
         if(playerChoice.containsKey(player)){
             return Result.err("Player choice is already set");
         }
+
         FlightBoard.RocketPawn pawn = player.getPawn();
         Set<FlightBoard.RocketPawn> rockets = playerChoice.keySet().stream().map(Player::getPawn).collect(Collectors.toSet());
+
         if(!rockets.containsAll(board.getOrder().subList(0, board.getOrder().indexOf(pawn)))){
             return Result.err("Player choice is not in order");
         }
-        if(Boolean.parseBoolean(input.get(0))){
-            playerChoice.put(player,input);
+
+        Pair<Boolean, Planet> choice = new Pair<>(Boolean.parseBoolean(input.get(0)), Planet.valueOf(input.get(1)));
+
+        if(choice.getKey()){
+            playerChoice.put(player, choice);
             return Result.ok(input);
         }
 
-        if(occupiedPlanets.contains(Planet.valueOf(input.get(1)))){
+        if(occupiedPlanets.contains(choice.getValue())){
             return Result.err("Player choice is already occupied");
         }
-        playerChoice.put(player, input);
-        occupiedPlanets.add(Planet.valueOf(input.get(1)));
+
+        playerChoice.put(player, choice);
+        occupiedPlanets.add(choice.getValue());
         return Result.ok(input);
     }
 
@@ -63,12 +69,14 @@ public class Planets extends Card{
             return Result.err("Not all Player choice are set");
         }
 
-        playerChoice.forEach((player, input) -> {
-            if(input.get(0).equals("false")){
+        playerChoice.forEach((player, choice) -> {
+            if(choice.getKey()){
                 return;
             }
-            player.setGoodsReward(goods.get(Planet.valueOf(input.get(1))));
+
+            player.setGoodsReward(goods.get(choice.getValue()));
         });
+
      return Result.ok("okay");
     }
 }
