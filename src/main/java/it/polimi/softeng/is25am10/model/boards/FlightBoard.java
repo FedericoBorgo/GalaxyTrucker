@@ -1,7 +1,5 @@
 package it.polimi.softeng.is25am10.model.boards;
 
-import it.polimi.softeng.is25am10.model.Card;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +9,6 @@ import java.util.List;
  */
 public class FlightBoard {
     private int timer;
-    private final Card[][] visible;
-    private final List<Card> deck;
 
     private final List<RocketPawn> order;
     private final List<Integer> offset;
@@ -21,8 +17,6 @@ public class FlightBoard {
     // Constructor method
     public FlightBoard() {
         this.timer = 0;
-        this.visible = new Card[3][3];
-        this.deck = new ArrayList<>();
         this.order = new ArrayList<>();
         this.offset = new ArrayList<>();
         this.leaderPosition = 6;
@@ -100,25 +94,6 @@ public class FlightBoard {
         return timer;
     }
 
-    /**
-     * Get method for the visible cards on the flight board.
-     * @return matrix of the visible cards.
-     */
-    public Card[][] getVisible() {
-        return visible;
-    }
-
-    /**
-     * Draw a card from the deck. Removes the drawn card from the deck of cards.
-     * Checks if the deck is empty. Uses the removeFirst method from the java.util.List class.
-     * @return the card on top of the deck or {@code null} if the deck is empty.
-     */
-    public Card drawCard() {
-        if(!deck.isEmpty()) {
-            return deck.removeFirst();
-        }
-        return null; // no available cards
-    }
 
     /**
      * Get method for the order of the pawns on the flightboard. The pawns are stored in an ordered list,
