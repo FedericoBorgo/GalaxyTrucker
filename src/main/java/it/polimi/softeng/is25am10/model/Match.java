@@ -27,7 +27,7 @@ public class Match {
      * @param pawn the RocketPawn associated with the player
      * @param nickname the player's nickname
      */
-    public void addPlayer(RocketPawn pawn, String nickname) {
+    public void addPlayer(FlightBoard.RocketPawn pawn, String nickname) {
         // The server checked in the connection phase that the name is unique
         // The server checks for the number of players added to the game to be right
         Player player = new Player(pawn, nickname);

@@ -1,10 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
-import it.polimi.softeng.is25am10.model.ConnectorType;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
-import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.*;
@@ -54,7 +51,7 @@ public class TilesBoard {
             set(c, Tile.WALL_TILE, Tile.Rotation.NONE);
 
         // the start of building a ship
-        set(new Coordinate(3, 2), new Tile(TilesType.C_HOUSE, "uuuu"), Tile.Rotation.NONE);
+        set(new Coordinate(3, 2), new Tile(Tile.Type.C_HOUSE, "uuuu"), Tile.Rotation.NONE);
     }
 
     //Places a tile at the specified coordinates on the board with a given orientation.
@@ -296,8 +293,8 @@ public class TilesBoard {
         Coordinate.forEach(c -> {
             try{
                 Tile downTile = get(c.down());
-                ConnectorType upper;
-                ConnectorType lower;
+                Tile.ConnectorType upper;
+                Tile.ConnectorType lower;
 
                 if(Tile.real(get(c)) && Tile.real(downTile)){
                     upper = Tile.getSide(get(c), getRotation(c).getData(), Tile.Side.DOWN);
@@ -310,8 +307,8 @@ public class TilesBoard {
 
             try{
                 Tile rightTile = get(c.right());
-                ConnectorType lefter;
-                ConnectorType righter;
+                Tile.ConnectorType lefter;
+                Tile.ConnectorType righter;
                 if(Tile.real(get(c)) && Tile.real(rightTile)){
                     lefter = Tile.getSide(get(c), getRotation(c).getData(), Tile.Side.RIGHT);
                     righter = Tile.getSide(rightTile, getRotation(c.right()).getData(), Tile.Side.LEFT);

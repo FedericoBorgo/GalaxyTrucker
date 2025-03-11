@@ -9,14 +9,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class TileTest {
     @Test
     void testTile(){
-        Tile tile = new Tile(TilesType.ROCKET, "suto");
+        Tile tile = new Tile(Tile.Type.ROCKET, "suto");
 
-        assertEquals(TilesType.ROCKET, tile.getType());
+        assertEquals(Tile.Type.ROCKET, tile.getType());
 
-        Map<Tile.Side, ConnectorType> connectors = tile.getConnectors();
-        assertEquals(ConnectorType.SMOOTH, connectors.get(Tile.Side.UP));
-        assertEquals(ConnectorType.UNIVERSAL, connectors.get(Tile.Side.RIGHT));
-        assertEquals(ConnectorType.TWO_PIPE, connectors.get(Tile.Side.DOWN));
-        assertEquals(ConnectorType.ONE_PIPE, connectors.get(Tile.Side.LEFT));
+        Map<Tile.Side, Tile.ConnectorType> connectors = tile.getConnectors();
+        assertEquals(Tile.ConnectorType.SMOOTH, connectors.get(Tile.Side.UP));
+        assertEquals(Tile.ConnectorType.UNIVERSAL, connectors.get(Tile.Side.RIGHT));
+        assertEquals(Tile.ConnectorType.TWO_PIPE, connectors.get(Tile.Side.DOWN));
+        assertEquals(Tile.ConnectorType.ONE_PIPE, connectors.get(Tile.Side.LEFT));
     }
 }

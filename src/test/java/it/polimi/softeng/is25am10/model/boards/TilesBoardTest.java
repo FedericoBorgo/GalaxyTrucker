@@ -2,8 +2,6 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
-import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +19,7 @@ class TilesBoardTest {
 
     @Test
     void testSetTile() {
-        Tile tile = new Tile(TilesType.ROCKET, "otus");
+        Tile tile = new Tile(Tile.Type.ROCKET, "otus");
         Result<Tile> result;
 
         result = tilesBoard.setTile(new Coordinate(3, 2), tile, Tile.Rotation.NONE);
@@ -34,7 +32,7 @@ class TilesBoardTest {
 
         result = tilesBoard.setTile(new Coordinate(2, 2), tile, Tile.Rotation.NONE);
         assertTrue(result.isOk());
-        assertEquals(TilesType.ROCKET, tilesBoard.getTile(new Coordinate(2, 2)).getData().getType());
+        assertEquals(Tile.Type.ROCKET, tilesBoard.getTile(new Coordinate(2, 2)).getData().getType());
         assertEquals(Tile.Rotation.NONE, tilesBoard.getRotation(new Coordinate(2, 2)).getData());
 
         result = tilesBoard.setTile(new Coordinate(0, 2), tile, Tile.Rotation.NONE);
@@ -47,7 +45,7 @@ class TilesBoardTest {
 
         result = tilesBoard.getTile(new Coordinate(3, 2));
         assertTrue(result.isOk());
-        assertEquals(TilesType.C_HOUSE, result.getData().getType());
+        assertEquals(Tile.Type.C_HOUSE, result.getData().getType());
 
         result = tilesBoard.getTile(new Coordinate(0, 0));
         assertTrue(result.isErr());
@@ -55,9 +53,9 @@ class TilesBoardTest {
 
     @Test
     void testBook(){
-        Tile tile1 = new Tile(TilesType.ROCKET, "otus");
-        Tile tile2 = new Tile(TilesType.DRILLS, "otus");
-        Tile tile3 = new Tile(TilesType.HOUSE, "otus");
+        Tile tile1 = new Tile(Tile.Type.ROCKET, "otus");
+        Tile tile2 = new Tile(Tile.Type.DRILLS, "otus");
+        Tile tile3 = new Tile(Tile.Type.HOUSE, "otus");
 
         Result<Tile> result;
 
@@ -80,7 +78,7 @@ class TilesBoardTest {
 
     @Test
     void testUseBookedTile(){
-        Tile tile = new Tile(TilesType.ROCKET, "otus");
+        Tile tile = new Tile(Tile.Type.ROCKET, "otus");
         Result<Tile> result;
 
         tilesBoard.bookTile(tile);
@@ -91,26 +89,26 @@ class TilesBoardTest {
 
         result = tilesBoard.getTile(new Coordinate(2, 2));
         assertTrue(result.isOk());
-        assertEquals(TilesType.ROCKET, result.getData().getType());
+        assertEquals(Tile.Type.ROCKET, result.getData().getType());
     }
 
     @Test
     void testDrillsRocket(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(TilesType.DRILLS, "sstu"), Tile.Rotation.INV);
-        tilesBoard.setTile(new Coordinate(3, 3), new Tile(TilesType.ROCKET, "suss"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.DRILLS, "sstu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ROCKET, "suss"), Tile.Rotation.INV);
 
-        tilesBoard.setTile(new Coordinate(2, 2), new Tile(TilesType.PIPES, "tusu"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 1), new Tile(TilesType.D_DRILLS, "sssu"), Tile.Rotation.INV);
-        tilesBoard.setTile(new Coordinate(2, 3), new Tile(TilesType.SHIELD, "ssou"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 4), new Tile(TilesType.ROCKET, "otst"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_DRILLS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ROCKET, "otst"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(1, 2), new Tile(TilesType.BATTERY_2, "otot"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(1, 3), new Tile(TilesType.D_ROCKET, "uoss"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(1, 4), new Tile(TilesType.P_ADDON, "sttt"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 2), new Tile(Tile.Type.BATTERY_2, "otot"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ROCKET, "uoss"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(0, 2), new Tile(TilesType.DRILLS, "stuo"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(0, 3), new Tile(TilesType.B_BOX_2, "usos"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(0, 4), new Tile(TilesType.PIPES, "ouou"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.DRILLS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
         Set<Coordinate> result = tilesBoard.isOK();
         assertFalse(result.isEmpty());
@@ -122,15 +120,15 @@ class TilesBoardTest {
 
     @Test
     void testConnectors(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(TilesType.DRILLS, "stuo"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(3, 3), new Tile(TilesType.PIPES, "tusu"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.DRILLS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(2, 2), new Tile(TilesType.B_BOX_2, "usos"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 3), new Tile(TilesType.ROCKET, "otst"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.ROCKET, "otst"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(4, 1), new Tile(TilesType.PIPES, "uouo"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(4, 2), new Tile(TilesType.P_ADDON, "tstt"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(4, 3), new Tile(TilesType.DRILLS, "sstu"), Tile.Rotation.CLOCK);
+        tilesBoard.setTile(new Coordinate(4, 1), new Tile(Tile.Type.PIPES, "uouo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(4, 2), new Tile(Tile.Type.P_ADDON, "tstt"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(4, 3), new Tile(Tile.Type.DRILLS, "sstu"), Tile.Rotation.CLOCK);
 
         Set<Coordinate> result = tilesBoard.isOK();
         //TODO not working
@@ -142,16 +140,16 @@ class TilesBoardTest {
 
     @Test
     void testUnreachable(){
-        tilesBoard.setTile(new Coordinate(2, 2), new Tile(TilesType.DRILLS, "suso"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.DRILLS, "suso"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(1, 2), new Tile(TilesType.HOUSE, "ouos"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(1, 1), new Tile(TilesType.DRILLS, "ssos"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(1, 3), new Tile(TilesType.ROCKET, "osss"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 2), new Tile(Tile.Type.HOUSE, "ouos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 1), new Tile(Tile.Type.DRILLS, "ssos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.ROCKET, "osss"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(3, 3), new Tile(TilesType.R_BOX_1, "tutt"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.R_BOX_1, "tutt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(4, 2), new Tile(TilesType.BATTERY_2, "ssut"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(4, 3), new Tile(TilesType.ROCKET, "ossu"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(4, 2), new Tile(Tile.Type.BATTERY_2, "ssut"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(4, 3), new Tile(Tile.Type.ROCKET, "ossu"), Tile.Rotation.NONE);
 
         tilesBoard.remove(new Coordinate(2, 2));
 

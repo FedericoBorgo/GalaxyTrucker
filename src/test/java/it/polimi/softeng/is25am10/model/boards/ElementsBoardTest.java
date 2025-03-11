@@ -1,8 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
-import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +37,7 @@ class ElementsBoardTest {
 
     @Test
     void testMove(){
-        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
         placeholder.put(new Coordinate(3, 2), 10);
         placeholder.move(new Coordinate(3, 2), new Coordinate(2, 2), 5);
 
@@ -51,7 +49,7 @@ class ElementsBoardTest {
 
     @Test
     void testRemoveIllegals(){
-        board.setTile(new Coordinate(2, 2), new Tile(TilesType.HOUSE, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
         placeholder.put(new Coordinate(2, 2), 10);
         board.remove(new Coordinate(2, 2));
         List<Coordinate> res = placeholder.removeIllegals();

@@ -2,7 +2,6 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesType;
 
 import java.io.IOException;
 import java.util.*;
@@ -12,11 +11,18 @@ import java.util.ArrayList;
  * This class offers the capacity to change the number of aliens held on a tile
  */
 public class AlienBoard extends ElementsBoard{
-    private final TilesType type;
+    private final Tile.Type type;
 
-    public AlienBoard(TilesBoard board, char alienType) {
+    public enum Type{
+        PURPLE, BROWN;
+    }
+
+    public AlienBoard(TilesBoard board, Type type) {
         super(board);
-        this.type = alienType == 'p'? TilesType.P_ADDON : TilesType.B_ADDON;
+        this.type = switch (type){
+            case PURPLE -> Tile.Type.P_ADDON;
+            case BROWN -> Tile.Type.B_ADDON;
+        };
     }
 
     /**
@@ -43,7 +49,7 @@ public class AlienBoard extends ElementsBoard{
 
     @Override
     public boolean check(Coordinate c, int qty) {
-        return board.getTile(c).getData().getType() == TilesType.HOUSE
+        return board.getTile(c).getData().getType() == Tile.Type.HOUSE
                 && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1);
     }
 }

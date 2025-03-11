@@ -2,17 +2,16 @@ package it.polimi.softeng.is25am10.model;
 
 import it.polimi.softeng.is25am10.model.boards.*;
 
-import java.util.Arrays;
-
 /**
  * Stores all the information of the single player, associating it with a pawn and the nickname.
  */
 
 public class Player {
-    private final RocketPawn pawn;
+    private final FlightBoard.RocketPawn pawn;
     private String nickname;
     private int cash;
     private final ShipBoard board;
+    private String rewards;
 
     /**
      * Constructs a Player with the specified RocketPawn and nickname.
@@ -20,7 +19,7 @@ public class Player {
      * @param pawn the RocketPawn associated with the player
      * @param nickname the player's nickname
      */
-    public Player(RocketPawn pawn, String nickname) {
+    public Player(FlightBoard.RocketPawn pawn, String nickname) {
         this.nickname = nickname;
         this.pawn = pawn;
         board = new ShipBoard();
@@ -49,7 +48,7 @@ public class Player {
      *
      * @return the RocketPawn instance linked to the player
      */
-    public RocketPawn getPawn() {
+    public FlightBoard.RocketPawn getPawn() {
         return pawn;
     }
 
@@ -69,5 +68,13 @@ public class Player {
      */
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void setRewards(String rewards) {
+        this.rewards = rewards;
+    }
+
+    public String getRewards() {
+        return rewards;
     }
 }
