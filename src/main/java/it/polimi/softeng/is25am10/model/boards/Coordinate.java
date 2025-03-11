@@ -1,5 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Result;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -73,5 +75,15 @@ public class Coordinate {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    static public Result<Coordinate> fromString(String s) {
+        if(s.length() != 4 || s.charAt(0) != 'x' || s.charAt(2) != 'y' || !Character.isDigit(s.charAt(1)) || !Character.isDigit(s.charAt(3)))
+            return Result.err("string is not a coordinate");
+        else
+            return Result.ok(new Coordinate(Character.getNumericValue(s.charAt(1)), Character.getNumericValue(s.charAt(3))));
+    }
+    static public String CoordtoString(Coordinate c) {
+        return "x"+c.x+",y"+c.y;
     }
 }

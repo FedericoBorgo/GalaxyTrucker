@@ -47,8 +47,7 @@ public class FlightBoard {
      *  Method for moving the rocket pawn in a new position, moves the {@code pawn} to the position
      *  {@code pos} while accounting for the order of the pawns and for possible overtakings of other pawns.
      * @param pawn the pawn to be moved.
-     * @param pos the target position of the pawn. If overtaking happens {@code pos} is not the new position
-     *            of the pawn {@code pawn}.
+     * @param pos the number of steps the pawn needs to take
      */
     public void moveRocket(RocketPawn pawn, int pos) {
         int index = order.indexOf(pawn);

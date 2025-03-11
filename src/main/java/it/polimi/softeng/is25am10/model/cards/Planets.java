@@ -40,6 +40,7 @@ public class Planets extends Card{
         }
 
         FlightBoard.RocketPawn pawn = player.getPawn();
+        // Put in a set all pawns of the players that have already made their choice
         Set<FlightBoard.RocketPawn> rockets = playerChoice.keySet().stream().map(Player::getPawn).collect(Collectors.toSet());
 
         if(!rockets.containsAll(board.getOrder().subList(0, board.getOrder().indexOf(pawn)))){
