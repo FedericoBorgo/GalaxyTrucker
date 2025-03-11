@@ -59,7 +59,7 @@ public class ShipBoard {
         return goods.get(type);
     }
 
-    public double getRocketPower(List<Coordinate> activate){
+    public double getDrillsPower(List<Coordinate> activate){
         double drills = board.countDrillsPower(activate);
 
         if(drills > 0){
@@ -67,5 +67,15 @@ public class ShipBoard {
         }
 
         return drills;
+    }
+
+    public double getRocketPower(List<Coordinate> activate){
+        double rocket = board.countRocketPower(activate);
+
+        if(rocket > 0){
+            rocket += bAlien.getTotal()*2;
+        }
+
+        return rocket;
     }
 }

@@ -439,4 +439,39 @@ public class TilesBoard {
 
         return drills + d_drills;
     }
+
+    public double countRocketPower(List<Coordinate> dDrills) {
+        AtomicInteger forwardRocket = new AtomicInteger();
+        AtomicInteger rotatedRocket = new AtomicInteger();
+
+        AtomicInteger forwardD_Rocket = new AtomicInteger();
+        AtomicInteger rotatedD_Rocket = new AtomicInteger();
+
+        Coordinate.forEach(c -> {
+            if (get(c).getType() != Tile.Type.ROCKET)
+                return;
+
+            if (getRotation(c) == Tile.Rotation.NONE)
+                forwardRocket.getAndIncrement();
+            else
+                rotatedRocket.getAndIncrement();
+        });
+
+        dDrills.forEach(d -> {
+            if (get(d).getType() != Tile.Type.D_ROCKET)
+                return;
+
+            if (getRotation(d) == Tile.Rotation.NONE)
+                forwardD_Rocket.getAndIncrement();
+            else
+                rotatedD_Rocket.getAndIncrement();
+        });
+
+        double rockets = forwardRocket.get() + rotatedRocket.get()/2.0;
+        double d_rockets = forwardD_Rocket.get() + rotatedD_Rocket.get()/2.0;
+        d_rockets *= 2;
+
+        return rockets + d_rockets;
+    }
 }
+
