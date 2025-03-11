@@ -17,7 +17,8 @@ public abstract class Card {
 
     public enum InputType {
         BOOLEAN,
-        COORD_PAIR
+        COORD_PAIR,
+        PLANET
     }
 
     public Card(boolean needPlayerChoice, List<InputType> inputOrder) {

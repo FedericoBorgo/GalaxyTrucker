@@ -2,6 +2,8 @@ package it.polimi.softeng.is25am10.model;
 
 import it.polimi.softeng.is25am10.model.boards.*;
 
+import java.util.List;
+
 /**
  * Stores all the information of the single player, associating it with a pawn and the nickname.
  */
@@ -12,6 +14,9 @@ public class Player {
     private int cash;
     private final ShipBoard board;
     private String rewards;
+
+
+    private List<GoodsBoard.Type> goodsReward;
 
     /**
      * Constructs a Player with the specified RocketPawn and nickname.
@@ -76,5 +81,13 @@ public class Player {
 
     public String getRewards() {
         return rewards;
+    }
+
+    public List<GoodsBoard.Type> getGoodsReward() {
+        return goodsReward;
+    }
+
+    public void setGoodsReward(List<GoodsBoard.Type> goodsReward) {
+        this.goodsReward = goodsReward;
     }
 }
