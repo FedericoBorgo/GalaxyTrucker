@@ -1,5 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import javafx.util.Pair;
+
 import java.util.*;
 
 public class ShipBoard {
@@ -55,5 +57,15 @@ public class ShipBoard {
 
     public ElementsBoard getGoods(GoodsBoard.Type type) {
         return goods.get(type);
+    }
+
+    public double getRocketPower(List<Coordinate> activate){
+        double drills = board.countDrillsPower(activate);
+
+        if(drills > 0){
+            drills += pAlien.getTotal()*2;
+        }
+
+        return drills;
     }
 }
