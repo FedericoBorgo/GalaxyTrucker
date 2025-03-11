@@ -33,7 +33,7 @@ class TilesBoardTest {
         result = tilesBoard.setTile(new Coordinate(2, 2), tile, Tile.Rotation.NONE);
         assertTrue(result.isOk());
         assertEquals(Tile.Type.ROCKET, tilesBoard.getTile(new Coordinate(2, 2)).getData().getType());
-        assertEquals(Tile.Rotation.NONE, tilesBoard.getRotation(new Coordinate(2, 2)).getData());
+        assertEquals(Tile.Rotation.NONE, tilesBoard.getRotation(new Coordinate(2, 2)));
 
         result = tilesBoard.setTile(new Coordinate(0, 2), tile, Tile.Rotation.NONE);
         assertTrue(result.isErr());
@@ -159,4 +159,24 @@ class TilesBoardTest {
         assertTrue(result.contains(new Coordinate(0, 0)));
     }
 
+    @Test
+    void checkExposedConnectors(){
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.DRILLS, "sstu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ROCKET, "suss"), Tile.Rotation.INV);
+
+        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_DRILLS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ROCKET, "otst"), Tile.Rotation.NONE);
+
+        tilesBoard.setTile(new Coordinate(1, 2), new Tile(Tile.Type.BATTERY_2, "otot"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ROCKET, "uoss"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
+
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.DRILLS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
+
+        assertEquals(8, tilesBoard.countExposedConnectors());
+    }
 }
