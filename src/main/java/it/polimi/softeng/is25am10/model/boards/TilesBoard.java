@@ -2,9 +2,11 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * TilesBoard Represents a ship board where tiles can be placed, booked, (or trashed).
@@ -139,8 +141,8 @@ public class TilesBoard {
      * @return a Result containing the rotation of the tile if the coordinates are valid,
      *         or an error Result with a message indicating the coordinates are out of bounds
      */
-    public Result<Tile.Rotation> getRotation(Coordinate c) {
-        return Result.ok(rotation[c.x()][c.y()]);
+    public Tile.Rotation getRotation(Coordinate c) {
+        return rotation[c.x()][c.y()];
     }
 
     /**
@@ -271,11 +273,11 @@ public class TilesBoard {
         Coordinate.forEach(c -> {
             try{
                 if(Tile.rocket(get(c))){
-                    if(getRotation(c).getData() != Tile.Rotation.NONE || Tile.real(get(c.down())))
+                    if(getRotation(c) != Tile.Rotation.NONE || Tile.real(get(c.down())))
                         result.add(c);
                 }
                 else if(Tile.drills(get(c))){
-                    Tile t = switch(getRotation(c).getData()){
+                    Tile t = switch(getRotation(c)){
                         case NONE -> get(c.up());
                         case CLOCK -> get(c.right());
                         case DOUBLE -> get(c.down());
@@ -297,8 +299,8 @@ public class TilesBoard {
                 Tile.ConnectorType lower;
 
                 if(Tile.real(get(c)) && Tile.real(downTile)){
-                    upper = Tile.getSide(get(c), getRotation(c).getData(), Tile.Side.DOWN);
-                    lower = Tile.getSide(downTile, getRotation(c.down()).getData(), Tile.Side.UP);
+                    upper = Tile.getSide(get(c), getRotation(c), Tile.Side.DOWN);
+                    lower = Tile.getSide(downTile, getRotation(c.down()), Tile.Side.UP);
 
                     if(!upper.connectable(lower))
                         result.add(c);
@@ -310,8 +312,8 @@ public class TilesBoard {
                 Tile.ConnectorType lefter;
                 Tile.ConnectorType righter;
                 if(Tile.real(get(c)) && Tile.real(rightTile)){
-                    lefter = Tile.getSide(get(c), getRotation(c).getData(), Tile.Side.RIGHT);
-                    righter = Tile.getSide(rightTile, getRotation(c.right()).getData(), Tile.Side.LEFT);
+                    lefter = Tile.getSide(get(c), getRotation(c), Tile.Side.RIGHT);
+                    righter = Tile.getSide(rightTile, getRotation(c.right()), Tile.Side.LEFT);
 
                     if(!lefter.connectable(righter))
                         result.add(c);
@@ -319,6 +321,51 @@ public class TilesBoard {
             }catch(IOException _){};
 
         });
+    }
 
+    public int countExposedConnectors(){
+        AtomicInteger count = new AtomicInteger();
+        List<Pair<Coordinate, Tile.Side>> debug = new ArrayList<>();
+
+        Coordinate.forEach(c -> {
+            if(!Tile.real(get(c)))
+                return;
+
+            Set<Tile.Side> check = new HashSet<>();
+
+            //if the near tiles are not real (WALL or EMPTY) or
+            // does not exist(IOException) check if the connector is
+            //smooth
+            try {
+                if(!Tile.real(get(c.left())))
+                    check.add(Tile.Side.LEFT);
+            } catch (IOException e) { check.add(Tile.Side.LEFT); }
+
+            try {
+                if(!Tile.real(get(c.right())))
+                    check.add(Tile.Side.RIGHT);
+            } catch (IOException e) { check.add(Tile.Side.RIGHT); }
+
+            try {
+                if(!Tile.real(get(c.up())))
+                    check.add(Tile.Side.UP);
+            } catch (IOException e) { check.add(Tile.Side.UP); }
+
+            try {
+                if(!Tile.real(get(c.down())))
+                    check.add(Tile.Side.DOWN);
+            } catch (IOException e) { check.add(Tile.Side.DOWN); }
+
+
+            for(Tile.Side s : check){
+                if(Tile.ConnectorType.SMOOTH !=
+                        Tile.getSide(get(c), getRotation(c), s)) {
+                    count.incrementAndGet();
+                    debug.add(new Pair<>(c, s));
+                }
+            }
+        });
+
+        return count.get();
     }
 }

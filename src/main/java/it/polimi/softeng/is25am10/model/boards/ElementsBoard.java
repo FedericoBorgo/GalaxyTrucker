@@ -137,36 +137,34 @@ public abstract class ElementsBoard {
      * @return
      */
     public Result<Integer> remove(List<Pair<Coordinate, Integer>> positions) {
-        int i;
-        Pair<Coordinate, Integer> val;
-        Result<Integer> res = Result.ok(0);
-        int qty;
+        Result<Integer> res;
         int total = 0;
 
-        for(i = 0; i < positions.size(); i++){
-            val = positions.get(i);
-            qty = val.getValue();
+        if(!checkPresence(positions))
+            return Result.err("not enough items in the specified positions");
 
-            res = remove(val.getKey(), qty);
+        for(Pair<Coordinate, Integer> p : positions){
+            res = remove(p.getKey(), p.getValue());
+            total += p.getValue();
 
             if(res.isErr())
-                break;
-
-            total += qty;
-        }
-
-        if(res.isErr()){
-            for(int j = 0; j < i; j++){
-                val = positions.get(i);
-                qty = val.getValue();
-
-                set(val.getKey(), qty + get(val.getKey()));
-            }
-
-            return Result.err("unable to remove all the qty");
+                throw new IllegalStateException("remove and checkPresence do not return the same value");
         }
 
         return Result.ok(total);
+    }
+
+    /**
+     * Check if there are enough items in the specified position.
+     * @param positions the list of positions and values
+     * @return true if there are enough, false if not.
+     */
+    public boolean checkPresence(List<Pair<Coordinate, Integer>> positions){
+        for(Pair<Coordinate, Integer> p : positions){
+            if(get(p.getKey()) > p.getValue())
+                return false;
+        }
+        return true;
     }
 
     /**
