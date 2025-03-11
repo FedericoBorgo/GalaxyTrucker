@@ -1,20 +1,21 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import java.io.IOException;
 import java.util.*;
 
 public class ShipBoard {
     private final TilesBoard tiles;
     private final ElementsBoard astronaut;
-    private final ElementsBoard pAlien;
-    private final ElementsBoard bAlien;
+    private final ElementsBoard purple;
+    private final ElementsBoard brown;
     private final ElementsBoard battery;
     private final Map<GoodsBoard.Type, ElementsBoard> goods;
 
     public ShipBoard(){
         tiles = new TilesBoard();
         astronaut = new AstronautBoard(tiles);
-        pAlien = new AlienBoard(tiles, AlienBoard.Type.BROWN);
-        bAlien = new AlienBoard(tiles, AlienBoard.Type.PURPLE);
+        purple = new AlienBoard(tiles, AlienBoard.Type.PURPLE);
+        brown = new AlienBoard(tiles, AlienBoard.Type.BROWN);
         battery = new BatteryBoard(tiles);
 
         goods = new HashMap<>();
@@ -22,9 +23,9 @@ public class ShipBoard {
             goods.put(type, new GoodsBoard(tiles, type));
         });
 
-        astronaut.setOthers(Arrays.asList(bAlien, pAlien));
-        pAlien.setOthers(Arrays.asList(bAlien, astronaut));
-        bAlien.setOthers(Arrays.asList(pAlien, astronaut));
+        astronaut.setOthers(Arrays.asList(brown, purple));
+        purple.setOthers(Arrays.asList(brown, astronaut));
+        brown.setOthers(Arrays.asList(purple, astronaut));
 
         Arrays.stream(GoodsBoard.Type.values()).forEach(type -> {
             List<ElementsBoard> other = new ArrayList<>(goods.values());
@@ -41,12 +42,12 @@ public class ShipBoard {
         return astronaut;
     }
 
-    public ElementsBoard getPurpleAlien() {
-        return pAlien;
+    public ElementsBoard getPurple() {
+        return purple;
     }
 
-    public ElementsBoard getBrownAlien() {
-        return bAlien;
+    public ElementsBoard getBrown() {
+        return brown;
     }
 
     public ElementsBoard getBattery() {
@@ -61,7 +62,7 @@ public class ShipBoard {
         double drills = tiles.countDrillsPower(activate);
 
         if(drills > 0){
-            drills += pAlien.getTotal()*2;
+            drills += purple.getTotal()*2;
         }
 
         return drills;
@@ -71,13 +72,70 @@ public class ShipBoard {
         int rocket = tiles.countRocketPower(activate);
 
         if(rocket > 0){
-            rocket += bAlien.getTotal()*2;
+            rocket += brown.getTotal()*2;
         }
 
         return rocket;
     }
 
+    private boolean thereIsSomeone(Coordinate c){
+        return purple.get(c) + astronaut.get(c) + brown.get(c) > 0;
+    }
+
+    private void removeSomeone(Coordinate c){
+        if(astronaut.get(c) > 0) {
+            astronaut.remove(c, 1);
+            return;
+        }
+
+        if(purple.get(c) > 0) {
+            purple.remove(c, 1);
+            return;
+        }
+
+        if(brown.get(c) > 0) {
+            brown.remove(c, 1);
+            return;
+        }
+    }
+
+    private void toRemove(boolean[][] marked, Coordinate c){
+        if(marked[c.x()][c.y()] || !thereIsSomeone(c))
+            return;
+
+        marked[c.x()][c.y()] = true;
+
+        try {
+            toRemove(marked, c.left());
+        } catch (IOException _) {
+        }
+        try {
+            toRemove(marked, c.right());
+        } catch (IOException _) {
+        }
+        try {
+            toRemove(marked, c.up());
+        } catch (IOException _) {
+        }
+        try {
+            toRemove(marked, c.down());
+        } catch (IOException _) {
+        }
+    }
+
     public void epidemic(){
-        //pulls out the dead crew
+        boolean[][] marked = new boolean[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+
+        for(boolean[] b: marked)
+            Arrays.fill(b, false);
+
+        Coordinate.forEach(c ->  {
+            toRemove(marked, c);
+        });
+
+        Coordinate.forEach(c -> {
+            if(marked[c.x()][c.y()])
+                removeSomeone(c);
+        });
     }
 }

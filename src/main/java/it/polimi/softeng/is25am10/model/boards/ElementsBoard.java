@@ -71,6 +71,10 @@ public abstract class ElementsBoard {
      */
     protected void set(Coordinate c, int value) {
         total += (value - get(c));
+
+        if(value == 0)
+            positions.remove(c);
+
         positions.put(c, value);
     }
 
