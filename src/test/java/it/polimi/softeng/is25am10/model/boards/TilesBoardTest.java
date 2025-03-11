@@ -224,6 +224,6 @@ class TilesBoardTest {
 
         List<Coordinate> battery = new ArrayList<>();
         battery.add(new Coordinate(1, 3));
-        assertEquals(3.5, tilesBoard.countRocketPower(battery));
+        assertEquals(3, tilesBoard.countRocketPower(battery));
     }
 }

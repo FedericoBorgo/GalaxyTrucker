@@ -407,20 +407,17 @@ public class TilesBoard {
     }
 
     public double countDrillsPower(List<Coordinate> dDrills) {
-        AtomicInteger forwardDrill = new AtomicInteger();
-        AtomicInteger rotatedDrill = new AtomicInteger();
-
-        AtomicInteger forwardD_Drill = new AtomicInteger();
-        AtomicInteger rotatedD_Drill = new AtomicInteger();
+        AtomicInteger drills = new AtomicInteger();
+        AtomicInteger d_drills = new AtomicInteger();
 
         Coordinate.forEach(c -> {
             if (get(c).getType() != Tile.Type.DRILLS)
                 return;
 
             if (getRotation(c) == Tile.Rotation.NONE)
-                forwardDrill.getAndIncrement();
+                drills.addAndGet(2);
             else
-                rotatedDrill.getAndIncrement();
+                drills.addAndGet(1);
         });
 
         dDrills.forEach(d -> {
@@ -428,50 +425,29 @@ public class TilesBoard {
                 return;
 
             if (getRotation(d) == Tile.Rotation.NONE)
-                forwardD_Drill.getAndIncrement();
+                d_drills.addAndGet(2);
             else
-                rotatedD_Drill.getAndIncrement();
+                d_drills.addAndGet(1);
         });
 
-        double drills = forwardDrill.get() + rotatedDrill.get()/2.0;
-        double d_drills = forwardD_Drill.get() + rotatedD_Drill.get()/2.0;
-        d_drills *= 2;
 
-        return drills + d_drills;
+        return drills.get()/2.0 + d_drills.get();
     }
 
-    public double countRocketPower(List<Coordinate> dDrills) {
-        AtomicInteger forwardRocket = new AtomicInteger();
-        AtomicInteger rotatedRocket = new AtomicInteger();
-
-        AtomicInteger forwardD_Rocket = new AtomicInteger();
-        AtomicInteger rotatedD_Rocket = new AtomicInteger();
+    public int countRocketPower(List<Coordinate> dDrills) {
+        AtomicInteger power = new AtomicInteger();
 
         Coordinate.forEach(c -> {
-            if (get(c).getType() != Tile.Type.ROCKET)
-                return;
-
-            if (getRotation(c) == Tile.Rotation.NONE)
-                forwardRocket.getAndIncrement();
-            else
-                rotatedRocket.getAndIncrement();
+            if (get(c).getType() == Tile.Type.ROCKET && getRotation(c) == Tile.Rotation.NONE)
+                power.getAndIncrement();
         });
 
         dDrills.forEach(d -> {
-            if (get(d).getType() != Tile.Type.D_ROCKET)
-                return;
-
-            if (getRotation(d) == Tile.Rotation.NONE)
-                forwardD_Rocket.getAndIncrement();
-            else
-                rotatedD_Rocket.getAndIncrement();
+            if (get(d).getType() == Tile.Type.D_ROCKET && getRotation(d) == Tile.Rotation.NONE)
+                power.addAndGet(2);
         });
 
-        double rockets = forwardRocket.get() + rotatedRocket.get()/2.0;
-        double d_rockets = forwardD_Rocket.get() + rotatedD_Rocket.get()/2.0;
-        d_rockets *= 2;
-
-        return rockets + d_rockets;
+        return power.get();
     }
 }
 

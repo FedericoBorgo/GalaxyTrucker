@@ -67,8 +67,8 @@ public class ShipBoard {
         return drills;
     }
 
-    public double getRocketPower(List<Coordinate> activate){
-        double rocket = tiles.countRocketPower(activate);
+    public int getRocketPower(List<Coordinate> activate){
+        int rocket = tiles.countRocketPower(activate);
 
         if(rocket > 0){
             rocket += bAlien.getTotal()*2;
