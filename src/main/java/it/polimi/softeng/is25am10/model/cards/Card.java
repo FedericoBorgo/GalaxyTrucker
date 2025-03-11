@@ -40,5 +40,5 @@ public abstract class Card {
 
     public abstract Result<List<String>> set(Player player, List<String> input);
 
-    public abstract void play();
+    public abstract Result<String> play();
 }
