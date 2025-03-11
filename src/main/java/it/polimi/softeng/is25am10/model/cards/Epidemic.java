@@ -14,9 +14,11 @@ import static it.polimi.softeng.is25am10.model.boards.TilesBoard.BOARD_WIDTH;
 
 public class Epidemic extends Card {
 
+   //constructor
     public Epidemic() {
-        super( true, null);
+        super( false, null);
     }
+
 
     @Override
     public Result<List<String>> set(Player player, List<String> input) {
@@ -24,6 +26,10 @@ public class Epidemic extends Card {
         return Result.ok(null);
     }
 
+    /**
+     * removes the crew members that the epidemic killed
+     * @return an error/success message
+     */
     @Override
     public Result<String> play() {
         if(board.getOrder().size()== playerChoice.size()) {

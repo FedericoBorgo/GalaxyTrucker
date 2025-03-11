@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Player;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -79,5 +80,7 @@ public class ShipBoard {
         return rocket;
     }
 
-    public void epidemic(){}
+    public void epidemic(){
+        //pulls out the dead crew
+    }
 }
