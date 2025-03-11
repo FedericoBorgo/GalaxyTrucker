@@ -1,12 +1,9 @@
 package it.polimi.softeng.is25am10.model.boards;
 
-import it.polimi.softeng.is25am10.model.Player;
-import javafx.util.Pair;
-
 import java.util.*;
 
 public class ShipBoard {
-    private final TilesBoard board;
+    private final TilesBoard tiles;
     private final ElementsBoard astronaut;
     private final ElementsBoard pAlien;
     private final ElementsBoard bAlien;
@@ -14,15 +11,15 @@ public class ShipBoard {
     private final Map<GoodsBoard.Type, ElementsBoard> goods;
 
     public ShipBoard(){
-        board = new TilesBoard();
-        astronaut = new AstronautBoard(board);
-        pAlien = new AlienBoard(board, AlienBoard.Type.BROWN);
-        bAlien = new AlienBoard(board, AlienBoard.Type.PURPLE);
-        battery = new BatteryBoard(board);
+        tiles = new TilesBoard();
+        astronaut = new AstronautBoard(tiles);
+        pAlien = new AlienBoard(tiles, AlienBoard.Type.BROWN);
+        bAlien = new AlienBoard(tiles, AlienBoard.Type.PURPLE);
+        battery = new BatteryBoard(tiles);
 
         goods = new HashMap<>();
         Arrays.stream(GoodsBoard.Type.values()).forEach(type -> {
-            goods.put(type, new GoodsBoard(board, type));
+            goods.put(type, new GoodsBoard(tiles, type));
         });
 
         astronaut.setOthers(Arrays.asList(bAlien, pAlien));
@@ -36,8 +33,8 @@ public class ShipBoard {
         });
     }
 
-    public TilesBoard getBoard() {
-        return board;
+    public TilesBoard getTiles() {
+        return tiles;
     }
 
     public ElementsBoard getAstronaut() {
@@ -61,7 +58,7 @@ public class ShipBoard {
     }
 
     public double getDrillsPower(List<Coordinate> activate){
-        double drills = board.countDrillsPower(activate);
+        double drills = tiles.countDrillsPower(activate);
 
         if(drills > 0){
             drills += pAlien.getTotal()*2;
@@ -71,7 +68,7 @@ public class ShipBoard {
     }
 
     public double getRocketPower(List<Coordinate> activate){
-        double rocket = board.countRocketPower(activate);
+        double rocket = tiles.countRocketPower(activate);
 
         if(rocket > 0){
             rocket += bAlien.getTotal()*2;

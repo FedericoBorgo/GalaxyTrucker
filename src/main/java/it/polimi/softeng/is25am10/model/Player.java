@@ -13,9 +13,6 @@ public class Player {
     private String nickname;
     private int cash;
     private final ShipBoard board;
-    private String rewards;
-
-
     private List<GoodsBoard.Type> goodsReward;
 
     /**
@@ -73,14 +70,6 @@ public class Player {
      */
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public void setRewards(String rewards) {
-        this.rewards = rewards;
-    }
-
-    public String getRewards() {
-        return rewards;
     }
 
     public List<GoodsBoard.Type> getGoodsReward() {

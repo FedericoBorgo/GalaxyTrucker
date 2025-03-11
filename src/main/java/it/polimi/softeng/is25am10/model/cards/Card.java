@@ -3,16 +3,17 @@ package it.polimi.softeng.is25am10.model.cards;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import org.json.JSONObject;
+
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class Card {
-    // does the player need to declare something?
     private final boolean needPlayerChoice;
     protected FlightBoard board;
-    protected final List<InputType> inputOrder;
+    protected Map<FlightBoard.RocketPawn, Player> registered;
+    public final int ID;
 
     public enum InputType {
         BOOLEAN,
@@ -20,24 +21,37 @@ public abstract class Card {
         PLANET
     }
 
-    public Card(boolean needPlayerChoice, List<InputType> inputOrder) {
+    public Card(boolean needPlayerChoice, int id) {
         this.needPlayerChoice = needPlayerChoice;
-        this.inputOrder = inputOrder;
+        ID = id;
+        registered = new HashMap<>();
     }
 
     public void setBoard(FlightBoard board) {
         this.board = board;
     }
 
+    public boolean isRegistered(Player player) {
+        return registered.containsValue(player);
+    }
+
+    protected boolean isCorrectOrder(Player player) {
+        return registered.keySet().containsAll(board.getOrder().subList(0, board.getOrder().indexOf(player.getPawn())));
+    }
+
+    protected boolean allRegistered(){
+        return registered.size() == board.getOrder().size();
+    }
+
+    public void register(Player player){
+        registered.put(player.getPawn(), player);
+    }
+
     public boolean needPlayerChoice() {
         return needPlayerChoice;
     }
 
-    public List<InputType> getInputOrder() {
-        return inputOrder;
-    }
+    public abstract Result<Object> set(Player player, JSONObject json);
 
-    public abstract Result<List<String>> set(Player player, List<String> input);
-
-    public abstract Result<String> play();
+    public abstract Result<Object> play();
 }
