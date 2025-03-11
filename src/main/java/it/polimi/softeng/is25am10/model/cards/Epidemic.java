@@ -14,8 +14,8 @@ import static it.polimi.softeng.is25am10.model.boards.TilesBoard.BOARD_WIDTH;
 
 public class Epidemic extends Card {
 
-    public Epidemic(boolean needPlayerChoice, List<InputType> inputOrder) {
-        super( needPlayerChoice, inputOrder);
+    public Epidemic() {
+        super( true, null);
     }
 
     @Override
