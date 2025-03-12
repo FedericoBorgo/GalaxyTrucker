@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Card {
     private final boolean needPlayerChoice;
@@ -52,6 +53,19 @@ public abstract class Card {
         return registered.keySet().containsAll(board.getOrder().subList(0, board.getOrder().indexOf(player.getPawn())));
     }
 
+    public Player nextPlayer(){
+        AtomicReference<Player> p = new AtomicReference<>();
+        p.set(null);
+
+        registered.forEach((pawn, player) -> {
+            if(isCorrectOrder(player)){
+                p.set(player);
+            }
+        });
+
+        return p.get();
+    }
+
     /**
      * Check if all the player gave their input
      * @return
@@ -75,4 +89,6 @@ public abstract class Card {
     public abstract Result<Object> set(Player player, JSONObject json);
 
     public abstract Result<Object> play();
+
+    public abstract boolean ready();
 }

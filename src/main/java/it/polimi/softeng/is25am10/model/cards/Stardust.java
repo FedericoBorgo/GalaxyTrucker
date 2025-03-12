@@ -28,7 +28,7 @@ public class Stardust extends Card {
     @Override
     public Result<Object> play() {
         //begin common part
-        if(!allRegistered())
+        if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
@@ -39,5 +39,10 @@ public class Stardust extends Card {
         }
 
         return Result.ok(null);
+    }
+
+    @Override
+    public boolean ready() {
+        return allRegistered();
     }
 }

@@ -10,6 +10,7 @@ import java.util.*;
 public class Planets extends Card{
     private Map<Planet, List<GoodsBoard.Type>> goods;
     private Map<Player, Planet> playerChoice;
+    private boolean ready = false;
 
     public enum Planet{
         PLANET1, PLANET2, PLANET3, NOPLANET
@@ -40,6 +41,10 @@ public class Planets extends Card{
             return Result.err("planet already occupied");
 
         playerChoice.put(player, planet);
+
+        if(playerChoice.values().containsAll(List.of(Planet.values())))
+            ready = true;
+
         register(player);
         return Result.ok(null);
     }
@@ -48,7 +53,7 @@ public class Planets extends Card{
     @Override
     public Result<Object> play() {
         //begin common part
-        if(!allRegistered())
+        if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
@@ -57,5 +62,10 @@ public class Planets extends Card{
         });
 
         return Result.ok(null);
+    }
+
+    @Override
+    public boolean ready() {
+        return ready;
     }
 }
