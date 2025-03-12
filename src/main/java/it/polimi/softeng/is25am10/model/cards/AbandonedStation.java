@@ -33,9 +33,8 @@ public class AbandonedStation extends Card {
             return Result.err("player choice is not in order");
         }
 
-        Boolean choice = Boolean.valueOf(json.getString("choice"));
+        boolean choice = json.getBoolean("choice");
 
-        register(player);
 
         playerChoice.put(player, choice);
         //enough crew?
@@ -48,7 +47,7 @@ public class AbandonedStation extends Card {
             }
         }
 
-
+        register(player);
 
         return Result.ok(null);
     }
