@@ -53,18 +53,6 @@ public abstract class Card {
         return registered.keySet().containsAll(board.getOrder().subList(0, board.getOrder().indexOf(player.getPawn())));
     }
 
-    public Player nextPlayer(){
-        AtomicReference<Player> p = new AtomicReference<>();
-        p.set(null);
-
-        registered.forEach((pawn, player) -> {
-            if(isCorrectOrder(player)){
-                p.set(player);
-            }
-        });
-
-        return p.get();
-    }
 
     /**
      * Check if all the player gave their input
