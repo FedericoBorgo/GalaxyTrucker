@@ -37,7 +37,7 @@ public class AbandonedStation extends Card {
 
 
         //enough crew?
-        if(playerChoice.get(player)) {
+        if(choice) {
             int crew = player.getBoard().getAstronaut().getTotal();
             if (crew < requiredCrew) {
                 return Result.err("not enough crew");
