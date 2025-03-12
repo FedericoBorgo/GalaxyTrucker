@@ -67,6 +67,11 @@ public class Tile {
         this.connectors = Collections.unmodifiableMap(map);
     }
 
+    public Tile(Type type, Map<Side, ConnectorType> connectors) {
+        this.type = type;
+        this.connectors = Collections.unmodifiableMap(connectors);
+    }
+
     /**
      * Retrieves the type of the tile.
      *
@@ -165,10 +170,10 @@ public class Tile {
          */
         public static ConnectorType fromChar(char c) {
             return switch (c) {
-                case 'o' -> ONE_PIPE;
-                case 't' -> TWO_PIPE;
-                case 'u' -> UNIVERSAL;
-                case 's' -> SMOOTH;
+                case 'o', '1' -> ONE_PIPE;
+                case 't', '2' -> TWO_PIPE;
+                case 'u', '3' -> UNIVERSAL;
+                case 's', '0' -> SMOOTH;
                 default -> throw new IllegalStateException("Unexpected ConnectorType "+ c);
             };
         }
