@@ -36,7 +36,6 @@ public class AbandonedStation extends Card {
         boolean choice = json.getBoolean("choice");
 
 
-        playerChoice.put(player, choice);
         //enough crew?
         if(playerChoice.get(player)) {
             int crew = player.getBoard().getAstronaut().getTotal();
@@ -47,6 +46,7 @@ public class AbandonedStation extends Card {
             }
         }
 
+        playerChoice.put(player, choice);
         register(player);
 
         return Result.ok(null);
