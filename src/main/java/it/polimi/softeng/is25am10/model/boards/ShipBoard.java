@@ -1,5 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import org.json.JSONArray;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -137,5 +139,8 @@ public class ShipBoard {
             if(marked[c.x()][c.y()])
                 removeSomeone(c);
         });
+    }
+
+    public void abandonCrew(JSONArray positionsCrew){
     }
 }
