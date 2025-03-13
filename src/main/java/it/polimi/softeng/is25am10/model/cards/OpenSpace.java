@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.polimi.softeng.is25am10.model.boards.Coordinate.fromStringToCoordinate;
+
 public class OpenSpace extends Card {
     private final Map<FlightBoard.RocketPawn, Integer> enginePower = new HashMap<>();
     public OpenSpace(int id) {
@@ -92,12 +94,5 @@ public class OpenSpace extends Card {
     @Override
     public JSONObject getData() {
         return null;
-    }
-
-    static private Result<Coordinate> fromStringToCoordinate(String s) {
-        if(s.length() != 4 || s.charAt(0) != 'x' || s.charAt(2) != 'y' || !Character.isDigit(s.charAt(1)) || !Character.isDigit(s.charAt(3)))
-            return Result.err("string is not a coordinate");
-        else
-            return Result.ok(new Coordinate(Character.getNumericValue(s.charAt(1)), Character.getNumericValue(s.charAt(3))));
     }
 }
