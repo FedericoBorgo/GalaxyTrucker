@@ -41,4 +41,9 @@ public class Epidemic extends Card {
     public boolean ready() {
         return allRegistered();
     }
+
+    @Override
+    public JSONObject getData() {
+        return null;
+    }
 }

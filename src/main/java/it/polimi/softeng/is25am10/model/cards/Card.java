@@ -79,4 +79,6 @@ public abstract class Card {
     public abstract Result<Object> play();
 
     public abstract boolean ready();
+
+    public abstract JSONObject getData();
 }

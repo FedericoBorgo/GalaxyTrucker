@@ -89,6 +89,11 @@ public class OpenSpace extends Card {
         return allRegistered();
     }
 
+    @Override
+    public JSONObject getData() {
+        return null;
+    }
+
     static private Result<Coordinate> fromStringToCoordinate(String s) {
         if(s.length() != 4 || s.charAt(0) != 'x' || s.charAt(2) != 'y' || !Character.isDigit(s.charAt(1)) || !Character.isDigit(s.charAt(3)))
             return Result.err("string is not a coordinate");
