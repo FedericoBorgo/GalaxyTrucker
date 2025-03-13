@@ -16,6 +16,15 @@ public class Tile {
 
     public enum Rotation{
         CLOCK, INV, DOUBLE, NONE;
+
+        public Side toSide(){
+            return switch (this){
+                case CLOCK -> Side.RIGHT;
+                case INV -> Side.LEFT;
+                case DOUBLE -> Side.DOWN;
+                case NONE -> Side.UP;
+            };
+        }
     }
 
     /**
@@ -217,6 +226,15 @@ public class Tile {
 
             return this == TWO_PIPE && other == TWO_PIPE;
         }
+    }
+
+    static public List<Side> shieldCoverage(Rotation rotation){
+        return switch (rotation){
+            case NONE -> Arrays.asList(Side.UP, Side.RIGHT);
+            case CLOCK -> Arrays.asList(Side.RIGHT, Side.DOWN);
+            case DOUBLE -> Arrays.asList(Side.DOWN, Side.LEFT);
+            case INV -> Arrays.asList(Side.LEFT, Side.UP);
+        };
     }
 }
 

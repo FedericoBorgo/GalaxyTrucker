@@ -1,12 +1,15 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 /**
  * TilesBoard Represents a ship board where tiles can be placed, booked, (or trashed).
@@ -216,9 +219,9 @@ public class TilesBoard {
      * @param c
      */
     public void remove(Coordinate c) {
+        trashed.add(board[c.x()][c.y()]);
         board[c.x()][c.y()] = Tile.EMPTY_TILE;
         rotation[c.x()][c.y()] = Tile.Rotation.NONE;
-
     }
 
     /**
@@ -448,6 +451,72 @@ public class TilesBoard {
         });
 
         return power.get();
+    }
+
+    private boolean doesShieldsCover(Tile.Side side){
+        AtomicBoolean covered = new AtomicBoolean();
+        covered.set(false);
+
+        Coordinate.forEachUntil(c -> {
+            if(get(c).getType() == Tile.Type.SHIELD &&
+                    Tile.shieldCoverage(getRotation(c)).contains(side)){
+                covered.set(true);
+                return false;
+            }
+            return true;
+        });
+        return covered.get();
+    }
+
+    private boolean doesDrillsCover(Tile.Side side, int where, boolean useBattery){
+        AtomicBoolean cover = new AtomicBoolean();
+        cover.set(false);
+
+        Predicate<Coordinate> checkDrill = c -> {
+            if (getRotation(c).toSide() == side &&
+                    (get(c).getType() == Tile.Type.DRILLS ||
+                            (useBattery && get(c).getType() == Tile.Type.D_DRILLS))) {
+                cover.set(true);
+                return false;
+            }
+            return true;
+        };
+
+        switch(side){
+            case UP:
+                Coordinate.forEachUntil(where, checkDrill);
+                break;
+            case DOWN:
+                Coordinate.forEachUntil(where - 1, checkDrill);
+                Coordinate.forEachUntil(where, checkDrill);
+                Coordinate.forEachUntil(where + 1, checkDrill);
+                break;
+            case LEFT, RIGHT:
+                Coordinate.forEachUntil(checkDrill, where - 1);
+                Coordinate.forEachUntil(checkDrill, where);
+                Coordinate.forEachUntil(checkDrill, where + 1);
+                break;
+        }
+
+        return cover.get();
+    }
+
+    private boolean hasExposedConnector(Tile.Side side, int where){
+        boolean hasExposed = false;
+
+        return hasExposed;
+    }
+
+    public void hit(Projectile p, Tile.Side side, int where, boolean useBattery){
+        AtomicBoolean saved = new AtomicBoolean(false);
+
+        if(p.stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(side)){
+            saved.set(true);
+        }
+        else if(p.stoppedBy() == Tile.Type.DRILLS && doesDrillsCover(side, where, useBattery)){
+            saved.set(true);
+        }
+
     }
 }
 

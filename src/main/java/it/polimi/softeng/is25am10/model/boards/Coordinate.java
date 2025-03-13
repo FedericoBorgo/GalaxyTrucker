@@ -63,6 +63,22 @@ public class Coordinate {
                 ok = predicate.test(new Coordinate(i, j));
     }
 
+    static public void forEachUntil(int x, Predicate<Coordinate> predicate) {
+        boolean ok = true;
+        if(x < 0 || x >= TilesBoard.BOARD_WIDTH)
+            return;
+        for(int j = 0; j < TilesBoard.BOARD_HEIGHT && ok; j++)
+            ok = predicate.test(new Coordinate(x, j));
+    }
+
+    static public void forEachUntil(Predicate<Coordinate> predicate, int y) {
+        boolean ok = true;
+        if(y < 0 || y >= TilesBoard.BOARD_HEIGHT)
+            return;
+        for(int i = 0; i < TilesBoard.BOARD_WIDTH && ok; i++)
+            ok = predicate.test(new Coordinate(i, y));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
