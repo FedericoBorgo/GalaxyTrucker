@@ -70,6 +70,18 @@ public class TilesBoard {
         return board[c.x()][c.y()];
     }
 
+    public Tile[][] getBoard() {
+        return board;
+    }
+
+    public Tile.Rotation[][] getRotation() {
+        return rotation;
+    }
+
+    public List<Tile> getTrashed() {
+        return trashed;
+    }
+
 
     // Checks if there is at least one tile adjacent to the specified position
     // that is not a wall or an empty space.

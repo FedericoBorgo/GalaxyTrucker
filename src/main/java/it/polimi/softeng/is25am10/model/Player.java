@@ -10,7 +10,6 @@ import java.util.List;
 
 public class Player {
     private final FlightBoard.RocketPawn pawn;
-    private String nickname;
     private int cash;
     private final ShipBoard board;
     private List<GoodsBoard.Type> goodsReward;
@@ -19,10 +18,8 @@ public class Player {
      * Constructs a Player with the specified RocketPawn and nickname.
      *
      * @param pawn the RocketPawn associated with the player
-     * @param nickname the player's nickname
      */
-    public Player(FlightBoard.RocketPawn pawn, String nickname) {
-        this.nickname = nickname;
+    public Player(FlightBoard.RocketPawn pawn) {
         this.pawn = pawn;
         board = new ShipBoard();
     }
@@ -61,15 +58,6 @@ public class Player {
      */
     public void giveCash(int amount) {
         cash += amount;
-    }
-
-    /**
-     * Sets the nickname of the player.
-     *
-     * @param nickname the nickname to be assigned
-     */
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
     }
 
     public List<GoodsBoard.Type> getGoodsReward() {

@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 import it.polimi.softeng.is25am10.model.Result;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,6 +9,19 @@ import java.util.List;
  * Includes methods for moving pawns
  */
 public class FlightBoard {
+    public static class CompressedFlightBoard{
+        public final List<RocketPawn> order;
+        public final List<Integer> offset;
+        public final int leaderPosition;
+
+
+        CompressedFlightBoard(List<RocketPawn> order, List<Integer> offset, int leaderPosition){
+            this.order = Collections.unmodifiableList(order);
+            this.offset = Collections.unmodifiableList(offset);
+            this.leaderPosition = leaderPosition;
+        }
+    }
+
     private int timer;
 
     private final List<RocketPawn> order;
@@ -129,5 +143,9 @@ public class FlightBoard {
 
     public enum RocketPawn {
         YELLOW, GREEN, BLUE, RED, EMPTY;
+    }
+
+    public CompressedFlightBoard compress() {
+        return new CompressedFlightBoard(order, offset, leaderPosition);
     }
 }
