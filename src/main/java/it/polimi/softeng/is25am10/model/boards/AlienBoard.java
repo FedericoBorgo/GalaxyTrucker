@@ -50,6 +50,6 @@ public class AlienBoard extends ElementsBoard{
     @Override
     public boolean check(Coordinate c, int qty) {
         return board.getTile(c).getData().getType() == Tile.Type.HOUSE
-                && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1);
+                && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1) && total+ qty <= 1;
     }
 }

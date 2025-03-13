@@ -71,4 +71,9 @@ public class AbandonedStation extends Card {
     public boolean ready() {
         return ready;
     }
+
+    @Override
+    public JSONObject getData() {
+        return null;
+    }
 }
