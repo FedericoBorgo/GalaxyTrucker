@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+
 import java.io.IOException;
 import java.util.*;
 
