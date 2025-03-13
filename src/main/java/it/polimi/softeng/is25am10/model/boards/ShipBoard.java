@@ -1,5 +1,8 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Projectile;
+import it.polimi.softeng.is25am10.model.Tile;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -138,4 +141,5 @@ public class ShipBoard {
                 removeSomeone(c);
         });
     }
+
 }
