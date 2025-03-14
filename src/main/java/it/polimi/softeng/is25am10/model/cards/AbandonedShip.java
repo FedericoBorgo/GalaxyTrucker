@@ -45,11 +45,6 @@ public class AbandonedShip extends Card {
         }
         //end
 
-        // JSON: positionsCrew: [
-        //    { "coordinate": "3,4", "removeCount": 2, "type": 'ASTRONAUT' },
-        //    { "coordinate": "5,6", "removeCount": 1, "type": 'P_ALIEN' },
-        //    { "coordinate": "1,2", "removeCount": 2, "type": 'ASTRONAUT' }
-        //  ]
         if(json.getBoolean("accept")){
             int count = 0;
             JSONArray tempPositionsCrew = json.getJSONArray("positionsCrew");
@@ -105,6 +100,7 @@ public class AbandonedShip extends Card {
             descendingPlayer.getBoard().getAstronaut().remove(positionsCrew);
             // give the credits to the player
             descendingPlayer.giveCash(cash);
+            board.moveRocket(descendingPlayer.getPawn(), -days);
             return Result.ok(descendingPlayer);
         }
 
