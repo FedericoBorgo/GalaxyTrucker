@@ -1,19 +1,22 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Card {
     private final boolean needPlayerChoice;
-    protected FlightBoard board;
-    protected Map<FlightBoard.RocketPawn, Player> registered;
+    protected final FlightBoard board;
+    protected final Map<FlightBoard.RocketPawn, Player> registered;
+    protected final Model model;
     public final int ID;
 
     public enum InputType {
@@ -22,14 +25,12 @@ public abstract class Card {
         PLANET
     }
 
-    public Card(boolean needPlayerChoice, int id) {
+    public Card(Model model, boolean needPlayerChoice, FlightBoard board, int id) {
         this.needPlayerChoice = needPlayerChoice;
+        this.board = board;
+        this.model = model;
         ID = id;
         registered = new HashMap<>();
-    }
-
-    public void setBoard(FlightBoard board) {
-        this.board = board;
     }
 
     /**
@@ -73,6 +74,32 @@ public abstract class Card {
     public boolean needPlayerChoice() {
         return needPlayerChoice;
     }
+
+    protected Map<Tile.Rotation, Integer> getDrillsToActivate(JSONObject json){
+        Map<Tile.Rotation, Integer> drills = new HashMap<>();
+
+        for(Tile.Rotation r: Tile.Rotation.values()){
+            drills.put(r, json.getInt(r.name()));
+        }
+        return drills;
+    }
+
+    protected int getNecessaryBattery(Map<Tile.Rotation, Integer> drills){
+        AtomicInteger count = new AtomicInteger(0);
+        drills.forEach((r, val) -> {
+            count.addAndGet(val);
+        });
+        return count.get();
+    }
+
+    protected int getRocketToActivate(JSONObject json){
+        return json.getInt("d_rocket");
+    }
+
+    protected boolean getChoice(JSONObject json){
+        return json.getBoolean("choice");
+    }
+
 
     public abstract Result<Object> set(Player player, JSONObject json);
 

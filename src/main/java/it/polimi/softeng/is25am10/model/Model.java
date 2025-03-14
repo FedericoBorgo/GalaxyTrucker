@@ -21,6 +21,9 @@ public class Model {
     private FlightBoard flight;
     private List<RocketPawn> unusedPawns;
     private final boolean disableChecks;
+    private final Map<Player, Integer> removedBattery;
+    private final Map<Player, Integer> removedGuys;
+    private final Map<Player, Integer> removedGoods;
 
     //Constructs a new Match instance
     public Model(boolean disableChecks, boolean disableChecks1) {
@@ -29,6 +32,9 @@ public class Model {
         tiles = new TilesCollection();
         flight = new FlightBoard();
         unusedPawns = new ArrayList<>(List.of(RocketPawn.values()));
+        removedBattery = new HashMap<>();
+        removedGuys = new HashMap<>();
+        removedGoods = new HashMap<>();
     }
 
     public Result<RocketPawn> addPlayer(String name) {
@@ -63,6 +69,16 @@ public class Model {
         flight.setRocketReady(players.get(name).getPawn());
     }
 
+    private void increment(Map<Player, Integer> map, Player player){
+        map.put(player, map.getOrDefault(player, 0) + 1);
+    }
+
+
+
+
+
+
+
     //player building board section
     public Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation){
         //TODO disableCheck
@@ -95,6 +111,13 @@ public class Model {
     }
     //end player building methods
 
+
+
+
+
+
+
+
     //player methods
     public List<GoodsBoard.Type> getReward(String name){
         return get(name).getGoodsReward();
@@ -108,6 +131,65 @@ public class Model {
     public int getCash(String name){
         return get(name).getCash();
     }
+
+    public Result<Integer> removeBattery(String name, Coordinate c){
+        Player p = get(name);
+        Result<Integer> res = ship(name).getBattery().remove(c, 1);
+
+        if(res.isOk())
+            increment(removedBattery, p);
+        return res;
+    }
+
+    public Result<Integer> removeGuy(String name, Coordinate c){
+        if(!ship(name).removeSomeone(c))
+            return Result.err("there is no one here");
+
+        increment(removedGuys, get(name));
+        return Result.ok(1);
+    }
+
+    public Result<Integer> removeGoods(String name, Coordinate c, GoodsBoard.Type t){
+        Result<Integer> res = ship(name).getGoods(t).remove(c, 1);
+
+        if(res.isOk())
+            increment(removedGoods, get(name));
+        return res;
+    }
+
+    public int getRemovedBattery(String name){
+        return removedBattery.getOrDefault(get(name), 0);
+    }
+
+    public int getRemovedGuys(String name){
+        return removedGuys.getOrDefault(get(name), 0);
+    }
+
+    public int getRemovedGoods(String name){
+        return removedGoods.getOrDefault(get(name), 0);
+    }
+
+    public int getRemovedBattery(Player p){
+        return removedBattery.getOrDefault(p, 0);
+    }
+
+    public int getRemovedGuys(Player p){
+        return removedGuys.getOrDefault(p, 0);
+    }
+
+    public int getRemovedGoods(Player p){
+        return removedGoods.getOrDefault(p, 0);
+    }
+    //end
+
+
+
+
+
+
+
+
+
 
     //tiles section
     public Tile drawTile(){

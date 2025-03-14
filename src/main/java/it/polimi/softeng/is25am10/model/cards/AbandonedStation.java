@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import org.json.JSONObject;
@@ -16,8 +17,8 @@ public class AbandonedStation extends Card {
     private int flightDays;
     private boolean ready = false;
 
-    public AbandonedStation(int Crew,List<GoodsBoard.Type> goodsType, int id, int backmoves) {
-        super(true, id);
+    public AbandonedStation(FlightBoard board, int Crew, List<GoodsBoard.Type> goodsType, int id, int backmoves) {
+        super(null, true, board, id);
         this.goods = goodsType;
         this.requiredCrew = Crew;
         this.flightDays = backmoves;
@@ -33,8 +34,7 @@ public class AbandonedStation extends Card {
             return Result.err("player choice is not in order");
         }
 
-        boolean choice = json.getBoolean("choice");
-
+        boolean choice = getChoice(json);
 
         //enough crew?
         if(choice) {

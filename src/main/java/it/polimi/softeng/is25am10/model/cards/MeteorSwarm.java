@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,8 +20,8 @@ public class MeteorSwarm extends Card {
         return new Random().nextInt(6) + 1;
     }
 
-    public MeteorSwarm(List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
-        super(true, id);
+    public MeteorSwarm(FlightBoard board, List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
+        super(null, true, board, id);
         projectiles = new ArrayList<>();
         playerChoice = new HashMap<>();
         AtomicInteger counter = new AtomicInteger();

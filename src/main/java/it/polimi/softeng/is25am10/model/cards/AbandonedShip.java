@@ -1,8 +1,10 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import javafx.util.Pair;
 import org.json.JSONObject;
@@ -24,8 +26,8 @@ public class AbandonedShip extends Card {
     private Optional<Coordinate> brownPosition;
     private Optional<Coordinate> purplePosition;
 
-    public AbandonedShip(int id, int astronaut, int cash, int days) {
-        super(true, id);
+    public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
+        super(model, true, board, id);
        this.cash = cash;
        this.days = days;
        this.astronaut = astronaut;
@@ -45,37 +47,11 @@ public class AbandonedShip extends Card {
         }
         //end
 
-        if(json.getBoolean("accept")){
-            int count = 0;
-            JSONArray tempPositionsCrew = json.getJSONArray("positionsCrew");
-            positionsCrew = new ArrayList<>();
-
-            for(int i = 0; i < tempPositionsCrew.length(); i++){
-                JSONObject o = tempPositionsCrew.getJSONObject(i);
-                Result<Coordinate> res = fromStringToCoordinate(o.getString("coordinate"));
-                if(res.isErr())
-                    return Result.err("coordinate not valid");
-
-                Coordinate cord = res.getData();
-                int qty = o.getInt("removeCount");
-                ShipBoard.CrewType type = ShipBoard.CrewType.valueOf(o.getString("crewType"));
-
-                if(!player.getBoard().checkEnough(cord, type, qty))
-                    return Result.err("not enough");
-
-                count+=qty;
-
-                switch(type){
-                    case ASTRONAUT -> positionsCrew.add(new Pair<>(cord, qty));
-                    case B_ALIEN -> brownPosition = Optional.of(cord);
-                    case P_ALIEN -> purplePosition = Optional.of(cord);
-                }
+        if(getChoice(json)){
+            if(model.getRemovedGuys(player) >= astronaut){
+                someoneAccepted = true;
+                descendingPlayer = player;
             }
-            if(count < this.astronaut)
-                return Result.err("not enough astronaut");
-
-            someoneAccepted = true;
-            descendingPlayer = player;
         }
 
         register(player);
@@ -87,18 +63,8 @@ public class AbandonedShip extends Card {
         //begin common part
         if(!ready())
             return Result.err("not all players declared their decision");
-        if(someoneAccepted)
-        {
-            // remove the purple/brown alien
-            brownPosition.ifPresent(coordinate -> {
-                descendingPlayer.getBoard().getBrown().remove(coordinate, 1);
-            });
-            purplePosition.ifPresent(coordinate -> {
-                descendingPlayer.getBoard().getPurple().remove(coordinate, 1);
-            });
-            // remove the astronauts
-            descendingPlayer.getBoard().getAstronaut().remove(positionsCrew);
-            // give the credits to the player
+
+        if(someoneAccepted){
             descendingPlayer.giveCash(cash);
             board.moveRocket(descendingPlayer.getPawn(), -days);
             return Result.ok(descendingPlayer);

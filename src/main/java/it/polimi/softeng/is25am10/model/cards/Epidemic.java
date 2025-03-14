@@ -2,12 +2,13 @@ package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
 public class Epidemic extends Card {
    //constructor
-    public Epidemic(int id) {
-        super( false, id);
+    public Epidemic(FlightBoard board, int id) {
+        super(null, false, board, id);
     }
 
 

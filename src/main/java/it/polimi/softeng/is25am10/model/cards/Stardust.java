@@ -7,8 +7,8 @@ import org.json.JSONObject;
 
 
 public class Stardust extends Card {
-    public Stardust(int id) {
-        super( false, id);
+    public Stardust(FlightBoard board, int id) {
+        super(null, false, board, id);
     }
 
     //not really needed

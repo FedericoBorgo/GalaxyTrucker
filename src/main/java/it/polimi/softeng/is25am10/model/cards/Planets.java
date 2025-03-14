@@ -19,8 +19,8 @@ public class Planets extends Card{
         PLANET1, PLANET2, PLANET3, NOPLANET
     }
 
-    public Planets(Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
-        super(true, id);
+    public Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
+        super(null, true, board, id);
         this.goods = goodsType;
         this.flightDays = backmoves;
 
