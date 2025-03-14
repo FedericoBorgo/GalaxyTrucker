@@ -1,16 +1,72 @@
 package it.polimi.softeng.is25am10.model;
 
-public enum Projectile {
-    SMALL_ASTEROID,
-    BIG_ASTEROID,
-    SMALL_FIRE,
-    BIG_FIRE;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import org.json.JSONObject;
 
-    public Tile.Type stoppedBy(){
-        return switch (this){
-            case SMALL_ASTEROID, SMALL_FIRE -> Tile.Type.SHIELD;
-            case BIG_ASTEROID -> Tile.Type.DRILLS;
-            case BIG_FIRE -> null;
-        };
+public class Projectile{
+    private final ProjectileType type;
+    private final Tile.Side side;
+    private final int where;
+    private final int ID;
+
+    public Projectile(ProjectileType type, Tile.Side side, int where, int ID) {
+        this.type = type;
+        this.side = side;
+        this.where = where;
+        this.ID = ID;
+    }
+
+    @Override
+    public String toString() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", type.toString());
+        jsonObject.put("side", side.toString());
+        jsonObject.put("where", where);
+        jsonObject.put("ID", ID);
+        return jsonObject.toString();
+    }
+
+    static Projectile fromString(String json) {
+        JSONObject jsonObject = new JSONObject(json);
+        ProjectileType type = ProjectileType.valueOf(jsonObject.getString("type"));
+        Tile.Side side = Tile.Side.valueOf(jsonObject.getString("side"));
+        int where = jsonObject.getInt("where");
+        int ID = jsonObject.getInt("ID");
+        return new Projectile(type, side, where, ID);
+    }
+
+    public enum ProjectileType {
+        SMALL_ASTEROID,
+        BIG_ASTEROID,
+        SMALL_FIRE,
+        BIG_FIRE;
+
+        public Tile.Type stoppedBy(){
+            return switch (this){
+                case SMALL_ASTEROID, SMALL_FIRE -> Tile.Type.SHIELD;
+                case BIG_ASTEROID -> Tile.Type.DRILLS;
+                case BIG_FIRE -> null;
+            };
+        }
+    }
+
+    public ProjectileType getType() {
+        return type;
+    }
+
+
+    public Tile.Side getSide() {
+        return side;
+    }
+
+
+    public int getWhere() {
+        return where;
+    }
+
+    public int getID() {
+        return ID;
     }
 }
+
+

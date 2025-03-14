@@ -1,39 +1,38 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.Player;
-import it.polimi.softeng.is25am10.model.Projectile;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import javafx.util.Pair;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class MeteorSwarm extends Card {
-    Projectile meteorsType;
-    Tile.Side meteorsDirection;
-    int where;
-    private boolean ready = false;
-    JSONObject json2 = new JSONObject();
-    private Map<Player, Boolean> playerChoice;
+    private Map<Player, Map<Integer, Optional<Coordinate>>> playerChoice;
+    List<Projectile> projectiles;
 
     public static int rollDice() {
         return new Random().nextInt(6) + 1;
     }
 
-    public MeteorSwarm(Projectile type,Tile.Side direction,boolean choice, int where, int id) {
+    public MeteorSwarm(List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
         super(true, id);
-        this.meteorsType = type;
-        this.meteorsDirection = direction;
-        this.where = where;
-        int number1 = rollDice();
-        int number2 = rollDice();
-        int target = number1 + number2;
-        json2.put("target", target);
-    }
+        projectiles = new ArrayList<>();
+        playerChoice = new HashMap<>();
+        AtomicInteger counter = new AtomicInteger();
+        counter.set(0);
 
+        meteors.forEach(pair -> {
+            int number = rollDice() + rollDice();
+            Projectile p = new Projectile(pair.getValue(), pair.getKey(), number, counter.getAndIncrement());
+            projectiles.add(p);
+        });
+
+    }
 
 
     @Override
@@ -46,48 +45,70 @@ public class MeteorSwarm extends Card {
 
         }
 
-        // if the player wants to use battery (if they aren't required or he doesn't have any, the choice is no)
-        boolean choice = json.getBoolean("choice");
-        if(choice && player.getBoard().getBattery().getTotal()<1) {
-                return Result.err("not enough battery");
+
+        AtomicBoolean error = new AtomicBoolean(false);
+        Map<Integer, Optional<Coordinate>> map = new HashMap<>();
+
+        projectiles.forEach(projectile -> {
+            Result<Coordinate> c = Coordinate.fromStringToCoordinate(json.getString("" + projectile.getID()));
+
+            if(c.isOk()){
+                if(player.getBoard().getBattery().get(c.getData()) > 0)
+                    map.put(projectile.getID(), Optional.of(c.getData()));
+                else
+                    error.set(true);
+            }
+            else
+                map.put(projectile.getID(), Optional.empty());
+        });
+
+        if (error.get()) {
+            return Result.err("not enough battery");
         }
 
-        playerChoice.put(player,choice);
-        ready = true;
+        playerChoice.put(player, map);
+        register(player);
 
         return Result.ok(null);
     }
 
     @Override
     public Result<Object> play() {
-        if(!ready())
+        if (!ready())
             return Result.err("not all player declared their decision");
 
-        Set<Player> players = playerChoice.keySet();
-        for(Player player : players) {
-            player.getBoard().getTiles().hit(meteorsType, meteorsDirection, where, playerChoice.get(player));
-        }
+        playerChoice.forEach((player, choice) -> {
+            projectiles.forEach(projectile -> {
+                Optional<Coordinate> choiceOptional = choice.get(player);
 
+                player.getBoard().hit(projectile, choiceOptional.isPresent());
+
+                choiceOptional.ifPresent(coordinate -> {
+                    player.getBoard().getBattery().remove(coordinate, 1);
+                });
+
+            });
+        });
 
         return Result.ok(null);
     }
 
     @Override
     public boolean ready() {
-        return ready;
+        return allRegistered();
     }
 
     @Override
     public JSONObject getData() {
-        json2.put("type", meteorsType);
-        json2.put("direction", meteorsDirection);
-        if(meteorsDirection == Tile.Side.LEFT || meteorsDirection == Tile.Side.RIGHT) {
-            int y = json2.getInt("target");
 
-        } else{
-           int x = json2.getInt("target");
-        }
-        return json2;
+        JSONObject json = new JSONObject();
+        JSONArray meteors = new JSONArray();
+        projectiles.forEach(projectile -> {
+            meteors.put(projectile.toString());
+        });
+        json.put("meteors", meteors);
+        return json;
+
     }
 }
 
