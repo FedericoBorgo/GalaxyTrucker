@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.RocketPawn;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 
@@ -19,20 +20,25 @@ public class Model {
     private TilesCollection tiles;
     private FlightBoard flight;
     private List<RocketPawn> unusedPawns;
+    private final boolean disableChecks;
 
     //Constructs a new Match instance
-    public Model() {
+    public Model(boolean disableChecks, boolean disableChecks1) {
+        this.disableChecks = disableChecks1;
         players = new HashMap<>();
         tiles = new TilesCollection();
         flight = new FlightBoard();
         unusedPawns = new ArrayList<>(List.of(RocketPawn.values()));
     }
 
-    public RocketPawn addPlayer(String name) {
+    public Result<RocketPawn> addPlayer(String name) {
+        if(players.containsKey(name))
+            return Result.err("player already connected");
+
         RocketPawn pawn = unusedPawns.removeFirst();
         Player p = new Player(pawn);
         players.put(name, p);
-        return pawn;
+        return Result.ok(pawn);
     }
 
     private Player get(String name){
@@ -59,6 +65,7 @@ public class Model {
 
     //player building board section
     public Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation){
+        //TODO disableCheck
         return ship(name).getTiles().setTile(c, t, rotation);
     }
 
@@ -87,6 +94,20 @@ public class Model {
         return ship(name).compress();
     }
     //end player building methods
+
+    //player methods
+    public List<GoodsBoard.Type> getReward(String name){
+        return get(name).getGoodsReward();
+    }
+
+    public Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c){
+        return disableChecks? ship(name).getGoods(t).put(c, 1) :
+                                get(name).placeReward(t, c);
+    }
+
+    public int getCash(String name){
+        return get(name).getCash();
+    }
 
     //tiles section
     public Tile drawTile(){

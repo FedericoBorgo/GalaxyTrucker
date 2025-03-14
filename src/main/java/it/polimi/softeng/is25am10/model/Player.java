@@ -67,4 +67,17 @@ public class Player {
     public void setGoodsReward(List<GoodsBoard.Type> goodsReward) {
         this.goodsReward = goodsReward;
     }
+
+    public Result<Integer> placeReward(GoodsBoard.Type reward, Coordinate c) {
+        if(!this.goodsReward.contains(reward))
+            return Result.err("cant place a goods not in the reward list");
+
+        Result<Integer> res = board.getGoods(reward).put(c, 1);
+
+        if(res.isErr())
+            return res;
+
+        goodsReward.remove(reward);
+        return res;
+    }
 }
