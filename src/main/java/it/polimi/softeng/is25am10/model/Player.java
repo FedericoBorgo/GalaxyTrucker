@@ -80,4 +80,5 @@ public class Player {
         goodsReward.remove(reward);
         return res;
     }
+
 }

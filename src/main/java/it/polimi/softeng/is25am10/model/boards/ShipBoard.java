@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 
+import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Tile;
 
 import java.io.IOException;
@@ -189,5 +190,9 @@ public class ShipBoard {
         goods.forEach((type, board) -> {
             board.removeIllegals();
         });
+    }
+
+    public void hit(Projectile projectile, boolean useBattery) {
+
     }
 }
