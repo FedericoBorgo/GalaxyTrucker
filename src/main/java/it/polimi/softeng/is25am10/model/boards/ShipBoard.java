@@ -1,12 +1,37 @@
 package it.polimi.softeng.is25am10.model.boards;
 
-import it.polimi.softeng.is25am10.model.Projectile;
+
 import it.polimi.softeng.is25am10.model.Tile;
 
 import java.io.IOException;
 import java.util.*;
 
 public class ShipBoard {
+    public static class CompressedShipBoard{
+        public final Tile[][] board;
+        public final Tile.Rotation[][] rotation;
+
+        public final Map<Coordinate, Integer> astronaut;
+        public final Map<Coordinate, Integer> purple;
+        public final Map<Coordinate, Integer> brown;
+        public final Map<Coordinate, Integer> battery;
+        public final Map<GoodsBoard.Type, Map<Coordinate, Integer>> goods;
+
+        CompressedShipBoard(Tile[][] board, Tile.Rotation[][] rotation,
+                            Map<Coordinate, Integer> astronaut,
+                            Map<Coordinate, Integer> purple,
+                            Map<Coordinate, Integer> brown,
+                            Map<Coordinate, Integer> battery,
+                            Map<GoodsBoard.Type, Map<Coordinate, Integer>> goods){
+            this.board = board;
+            this.rotation = rotation;
+            this.astronaut = astronaut;
+            this.purple = purple;
+            this.brown = brown;
+            this.battery = battery;
+            this.goods = goods;
+        }
+    }
     private final TilesBoard tiles;
     private final ElementsBoard astronaut;
     private final ElementsBoard purple;
@@ -142,4 +167,27 @@ public class ShipBoard {
         });
     }
 
+    public CompressedShipBoard compress(){
+        Map<GoodsBoard.Type, Map<Coordinate, Integer>> goodMap = new HashMap<>();
+
+        goods.forEach((type, board) -> {
+            goodMap.put(type, board.positions);
+        });
+
+        return new CompressedShipBoard(tiles.getBoard(), tiles.getRotation(),
+                astronaut.getPositions(),
+                purple.getPositions(),
+                brown.getPositions(),
+                battery.getPositions(), goodMap);
+    }
+
+    public void removeIllegals(){
+        astronaut.removeIllegals();
+        purple.removeIllegals();
+        brown.removeIllegals();
+        battery.removeIllegals();
+        goods.forEach((type, board) -> {
+            board.removeIllegals();
+        });
+    }
 }
