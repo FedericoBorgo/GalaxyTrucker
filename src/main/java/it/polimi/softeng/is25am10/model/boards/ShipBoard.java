@@ -33,6 +33,11 @@ public class ShipBoard {
             this.goods = goods;
         }
     }
+
+    public enum CrewType{
+        ASTRONAUT, B_ALIEN, P_ALIEN
+    }
+
     private final TilesBoard tiles;
     private final ElementsBoard astronaut;
     private final ElementsBoard purple;
@@ -194,5 +199,13 @@ public class ShipBoard {
 
     public void hit(Projectile projectile, boolean useBattery) {
 
+    }
+
+    public boolean checkEnough(Coordinate c, CrewType crewType, int qty){
+        return qty <= switch(crewType){
+            case ASTRONAUT -> astronaut.get(c);
+            case B_ALIEN -> brown.get(c);
+            case P_ALIEN -> purple.get(c);
+        };
     }
 }
