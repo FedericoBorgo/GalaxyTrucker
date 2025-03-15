@@ -6,12 +6,10 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Space extends Card {
     private final Map<FlightBoard.Pawn, Integer> enginePower = new HashMap<>();
@@ -71,8 +69,21 @@ public class Space extends Card {
             jsonArray.put(entry);
         });
 
-        json.put("openspace", jsonArray);
+        json.put("space", jsonArray);
 
         return json;
+    }
+
+    public static List<Card> construct(Model model, FlightBoard board){
+        String out = dump(Space.class.getResourceAsStream("space.json"));
+        JSONObject jsonObject = new JSONObject(out);
+        JSONArray jsonArray = jsonObject.getJSONArray("ids");
+        List<Card> cards = new ArrayList<>();
+
+        jsonArray.forEach(item -> {
+            cards.add(new Space(model, board, Integer.parseInt(item.toString())));
+        });
+
+        return cards;
     }
 }

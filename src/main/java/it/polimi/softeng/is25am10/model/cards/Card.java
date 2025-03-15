@@ -5,11 +5,14 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Generic class used by all types of cards.
+ * Generic class used by all types of space.json.
  * The necessary info about every card is if its
  * need an input by the player (needInput) and
  * some data (getData). We also need to know the
@@ -134,4 +137,12 @@ public abstract class Card {
      * @return
      */
     public abstract JSONObject getData();
+
+    protected static String dump(InputStream stream){
+        try {
+            return new String(stream.readAllBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

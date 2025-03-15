@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class Meteor extends Card {
+public class Meteors extends Card {
     private Map<Player, List<Integer>> useBattery;
     List<Projectile> projectiles;
 
@@ -18,8 +18,8 @@ public class Meteor extends Card {
         return new Random().nextInt(6) + 1;
     }
 
-    public Meteor(FlightBoard board, List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
-        super(null, true, board, id, Type.METEOR);
+    public Meteors(FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
+        super(null, true, board, id, Card.Type.METEOR);
         projectiles = new ArrayList<>();
         useBattery = new HashMap<>();
         AtomicInteger counter = new AtomicInteger();
@@ -86,9 +86,33 @@ public class Meteor extends Card {
         projectiles.forEach(projectile -> {
             meteors.put(projectile.toString());
         });
-        json.put("meteorswarm", meteors);
+        json.put("meteors", meteors);
         return json;
+    }
 
+    public static List<Card> construct(FlightBoard board){
+        String out = dump(Meteors.class.getResourceAsStream("meteors.json"));
+        JSONArray jsonCards = new JSONArray(out);
+        List<Card> cards = new ArrayList<>();
+
+        jsonCards.forEach(item -> {
+            JSONObject entry = (JSONObject) item;
+            int id;
+            List<Pair<Tile.Side, Projectile.Type>> meteors = new ArrayList<>();
+
+            id = entry.getInt("id");
+
+            entry.getJSONArray("asteroids").forEach(obj -> {
+                JSONObject asteroid = (JSONObject) obj;
+                Tile.Side side = Tile.Side.valueOf(asteroid.getString("side"));
+                Projectile.Type type = Projectile.Type.valueOf(asteroid.getString("type"));
+                meteors.add(new Pair<>(side, type));
+            });
+
+            cards.add(new Meteors(board, meteors, id));
+        });
+
+        return cards;
     }
 }
 

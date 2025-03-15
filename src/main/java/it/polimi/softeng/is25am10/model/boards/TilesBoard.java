@@ -520,7 +520,7 @@ public class TilesBoard {
         return hasExposed;
     }
 
-    public void hit(Projectile.ProjectileType p, Tile.Side side, int where, boolean useBattery){
+    public void hit(Projectile.Type p, Tile.Side side, int where, boolean useBattery){
         AtomicBoolean saved = new AtomicBoolean(false);
 
         if(p.stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(side)){

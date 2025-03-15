@@ -5,7 +5,7 @@ module it.polimi.softeng.is25am10 {
     requires org.controlsfx.controls;
     requires org.json;
     requires jdk.jsobject;
-    requires org.yaml.snakeyaml;
+    requires jdk.jdi;
 
     opens it.polimi.softeng.is25am10 to javafx.fxml;
     exports it.polimi.softeng.is25am10;

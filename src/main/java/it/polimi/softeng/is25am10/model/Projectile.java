@@ -3,12 +3,12 @@ package it.polimi.softeng.is25am10.model;
 import org.json.JSONObject;
 
 public class Projectile{
-    private final ProjectileType type;
+    private final Type type;
     private final Tile.Side side;
     private final int where;
     private final int ID;
 
-    public Projectile(ProjectileType type, Tile.Side side, int where, int ID) {
+    public Projectile(Type type, Tile.Side side, int where, int ID) {
         this.type = type;
         this.side = side;
         this.where = where;
@@ -27,14 +27,14 @@ public class Projectile{
 
     static Projectile fromString(String json) {
         JSONObject jsonObject = new JSONObject(json);
-        ProjectileType type = ProjectileType.valueOf(jsonObject.getString("type"));
+        Type type = Type.valueOf(jsonObject.getString("type"));
         Tile.Side side = Tile.Side.valueOf(jsonObject.getString("side"));
         int where = jsonObject.getInt("where");
         int ID = jsonObject.getInt("ID");
         return new Projectile(type, side, where, ID);
     }
 
-    public enum ProjectileType {
+    public enum Type {
         SMALL_ASTEROID,
         BIG_ASTEROID,
         SMALL_FIRE,
@@ -49,7 +49,7 @@ public class Projectile{
         }
     }
 
-    public ProjectileType getType() {
+    public Type getType() {
         return type;
     }
 

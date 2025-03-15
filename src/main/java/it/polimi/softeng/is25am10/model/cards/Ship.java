@@ -69,7 +69,7 @@ public class Ship extends Card {
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("abandonedship", "");
+        data.put("ship", "");
         return data;
     }
 }

@@ -68,7 +68,7 @@ public class Station extends Card {
     @Override
     public JSONObject getData() {
         JSONObject json = new JSONObject();
-        json.put("abandonedstation", "");
+        json.put("station", "");
         return json;
     }
 }
