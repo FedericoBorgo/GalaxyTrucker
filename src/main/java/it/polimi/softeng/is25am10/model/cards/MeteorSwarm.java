@@ -87,8 +87,7 @@ public class MeteorSwarm extends Card {
         JSONObject json = new JSONObject();
         JSONArray meteors = new JSONArray();
         projectiles.forEach(projectile -> {
-            if(projectile.getType() == Projectile.ProjectileType.SMALL_ASTEROID)
-                meteors.put(projectile.toString());
+            meteors.put(projectile.toString());
         });
         json.put("meteorswarm", meteors);
         return json;
