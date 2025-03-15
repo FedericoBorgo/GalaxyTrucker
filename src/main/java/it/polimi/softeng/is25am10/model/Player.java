@@ -13,13 +13,15 @@ public class Player {
     private int cash;
     private final ShipBoard board;
     private List<GoodsBoard.Type> goodsReward;
+    private final String name;
 
     /**
      * Constructs a Player with the specified RocketPawn and nickname.
      *
      * @param pawn the RocketPawn associated with the player
      */
-    public Player(FlightBoard.RocketPawn pawn) {
+    public Player(String name, FlightBoard.RocketPawn pawn) {
+        this.name = name;
         this.pawn = pawn;
         board = new ShipBoard();
     }
@@ -81,4 +83,7 @@ public class Player {
         return res;
     }
 
+    public String getName() {
+        return name;
+    }
 }

@@ -48,6 +48,8 @@ public class Stardust extends Card {
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("stardust", "");
+        return jsonObject;
     }
 }

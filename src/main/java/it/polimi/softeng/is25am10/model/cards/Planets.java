@@ -5,6 +5,7 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -81,11 +82,22 @@ public class Planets extends Card{
 
     @Override
     public boolean ready() {
-        return ready;
+        return ready || allRegistered();
     }
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject json = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
+        Arrays.asList(Planet.values()).forEach(planet -> {
+            if(planet != Planet.NOPLANET && !playerChoice.containsValue(planet)){
+                jsonArray.put(planet);
+            }
+        });
+
+        json.put("planets", jsonArray);
+
+        return json;
     }
 }

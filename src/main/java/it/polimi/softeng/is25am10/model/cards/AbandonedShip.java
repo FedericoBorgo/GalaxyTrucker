@@ -22,21 +22,16 @@ public class AbandonedShip extends Card {
     private final int astronaut;
     private boolean someoneAccepted;
     private Player descendingPlayer;
-    private List<Pair<Coordinate, Integer>> positionsCrew;
-    private Optional<Coordinate> brownPosition;
-    private Optional<Coordinate> purplePosition;
 
     public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
         super(model, true, board, id);
        this.cash = cash;
        this.days = days;
        this.astronaut = astronaut;
-       brownPosition = Optional.empty();
-       purplePosition = Optional.empty();
     }
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -47,19 +42,20 @@ public class AbandonedShip extends Card {
         }
         //end
 
-        if(getChoice(json)){
-            if(model.getRemovedGuys(player) >= astronaut){
+        if(!someoneAccepted && getChoice(json)){
+            if(model.getRemovedItems(player).guys >= astronaut){
+                model.getRemovedItems(player).guys = 0;
                 someoneAccepted = true;
                 descendingPlayer = player;
             }
         }
 
         register(player);
-        return Result.ok(someoneAccepted);
+        return Result.ok("");
     }
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all players declared their decision");
@@ -67,7 +63,7 @@ public class AbandonedShip extends Card {
         if(someoneAccepted){
             descendingPlayer.giveCash(cash);
             board.moveRocket(descendingPlayer.getPawn(), -days);
-            return Result.ok(descendingPlayer);
+            return Result.ok("");
         }
 
         return Result.ok("Nobody wanted to descend on the abandoned ship");
@@ -81,6 +77,8 @@ public class AbandonedShip extends Card {
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject data = new JSONObject();
+        data.put("abandonedship", "");
+        return data;
     }
 }

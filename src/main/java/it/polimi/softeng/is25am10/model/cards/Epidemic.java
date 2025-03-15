@@ -13,11 +13,11 @@ public class Epidemic extends Card {
 
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         if(isRegistered(player))
             return Result.err("player already registered");
         register(player);
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     /**
@@ -25,7 +25,7 @@ public class Epidemic extends Card {
      * @return an error/success message
      */
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
@@ -35,7 +35,7 @@ public class Epidemic extends Card {
             player.getBoard().epidemic();
         });
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override
@@ -45,6 +45,8 @@ public class Epidemic extends Card {
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject data = new JSONObject();
+        data.put("epidemic", "");
+        return data;
     }
 }

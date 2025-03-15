@@ -16,12 +16,14 @@ import static it.polimi.softeng.is25am10.model.boards.Coordinate.fromStringToCoo
 
 public class OpenSpace extends Card {
     private final Map<FlightBoard.RocketPawn, Integer> enginePower = new HashMap<>();
+    private final Map<String, Integer> enginePowerName = new HashMap<>();
+
     public OpenSpace(Model model, FlightBoard board, int id) {
         super(model, true, board, id);
     }
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -32,20 +34,15 @@ public class OpenSpace extends Card {
         }
         //end
 
-        int rockets = getRocketToActivate(json);
-
-        if(model.getRemovedBattery(player) < rockets)
-            return Result.err("not enough battery");
-
-
-        enginePower.put(player.getPawn(), player.getBoard().getRocketPower(rockets));
+        enginePower.put(player.getPawn(), player.getBoard().getRocketPower(model.getRemovedItems(player).battery));
+        model.getRemovedItems(player).battery = 0;
         register(player);
-        return Result.ok(rockets);
+        return Result.ok("" + enginePower.get(player.getPawn()));
     }
 
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
@@ -56,7 +53,7 @@ public class OpenSpace extends Card {
             board.moveRocket(p, enginePower.get(p));
         }
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override
@@ -66,6 +63,18 @@ public class OpenSpace extends Card {
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONArray jsonArray = new JSONArray();
+        JSONObject json = new JSONObject();
+
+        enginePowerName.forEach((name, power) -> {
+            JSONObject entry = new JSONObject();
+            entry.put("name", name);
+            entry.put("val", power);
+            jsonArray.put(entry);
+        });
+
+        json.put("openspace", jsonArray);
+
+        return json;
     }
 }

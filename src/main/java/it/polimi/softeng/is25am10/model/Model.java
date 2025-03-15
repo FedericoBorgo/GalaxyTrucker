@@ -16,14 +16,26 @@ import java.util.*;
  */
 
 public class Model {
+    public static class RemovedItems{
+        public int battery;
+        public int guys;
+        public int goods;
+
+        public RemovedItems(){
+            this.battery = 0;
+            this.guys = 0;
+            this.goods = 0;
+        }
+    }
+
+
     private final Map<String, Player> players;
     private TilesCollection tiles;
     private FlightBoard flight;
     private List<RocketPawn> unusedPawns;
     private final boolean disableChecks;
-    private final Map<Player, Integer> removedBattery;
-    private final Map<Player, Integer> removedGuys;
-    private final Map<Player, Integer> removedGoods;
+    private final Map<Player, RemovedItems> removedItems;
+    private final Map<Player, Map<Tile.Rotation, Integer>> usingDrills;
 
     //Constructs a new Match instance
     public Model(boolean disableChecks, boolean disableChecks1) {
@@ -32,9 +44,8 @@ public class Model {
         tiles = new TilesCollection();
         flight = new FlightBoard();
         unusedPawns = new ArrayList<>(List.of(RocketPawn.values()));
-        removedBattery = new HashMap<>();
-        removedGuys = new HashMap<>();
-        removedGoods = new HashMap<>();
+        removedItems = new HashMap<>();
+        usingDrills = new HashMap<>();
     }
 
     public Result<RocketPawn> addPlayer(String name) {
@@ -42,8 +53,9 @@ public class Model {
             return Result.err("player already connected");
 
         RocketPawn pawn = unusedPawns.removeFirst();
-        Player p = new Player(pawn);
+        Player p = new Player(name, pawn);
         players.put(name, p);
+        removedItems.put(p, new RemovedItems());
         return Result.ok(pawn);
     }
 
@@ -67,10 +79,6 @@ public class Model {
     public void setReady(String name){
         //TODO where to put the aliens
         flight.setRocketReady(players.get(name).getPawn());
-    }
-
-    private void increment(Map<Player, Integer> map, Player player){
-        map.put(player, map.getOrDefault(player, 0) + 1);
     }
 
 
@@ -132,53 +140,58 @@ public class Model {
         return get(name).getCash();
     }
 
-    public Result<Integer> removeBattery(String name, Coordinate c){
+    public Result<Integer> drop(String name, Coordinate c){
+        ShipBoard ship = ship(name);
         Player p = get(name);
-        Result<Integer> res = ship(name).getBattery().remove(c, 1);
 
-        if(res.isOk())
-            increment(removedBattery, p);
-        return res;
-    }
+        if(ship.getBattery().get(c) > 0){
+            ship.getBattery().remove(c, 1);
+            removedItems.get(p).battery++;
+        }
+        else if(ship.getAstronaut().get(c) > 0){
+            ship.getAstronaut().remove(c, 1);
+            removedItems.get(p).guys++;
+        }
+        else if(ship.getBrown().get(c) > 0){
+            ship.getBrown().remove(c, 1);
+            removedItems.get(p).guys++;
+        }
+        else if(ship.getPurple().get(c) > 0){
+            ship.getPurple().remove(c, 1);
+            removedItems.get(p).guys++;
+        }
+        else
+            return Result.err("no one removed");
 
-    public Result<Integer> removeGuy(String name, Coordinate c){
-        if(!ship(name).removeSomeone(c))
-            return Result.err("there is no one here");
-
-        increment(removedGuys, get(name));
         return Result.ok(1);
     }
 
-    public Result<Integer> removeGoods(String name, Coordinate c, GoodsBoard.Type t){
+    public Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
         Result<Integer> res = ship(name).getGoods(t).remove(c, 1);
 
         if(res.isOk())
-            increment(removedGoods, get(name));
+            removedItems.get(get(name)).goods++;
         return res;
     }
 
-    public int getRemovedBattery(String name){
-        return removedBattery.getOrDefault(get(name), 0);
+    public RemovedItems getRemovedItems(Player player){
+        return removedItems.get(player);
     }
 
-    public int getRemovedGuys(String name){
-        return removedGuys.getOrDefault(get(name), 0);
+    public RemovedItems getRemovedItems(String name){
+        return getRemovedItems(get(name));
     }
 
-    public int getRemovedGoods(String name){
-        return removedGoods.getOrDefault(get(name), 0);
+    public void setUsingDrills(String name, Map<Tile.Rotation, Integer> map){
+        usingDrills.put(get(name), map);
     }
 
-    public int getRemovedBattery(Player p){
-        return removedBattery.getOrDefault(p, 0);
+    public Map<Tile.Rotation, Integer> getUsingDrills(String name){
+        return usingDrills.getOrDefault(get(name), null);
     }
 
-    public int getRemovedGuys(Player p){
-        return removedGuys.getOrDefault(p, 0);
-    }
-
-    public int getRemovedGoods(Player p){
-        return removedGoods.getOrDefault(p, 0);
+    public Map<Tile.Rotation, Integer> getUsingDrills(Player p){
+        return usingDrills.getOrDefault(p, null);
     }
     //end
 
