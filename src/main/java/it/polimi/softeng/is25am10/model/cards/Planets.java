@@ -67,9 +67,9 @@ public class Planets extends Card{
         });
 
         //move pawns in reverse flight order
-        List<FlightBoard.RocketPawn> reversed = new ArrayList<>(board.getOrder());
+        List<FlightBoard.Pawn> reversed = new ArrayList<>(board.getOrder());
         Collections.reverse(reversed);
-        for(FlightBoard.RocketPawn pawn : reversed){
+        for(FlightBoard.Pawn pawn : reversed){
             Player player = registered.get(pawn);
             if(Planet.NOPLANET != playerChoice.get(player)){
                 board.moveRocket(player.getPawn(), flightDays);

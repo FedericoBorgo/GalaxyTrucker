@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Result;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -43,5 +44,13 @@ class CoordinateTest {
             fail();
         }catch (IOException _){
         }
+    }
+
+    @Test
+    void testFromString(){
+        Result<Coordinate> result = Coordinate.fromString("x1y1");
+        assertTrue(result.isOk());
+        result = Coordinate.fromString("x1y9");
+        assertTrue(result.isErr());
     }
 }

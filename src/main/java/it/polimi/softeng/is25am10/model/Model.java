@@ -3,7 +3,7 @@ package it.polimi.softeng.is25am10.model;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard.RocketPawn;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard.Pawn;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
@@ -32,7 +32,7 @@ public class Model {
     private final Map<String, Player> players;
     private TilesCollection tiles;
     private FlightBoard flight;
-    private List<RocketPawn> unusedPawns;
+    private List<Pawn> unusedPawns;
     private final boolean disableChecks;
     private final Map<Player, RemovedItems> removedItems;
     private final Map<Player, Map<Tile.Rotation, Integer>> usingDrills;
@@ -43,16 +43,16 @@ public class Model {
         players = new HashMap<>();
         tiles = new TilesCollection();
         flight = new FlightBoard();
-        unusedPawns = new ArrayList<>(List.of(RocketPawn.values()));
+        unusedPawns = new ArrayList<>(List.of(Pawn.values()));
         removedItems = new HashMap<>();
         usingDrills = new HashMap<>();
     }
 
-    public Result<RocketPawn> addPlayer(String name) {
+    public Result<Pawn> addPlayer(String name) {
         if(players.containsKey(name))
             return Result.err("player already connected");
 
-        RocketPawn pawn = unusedPawns.removeFirst();
+        Pawn pawn = unusedPawns.removeFirst();
         Player p = new Player(name, pawn);
         players.put(name, p);
         removedItems.put(p, new RemovedItems());

@@ -10,12 +10,12 @@ import java.util.List;
  */
 public class FlightBoard {
     public static class CompressedFlightBoard{
-        public final List<RocketPawn> order;
+        public final List<Pawn> order;
         public final List<Integer> offset;
         public final int leaderPosition;
 
 
-        CompressedFlightBoard(List<RocketPawn> order, List<Integer> offset, int leaderPosition){
+        CompressedFlightBoard(List<Pawn> order, List<Integer> offset, int leaderPosition){
             this.order = Collections.unmodifiableList(order);
             this.offset = Collections.unmodifiableList(offset);
             this.leaderPosition = leaderPosition;
@@ -24,15 +24,17 @@ public class FlightBoard {
 
     private int timer;
 
-    private final List<RocketPawn> order;
+    private final List<Pawn> order;
     private final List<Integer> offset;
     private int leaderPosition;
+    private final List<Pawn> quitters;
 
     // Constructor method
     public FlightBoard() {
         this.timer = 0;
         this.order = new ArrayList<>();
         this.offset = new ArrayList<>();
+        this.quitters = new ArrayList<>();
         this.leaderPosition = 6;
     }
 
@@ -42,7 +44,7 @@ public class FlightBoard {
      * Method used to add the rocket pawn on the flight board by finishing order
      * @param pawn The pawn to be added
      */
-    public void setRocketReady(RocketPawn pawn) {
+    public void setRocketReady(Pawn pawn) {
         //TODO the player can chose which position
         int[] OFFSET = {0, -3, -5, -6};
         order.addLast(pawn);
@@ -64,7 +66,7 @@ public class FlightBoard {
      * @param pos the target position of the pawn. If overtaking happens {@code pos} is not the new position
      *            of the pawn {@code pawn}.
      */
-    public void moveRocket(RocketPawn pawn, int pos) {
+    public void moveRocket(Pawn pawn, int pos) {
         int index = order.indexOf(pawn);
         boolean positive = pos > 0;
         int steps = positive? -1 : 1;
@@ -88,6 +90,11 @@ public class FlightBoard {
         offset.set(index, offset.get(index) + pos);
 
         //shift all the pawns
+        shift();
+        checkDuped();
+    }
+
+    private void shift(){
         int shift = offset.getFirst();
         offset.replaceAll(val -> val - shift);
         leaderPosition += shift;
@@ -108,14 +115,13 @@ public class FlightBoard {
         return timer;
     }
 
-
     /**
      * Get method for the order of the pawns on the flightboard. The pawns are stored in an ordered list,
      * their position on the list is their order on the flightboard.
      *
      * @return list of the order of the pawns.
      */
-    public List<RocketPawn> getOrder() {
+    public List<Pawn> getOrder() {
         return order;
     }
 
@@ -141,11 +147,28 @@ public class FlightBoard {
      * Includes an {@code EMPTY} value.
      */
 
-    public enum RocketPawn {
+    public enum Pawn {
         YELLOW, GREEN, BLUE, RED, EMPTY;
     }
 
     public CompressedFlightBoard compress() {
         return new CompressedFlightBoard(order, offset, leaderPosition);
+    }
+
+    public void quit(Pawn pawn) {
+        offset.remove(order.indexOf(pawn));
+        order.remove(pawn);
+        quitters.add(pawn);
+        shift();
+    }
+
+    public List<Pawn> getQuitters() {
+        return quitters;
+    }
+
+    public void checkDuped(){
+        for(int i = order.size()-1; i >= 0; i--)
+            if(offset.get(i) <= -24)
+                quit(order.get(i));
     }
 }

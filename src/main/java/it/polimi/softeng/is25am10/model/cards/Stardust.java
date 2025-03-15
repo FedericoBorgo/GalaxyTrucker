@@ -32,7 +32,7 @@ public class Stardust extends Card {
             return Result.err("not all player declared their decision");
         //end
 
-        FlightBoard.RocketPawn pawn;
+        FlightBoard.Pawn pawn;
         for(int i= board.getOrder().size()-1; i >= 0; i--){
             pawn = board.getOrder().get(i);
             board.moveRocket(pawn, -registered.get(pawn).getBoard().getTiles().countExposedConnectors());

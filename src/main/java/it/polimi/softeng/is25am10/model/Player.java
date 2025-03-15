@@ -12,7 +12,7 @@ import java.util.List;
  */
 
 public class Player {
-    private final FlightBoard.RocketPawn pawn;
+    private final FlightBoard.Pawn pawn;
     private int cash;
     private final ShipBoard board;
     private List<GoodsBoard.Type> goodsReward;
@@ -23,7 +23,7 @@ public class Player {
      *
      * @param pawn the RocketPawn associated with the player
      */
-    public Player(String name, FlightBoard.RocketPawn pawn) {
+    public Player(String name, FlightBoard.Pawn pawn) {
         this.name = name;
         this.pawn = pawn;
         board = new ShipBoard();
@@ -52,7 +52,7 @@ public class Player {
      *
      * @return the RocketPawn instance linked to the player
      */
-    public FlightBoard.RocketPawn getPawn() {
+    public FlightBoard.Pawn getPawn() {
         return pawn;
     }
 

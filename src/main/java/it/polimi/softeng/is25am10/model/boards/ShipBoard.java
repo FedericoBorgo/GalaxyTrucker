@@ -116,23 +116,21 @@ public class ShipBoard {
         return purple.get(c) + astronaut.get(c) + brown.get(c) > 0;
     }
 
-    public boolean removeSomeone(Coordinate c){
+    public void removeSomeone(Coordinate c){
         if(astronaut.get(c) > 0) {
             astronaut.remove(c, 1);
-            return true;
+            return;
         }
 
         if(purple.get(c) > 0) {
             purple.remove(c, 1);
-            return true;
+            return;
         }
 
         if(brown.get(c) > 0) {
             brown.remove(c, 1);
-            return true;
         }
 
-        return false;
     }
 
     private void toRemove(boolean[][] marked, Coordinate c){
@@ -141,22 +139,10 @@ public class ShipBoard {
 
         marked[c.x()][c.y()] = true;
 
-        try {
-            toRemove(marked, c.left());
-        } catch (IOException _) {
-        }
-        try {
-            toRemove(marked, c.right());
-        } catch (IOException _) {
-        }
-        try {
-            toRemove(marked, c.up());
-        } catch (IOException _) {
-        }
-        try {
-            toRemove(marked, c.down());
-        } catch (IOException _) {
-        }
+        try {toRemove(marked, c.left());} catch (IOException _) {}
+        try {toRemove(marked, c.right());} catch (IOException _) {}
+        try {toRemove(marked, c.up());} catch (IOException _) {}
+        try {toRemove(marked, c.down());} catch (IOException _) {}
     }
 
     public void epidemic(){
@@ -201,13 +187,5 @@ public class ShipBoard {
 
     public void hit(Projectile projectile, boolean useBattery) {
 
-    }
-
-    public boolean checkEnough(Coordinate c, CrewType crewType, int qty){
-        return qty <= switch(crewType){
-            case ASTRONAUT -> astronaut.get(c);
-            case B_ALIEN -> brown.get(c);
-            case P_ALIEN -> purple.get(c);
-        };
     }
 }

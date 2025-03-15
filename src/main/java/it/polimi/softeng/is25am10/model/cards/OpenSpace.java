@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OpenSpace extends Card {
-    private final Map<FlightBoard.RocketPawn, Integer> enginePower = new HashMap<>();
+    private final Map<FlightBoard.Pawn, Integer> enginePower = new HashMap<>();
     private final Map<String, Integer> enginePowerName = new HashMap<>();
 
     public OpenSpace(Model model, FlightBoard board, int id) {
@@ -44,7 +44,7 @@ public class OpenSpace extends Card {
         //end
 
         for(int i = board.getOrder().size() - 1; i >= 0; i--){
-            FlightBoard.RocketPawn p = board.getOrder().get(i);
+            FlightBoard.Pawn p = board.getOrder().get(i);
             board.moveRocket(p, enginePower.get(p));
         }
 

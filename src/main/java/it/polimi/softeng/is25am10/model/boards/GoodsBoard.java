@@ -57,7 +57,6 @@ public class GoodsBoard extends ElementsBoard{
             case YELLOW -> YELLOW_BOX;
             case BLUE -> BLUE_BOX;
             case GREEN -> GREEN_BOX;
-            default -> null;
         };
     }
 

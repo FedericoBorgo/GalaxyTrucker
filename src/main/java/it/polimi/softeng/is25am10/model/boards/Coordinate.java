@@ -69,10 +69,15 @@ public record Coordinate(int x, int y) {
             ok = predicate.test(new Coordinate(i, y));
     }
 
-    static public Result<Coordinate> fromStringToCoordinate(String s) {
+    static public Result<Coordinate> fromString(String s) {
         if (s.length() != 4 || s.charAt(0) != 'x' || s.charAt(2) != 'y' || !Character.isDigit(s.charAt(1)) || !Character.isDigit(s.charAt(3)))
             return Result.err("string is not a coordinate");
         else
-            return Result.ok(new Coordinate(Character.getNumericValue(s.charAt(1)), Character.getNumericValue(s.charAt(3))));
+            try {
+                return Result.ok(new Coordinate(Character.getNumericValue(s.charAt(1)), Character.getNumericValue(s.charAt(3))));
+            }
+            catch (IndexOutOfBoundsException _) {
+                return Result.err("out of bound");
+            }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Map;
 public abstract class Card {
     private final boolean needPlayerChoice;
     protected final FlightBoard board;
-    protected final Map<FlightBoard.RocketPawn, Player> registered;
+    protected final Map<FlightBoard.Pawn, Player> registered;
     protected final Model model;
     public final int ID;
 
