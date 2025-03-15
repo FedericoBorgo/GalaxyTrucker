@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.model.boards;
 
 
 import it.polimi.softeng.is25am10.model.Projectile;
+import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 
 import java.io.IOException;
@@ -187,5 +188,30 @@ public class ShipBoard {
 
     public void hit(Projectile projectile, boolean useBattery) {
 
+    }
+
+    public void init(Optional<Coordinate> purple, Optional<Coordinate> brown){
+        purple.ifPresent(c -> {
+            this.purple.put(c, 1);
+        });
+
+        brown.ifPresent(c -> {
+            this.brown.put(c, 1);
+        });
+
+        Coordinate.forEach(c -> {
+            Result<Tile> res = tiles.getTile(c);
+
+            if(res.isOk()){
+                Tile tile = res.getData();
+
+                if(Tile.house(tile))
+                    astronaut.put(c, 2);
+                else if(tile.getType() == Tile.Type.BATTERY_2)
+                    battery.put(c, 2);
+                else if(tile.getType() == Tile.Type.BATTERY_3)
+                    battery.put(c, 3);
+            }
+        });
     }
 }

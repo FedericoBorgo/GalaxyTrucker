@@ -28,14 +28,13 @@ public class Model {
         }
     }
 
-
     private final Map<String, Player> players;
-    private TilesCollection tiles;
-    private FlightBoard flight;
-    private List<Pawn> unusedPawns;
+    private final TilesCollection tiles;
+    private final FlightBoard flight;
+    private final List<Pawn> unusedPawns;
     private final boolean disableChecks;
     private final Map<Player, RemovedItems> removedItems;
-    private final Map<Player, Map<Tile.Rotation, Integer>> usingDrills;
+    private final Map<Player, Map<Tile.Rotation, Integer>> drillsToUse;
 
     //Constructs a new Match instance
     public Model(boolean disableChecks, boolean disableChecks1) {
@@ -45,7 +44,7 @@ public class Model {
         flight = new FlightBoard();
         unusedPawns = new ArrayList<>(List.of(Pawn.values()));
         removedItems = new HashMap<>();
-        usingDrills = new HashMap<>();
+        drillsToUse = new HashMap<>();
     }
 
     public Result<Pawn> addPlayer(String name) {
@@ -117,6 +116,10 @@ public class Model {
     public CompressedShipBoard getShip(String name){
         return ship(name).compress();
     }
+
+    public void init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown){
+        ship(name).init(purple, brown);
+    }
     //end player building methods
 
 
@@ -182,16 +185,16 @@ public class Model {
         return getRemovedItems(get(name));
     }
 
-    public void setUsingDrills(String name, Map<Tile.Rotation, Integer> map){
-        usingDrills.put(get(name), map);
+    public void setDrillsToUse(String name, Map<Tile.Rotation, Integer> map){
+        drillsToUse.put(get(name), map);
     }
 
-    public Map<Tile.Rotation, Integer> getUsingDrills(String name){
-        return getUsingDrills(get(name));
+    public Map<Tile.Rotation, Integer> getDrillsToUse(String name){
+        return getDrillsToUse(get(name));
     }
 
-    public Map<Tile.Rotation, Integer> getUsingDrills(Player p){
-        return usingDrills.getOrDefault(p, null);
+    public Map<Tile.Rotation, Integer> getDrillsToUse(Player p){
+        return drillsToUse.getOrDefault(p, null);
     }
     //end
 
