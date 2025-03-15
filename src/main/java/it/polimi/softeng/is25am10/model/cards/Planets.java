@@ -1,10 +1,9 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Player;
-import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,7 +16,7 @@ public class Planets extends Card{
     private int flightDays;
 
     public enum Planet{
-        PLANET1, PLANET2, PLANET3, NOPLANET
+        PLANET1, PLANET2, PLANET3, PLANET4, NOPLANET
     }
 
     public Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
@@ -46,9 +45,12 @@ public class Planets extends Card{
         if(planet != Planet.NOPLANET && playerChoice.containsValue(planet))
             return Result.err("planet already occupied");
 
+        if(!goods.containsKey(planet))
+            return Result.err("planet does not exist");
+
         playerChoice.put(player, planet);
 
-        if(playerChoice.values().containsAll(List.of(Planet.values())))
+        if(playerChoice.values().containsAll(goods.keySet()))
             ready = true;
 
         register(player);
@@ -99,5 +101,34 @@ public class Planets extends Card{
         json.put("planets", jsonArray);
 
         return json;
+    }
+
+    public static List<Card> construct(FlightBoard board){
+        String out = dump(Planets.class.getResourceAsStream("planets.json"));
+        JSONArray jsonCards = new JSONArray(out);
+        List<Card> cards = new ArrayList<>();
+
+        jsonCards.forEach(item -> {
+            JSONObject entry = (JSONObject) item;
+            int id = entry.getInt("id");
+            int days = entry.getInt("days");
+            Map<Planet, List<GoodsBoard.Type>> goods = new HashMap<>();
+
+            for (Planet p: Planet.values()) {
+                if(entry.has(p.name())){
+                    List<GoodsBoard.Type> types = new ArrayList<>();
+
+                    entry.getJSONArray(p.name()).forEach(box -> {
+                        types.add(GoodsBoard.Type.valueOf(box.toString()));
+                    });
+
+                    goods.put(p, types);
+                }
+            }
+
+            cards.add(new Planets(board, goods, id, days));
+        });
+
+        return cards;
     }
 }

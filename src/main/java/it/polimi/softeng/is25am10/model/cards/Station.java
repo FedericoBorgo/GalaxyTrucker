@@ -5,9 +5,13 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Station extends Card {
     private List<GoodsBoard.Type> goods;
@@ -70,5 +74,27 @@ public class Station extends Card {
         JSONObject json = new JSONObject();
         json.put("station", "");
         return json;
+    }
+
+    public static List<Card> construct(FlightBoard board){
+        String out = dump(Station.class.getResourceAsStream("station.json"));
+        JSONArray jsonCards = new JSONArray(out);
+        List<Card> cards = new ArrayList<>();
+
+        jsonCards.forEach(item -> {
+            JSONObject entry = (JSONObject) item;
+            int id = entry.getInt("id");
+            int days = entry.getInt("days");
+            int guys = entry.getInt("guys");
+            List<GoodsBoard.Type> types = new ArrayList<>();
+
+            entry.getJSONArray("goods").forEach(type -> {
+                types.add(GoodsBoard.Type.valueOf(type.toString()));
+            });
+
+            cards.add(new Station(board, guys, types, id, days));
+        });
+
+        return cards;
     }
 }

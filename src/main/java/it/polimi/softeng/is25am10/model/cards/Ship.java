@@ -4,9 +4,14 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Ship extends Card {
     private final int cash;
@@ -71,5 +76,23 @@ public class Ship extends Card {
         JSONObject data = new JSONObject();
         data.put("ship", "");
         return data;
+    }
+
+    public static List<Card> construct(Model model, FlightBoard board){
+        String out = dump(Ship.class.getResourceAsStream("ship.json"));
+        JSONArray jsonCards = new JSONArray(out);
+        List<Card> cards = new ArrayList<>();
+
+        jsonCards.forEach(item -> {
+            JSONObject entry = (JSONObject) item;
+            int id = entry.getInt("id");
+            int days = entry.getInt("days");
+            int guys = entry.getInt("guys");
+            int cash = entry.getInt("cash");
+
+            cards.add(new Ship(model, board, id, guys, cash, days));
+        });
+
+        return cards;
     }
 }

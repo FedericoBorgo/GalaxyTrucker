@@ -4,8 +4,10 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Epidemic extends Card {
@@ -51,5 +53,18 @@ public class Epidemic extends Card {
         JSONObject data = new JSONObject();
         data.put("epidemic", "");
         return data;
+    }
+
+    public static List<Card> construct(FlightBoard board){
+        String out = dump(Epidemic.class.getResourceAsStream("epidemic.json"));
+        JSONObject jsonObject = new JSONObject(out);
+        JSONArray jsonArray = jsonObject.getJSONArray("ids");
+        List<Card> cards = new ArrayList<>();
+
+        jsonArray.forEach(item -> {
+            cards.add(new Epidemic(board, Integer.parseInt(item.toString())));
+        });
+
+        return cards;
     }
 }

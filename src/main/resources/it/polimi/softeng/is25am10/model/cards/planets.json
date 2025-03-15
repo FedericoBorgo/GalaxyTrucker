@@ -1,0 +1,51 @@
+[
+  {
+    "id" : 12,
+    "days" : 3,
+    "PLANET1": ["RED", "GREEN", "BLUE", "BLUE", "BLUE"],
+    "PLANET2": ["RED", "YELLOW", "BLUE"],
+    "PLANET3": ["RED", "BLUE", "BLUE", "BLUE"],
+    "PLANET4": ["RED", "GREEN"]
+  },
+  {
+    "id" : 14,
+    "days" : 2,
+    "PLANET1": ["RED", "RED"],
+    "PLANET2": ["RED", "BLUE", "BLUE"],
+    "PLANET3": ["YELLOW"]
+  },
+  {
+    "id" : 15,
+    "days" : 3,
+    "PLANET1": ["YELLOW", "GREEN", "BLUE", "BLUE"],
+    "PLANET2": ["YELLOW", "YELLOW"]
+  },
+  {
+    "id" : 16,
+    "days" : 1,
+    "PLANET1": ["GREEN", "GREEN"],
+    "PLANET2": ["YELLOW"],
+    "PLANET3": ["BLUE", "BLUE", "BLUE"]
+  },
+  {
+    "id" : 32,
+    "days" : 4,
+    "PLANET1": ["RED", "RED", "RED", "YELLOW"],
+    "PLANET2": ["RED", "RED", "GREEN", "GREEN"],
+    "PLANET3": ["RED", "BLUE", "BLUE", "BLUE", "BLUE"]
+  },
+  {
+    "id" : 33,
+    "days" : 3,
+    "PLANET1": ["RED", "RED"],
+    "PLANET2": ["GREEN", "GREEN", "GREEN", "GREEN"]
+  },
+  {
+    "id" : 34,
+    "days" : 2,
+    "PLANET1": ["RED", "YELLOW"],
+    "PLANET2": ["YELLOW", "GREEN", "BLUE"],
+    "PLANET3": ["GREEN", "GREEN"],
+    "PLANET4": ["YELLOW"]
+  }
+]

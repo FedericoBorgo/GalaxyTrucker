@@ -97,10 +97,8 @@ public class Meteors extends Card {
 
         jsonCards.forEach(item -> {
             JSONObject entry = (JSONObject) item;
-            int id;
+            int id = entry.getInt("id");
             List<Pair<Tile.Side, Projectile.Type>> meteors = new ArrayList<>();
-
-            id = entry.getInt("id");
 
             entry.getJSONArray("asteroids").forEach(obj -> {
                 JSONObject asteroid = (JSONObject) obj;

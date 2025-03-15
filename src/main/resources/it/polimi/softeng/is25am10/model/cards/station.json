@@ -1,0 +1,26 @@
+[
+  {
+    "id" : 20,
+    "guys": 5,
+    "days" : 1,
+    "goods" : ["YELLOW", "GREEN"]
+  },
+  {
+    "id" : 21,
+    "guys": 6,
+    "days" : 1,
+    "goods" : ["RED", "RED"]
+  },
+  {
+    "id" : 39,
+    "guys": 7,
+    "days" : 1,
+    "goods" : ["RED", "YELLOW"]
+  },
+  {
+    "id" : 40,
+    "guys": 8,
+    "days" : 2,
+    "goods" : ["YELLOW", "YELLOW", "GREEN"]
+  }
+]
