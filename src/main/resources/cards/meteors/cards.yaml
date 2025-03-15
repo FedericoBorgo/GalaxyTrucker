@@ -1,0 +1,24 @@
+meteors:
+  - id: 9
+      - type: BIG_ASTEROID
+        side: UP
+      - type: SMALL_ASTEROID
+        side: LEFT
+      - type: SMALL_ASTEROID
+        side: RIGHT
+  - id: 10
+      - type: SMALL_ASTEROID
+        side: UP
+      - type: SMALL_ASTEROID
+        side: UP
+      - type: SMALL_ASTEROID
+        side: LEFT
+      - type: SMALL_ASTEROID
+        side: DOWN
+  - id: 11
+      - type: BIG_ASTEROID
+        side: UP
+      - type: SMALL_ASTEROID
+        side: UP
+      - type: BIG_ASTEROID
+        side: UP

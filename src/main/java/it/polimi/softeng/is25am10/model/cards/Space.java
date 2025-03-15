@@ -6,16 +6,19 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class OpenSpace extends Card {
+public class Space extends Card {
     private final Map<FlightBoard.Pawn, Integer> enginePower = new HashMap<>();
     private final Map<String, Integer> enginePowerName = new HashMap<>();
 
-    public OpenSpace(Model model, FlightBoard board, int id) {
-        super(model, true, board, id);
+    public Space(Model model, FlightBoard board, int id) {
+        super(model, true, board, id, Type.SHIP);
     }
 
     @Override

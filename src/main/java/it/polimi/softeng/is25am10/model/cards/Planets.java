@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -20,7 +21,7 @@ public class Planets extends Card{
     }
 
     public Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
-        super(null, true, board, id);
+        super(null, true, board, id, Type.PLANETS);
         this.goods = goodsType;
         this.flightDays = backmoves;
 

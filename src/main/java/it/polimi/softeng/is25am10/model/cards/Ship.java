@@ -6,15 +6,17 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
-public class AbandonedShip extends Card {
+import java.util.List;
+
+public class Ship extends Card {
     private final int cash;
     private final int days;
     private final int astronaut;
     private boolean someoneAccepted;
     private Player descendingPlayer;
 
-    public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
-        super(model, true, board, id);
+    public Ship(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
+        super(model, true, board, id, Type.SHIP);
        this.cash = cash;
        this.days = days;
        this.astronaut = astronaut;

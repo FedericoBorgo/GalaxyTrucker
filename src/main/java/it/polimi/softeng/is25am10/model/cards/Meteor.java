@@ -1,9 +1,6 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.Player;
-import it.polimi.softeng.is25am10.model.Projectile;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
@@ -13,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class MeteorSwarm extends Card {
+public class Meteor extends Card {
     private Map<Player, List<Integer>> useBattery;
     List<Projectile> projectiles;
 
@@ -21,8 +18,8 @@ public class MeteorSwarm extends Card {
         return new Random().nextInt(6) + 1;
     }
 
-    public MeteorSwarm(FlightBoard board, List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
-        super(null, true, board, id);
+    public Meteor(FlightBoard board, List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
+        super(null, true, board, id, Type.METEOR);
         projectiles = new ArrayList<>();
         useBattery = new HashMap<>();
         AtomicInteger counter = new AtomicInteger();
