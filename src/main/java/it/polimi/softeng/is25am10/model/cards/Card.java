@@ -138,7 +138,7 @@ public abstract class Card {
      */
     public abstract JSONObject getData();
 
-    protected static String dump(InputStream stream){
+    public static String dump(InputStream stream){
         try {
             return new String(stream.readAllBytes());
         } catch (IOException e) {

@@ -1,14 +1,16 @@
 package it.polimi.softeng.is25am10.model;
 
+import it.polimi.softeng.is25am10.model.cards.Card;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents the entire set of tiles used for one game.
@@ -16,19 +18,32 @@ import java.util.Objects;
  * {@code seen} for the face-up ones.
  */
 public class TilesCollection {
-    static final List<Tile> TILES;
+    static List<Tile> TILES;
     private final List<Tile> tiles;
     private final List<Tile> seen;
 
     /**
      * Creates a deck of tiles for a match and shuffles it.
      */
-    TilesCollection() {
+    public TilesCollection() {
         tiles = new ArrayList<>();
         seen = new ArrayList<>();
-        TILES.forEach(tile -> {
-            tiles.add(new Tile(tile.getType(), tile.getConnectors()));
-        });
+
+        String out = Card.dump(TilesCollection.class.getResourceAsStream("tiles.json"));
+        JSONObject object = new JSONObject(out);
+
+        for (Tile.Type type : Tile.Type.values()) {
+            if(type == Tile.Type.EMPTY || type == Tile.Type.WALL)
+                continue;
+
+            JSONArray array = object.getJSONArray(type.name());
+
+            array.forEach(e -> {
+                tiles.add(new Tile(type, e.toString()));
+            });
+        }
+
+        Collections.shuffle(tiles);
     }
 
     /**
@@ -75,29 +90,5 @@ public class TilesCollection {
      */
     public void give(Tile tile){
         seen.add(tile);
-    }
-
-    static {
-        TILES = new ArrayList<>();
-
-        Arrays.stream(Tile.Type.values()).forEach(tileType -> {
-            if(tileType == Tile.Type.WALL || tileType == Tile.Type.EMPTY)
-                return;
-
-            try {
-                Path resourcePath = Paths.get(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("tiles/"+tileType.name())).toURI());
-                List<String> files = Files.list(resourcePath)
-                        .map(Path::getFileName)
-                        .map(Path::toString)
-                        .map(s -> s.substring(0, 4))
-                        .toList();
-
-                for(String connectors : files)
-                    TILES.add(new Tile(tileType, connectors));
-
-            } catch (URISyntaxException | IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 }

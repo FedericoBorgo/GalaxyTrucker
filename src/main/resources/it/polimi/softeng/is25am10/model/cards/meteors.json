@@ -13,6 +13,7 @@
       { "type": "SMALL_ASTEROID", "side": "UP" },
       { "type": "SMALL_ASTEROID", "side": "UP" },
       { "type": "SMALL_ASTEROID", "side": "LEFT" },
+      { "type": "SMALL_ASTEROID", "side": "RIGHT" },
       { "type": "SMALL_ASTEROID", "side": "DOWN" }
     ]
   },
@@ -22,6 +23,36 @@
       { "type": "BIG_ASTEROID", "side": "UP" },
       { "type": "SMALL_ASTEROID", "side": "UP" },
       { "type": "BIG_ASTEROID", "side": "UP" }
+    ]
+  },
+  {
+    "id": 29,
+    "asteroids": [
+      { "type": "SMALL_ASTEROID", "side": "UP" },
+      { "type": "SMALL_ASTEROID", "side": "UP" },
+      { "type": "BIG_ASTEROID", "side": "LEFT" },
+      { "type": "SMALL_ASTEROID", "side": "LEFT" },
+      { "type": "SMALL_ASTEROID", "side": "LEFT" }
+    ]
+  },
+  {
+    "id": 30,
+    "asteroids": [
+      { "type": "BIG_ASTEROID", "side": "UP" },
+      { "type": "BIG_ASTEROID", "side": "UP" },
+      { "type": "SMALL_ASTEROID", "side": "DOWN" },
+      { "type": "SMALL_ASTEROID", "side": "DOWN" }
+    ]
+  },
+  {
+    "id": 31,
+    "asteroids": [
+      { "type": "SMALL_ASTEROID", "side": "UP" },
+      { "type": "SMALL_ASTEROID", "side": "UP" },
+      { "type": "BIG_ASTEROID", "side": "RIGHT" },
+      { "type": "BIG_ASTEROID", "side": "UP" },
+      { "type": "SMALL_ASTEROID", "side": "RIGHT" },
+      { "type": "SMALL_ASTEROID", "side": "RIGHT" }
     ]
   }
 ]
