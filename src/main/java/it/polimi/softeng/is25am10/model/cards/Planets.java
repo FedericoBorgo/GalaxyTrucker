@@ -4,7 +4,6 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,7 +27,7 @@ public class Planets extends Card{
     }
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -52,12 +51,12 @@ public class Planets extends Card{
             ready = true;
 
         register(player);
-        return Result.ok(null);
+        return Result.ok("");
     }
 
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
@@ -77,7 +76,7 @@ public class Planets extends Card{
             }
         }
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override

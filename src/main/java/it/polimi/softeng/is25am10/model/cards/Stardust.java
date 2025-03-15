@@ -13,11 +13,11 @@ public class Stardust extends Card {
 
     //not really needed
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         if(isRegistered(player))
             return Result.err("player already registered");
         register(player);
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     /**
@@ -26,7 +26,7 @@ public class Stardust extends Card {
      * @return result type tells if it's been successful
      */
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
@@ -38,7 +38,7 @@ public class Stardust extends Card {
             board.moveRocket(pawn, -registered.get(pawn).getBoard().getTiles().countExposedConnectors());
         }
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override

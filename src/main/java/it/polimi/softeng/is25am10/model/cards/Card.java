@@ -3,14 +3,11 @@ package it.polimi.softeng.is25am10.model.cards;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Card {
     private final boolean needPlayerChoice;
@@ -75,31 +72,9 @@ public abstract class Card {
         return needPlayerChoice;
     }
 
-    protected Map<Tile.Rotation, Integer> getDrillsToActivate(JSONObject json){
-        Map<Tile.Rotation, Integer> drills = new HashMap<>();
-
-        for(Tile.Rotation r: Tile.Rotation.values()){
-            drills.put(r, json.getInt(r.name()));
-        }
-        return drills;
-    }
-
-    protected int getNecessaryBattery(Map<Tile.Rotation, Integer> drills){
-        AtomicInteger count = new AtomicInteger(0);
-        drills.forEach((r, val) -> {
-            count.addAndGet(val);
-        });
-        return count.get();
-    }
-
-    protected int getRocketToActivate(JSONObject json){
-        return json.getInt("d_rocket");
-    }
-
     protected boolean getChoice(JSONObject json){
         return json.getBoolean("choice");
     }
-
 
     public abstract Result<String> set(Player player, JSONObject json);
 

@@ -1,12 +1,12 @@
 package it.polimi.softeng.is25am10.model;
 
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard.RocketPawn;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard.RocketPawn;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 
 import java.util.*;
 
@@ -187,7 +187,7 @@ public class Model {
     }
 
     public Map<Tile.Rotation, Integer> getUsingDrills(String name){
-        return usingDrills.getOrDefault(get(name), null);
+        return getUsingDrills(get(name));
     }
 
     public Map<Tile.Rotation, Integer> getUsingDrills(Player p){

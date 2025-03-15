@@ -1,15 +1,15 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.*;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.Player;
+import it.polimi.softeng.is25am10.model.Projectile;
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.Inet4Address;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -56,7 +56,6 @@ public class MeteorSwarm extends Card {
         if(use.size() > model.getRemovedItems(player).battery)
             return Result.err("not enough battery");
 
-        model.getRemovedItems(player).battery = 0;
         useBattery.put(player, use);
         register(player);
 

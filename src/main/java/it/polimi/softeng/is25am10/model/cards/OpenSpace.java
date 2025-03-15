@@ -3,16 +3,12 @@ package it.polimi.softeng.is25am10.model.cards;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import org.json.JSONObject;
 import org.json.JSONArray;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.json.JSONObject;
 
-import static it.polimi.softeng.is25am10.model.boards.Coordinate.fromStringToCoordinate;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OpenSpace extends Card {
     private final Map<FlightBoard.RocketPawn, Integer> enginePower = new HashMap<>();
@@ -35,7 +31,6 @@ public class OpenSpace extends Card {
         //end
 
         enginePower.put(player.getPawn(), player.getBoard().getRocketPower(model.getRemovedItems(player).battery));
-        model.getRemovedItems(player).battery = 0;
         register(player);
         return Result.ok("" + enginePower.get(player.getPawn()));
     }

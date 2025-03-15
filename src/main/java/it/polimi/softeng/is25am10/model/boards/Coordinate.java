@@ -3,7 +3,6 @@ package it.polimi.softeng.is25am10.model.boards;
 import it.polimi.softeng.is25am10.model.Result;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 

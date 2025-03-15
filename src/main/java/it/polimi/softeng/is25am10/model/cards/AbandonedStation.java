@@ -4,11 +4,9 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.Map;
 
 public class AbandonedStation extends Card {
     private List<GoodsBoard.Type> goods;

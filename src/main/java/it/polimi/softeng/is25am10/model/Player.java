@@ -1,6 +1,9 @@
 package it.polimi.softeng.is25am10.model;
 
-import it.polimi.softeng.is25am10.model.boards.*;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 
 import java.util.List;
 

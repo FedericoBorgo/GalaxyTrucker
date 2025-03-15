@@ -3,18 +3,8 @@ package it.polimi.softeng.is25am10.model.cards;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import javafx.util.Pair;
 import org.json.JSONObject;
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static it.polimi.softeng.is25am10.model.boards.Coordinate.fromStringToCoordinate;
 
 public class AbandonedShip extends Card {
     private final int cash;
@@ -44,7 +34,6 @@ public class AbandonedShip extends Card {
 
         if(!someoneAccepted && getChoice(json)){
             if(model.getRemovedItems(player).guys >= astronaut){
-                model.getRemovedItems(player).guys = 0;
                 someoneAccepted = true;
                 descendingPlayer = player;
             }

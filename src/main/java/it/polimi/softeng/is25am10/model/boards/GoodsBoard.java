@@ -2,7 +2,10 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import it.polimi.softeng.is25am10.model.Tile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class offers the capacity to change the number of goods held on a tile.
