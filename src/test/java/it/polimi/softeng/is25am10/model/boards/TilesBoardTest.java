@@ -5,9 +5,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -199,8 +197,8 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
-        List<Coordinate> battery = new ArrayList<>();
-        battery.add(new Coordinate(2, 1));
+        Map<Tile.Rotation, Integer> battery = new HashMap<>();
+        battery.put(Tile.Rotation.INV, 1);
         assertEquals(2.5, tilesBoard.countDrillsPower(battery));
     }
 
@@ -222,8 +220,6 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
-        List<Coordinate> battery = new ArrayList<>();
-        battery.add(new Coordinate(1, 3));
-        assertEquals(3, tilesBoard.countRocketPower(battery));
+        assertEquals(3, tilesBoard.countRocketPower(1));
     }
 }

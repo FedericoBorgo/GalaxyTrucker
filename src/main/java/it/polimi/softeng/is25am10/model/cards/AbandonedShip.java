@@ -1,18 +1,10 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import javafx.util.Pair;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static it.polimi.softeng.is25am10.model.boards.Coordinate.fromStringToCoordinate;
 
 public class AbandonedShip extends Card {
     private final int cash;
@@ -20,21 +12,16 @@ public class AbandonedShip extends Card {
     private final int astronaut;
     private boolean someoneAccepted;
     private Player descendingPlayer;
-    private List<Pair<Coordinate, Integer>> positionsCrew;
-    private Optional<Coordinate> brownPosition;
-    private Optional<Coordinate> purplePosition;
 
-    public AbandonedShip(int id, int astronaut, int cash, int days) {
-        super(true, id);
+    public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
+        super(model, true, board, id);
        this.cash = cash;
        this.days = days;
        this.astronaut = astronaut;
-       brownPosition = Optional.empty();
-       purplePosition = Optional.empty();
     }
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -45,63 +32,27 @@ public class AbandonedShip extends Card {
         }
         //end
 
-        if(json.getBoolean("accept")){
-            int count = 0;
-            JSONArray tempPositionsCrew = json.getJSONArray("positionsCrew");
-            positionsCrew = new ArrayList<>();
-
-            for(int i = 0; i < tempPositionsCrew.length(); i++){
-                JSONObject o = tempPositionsCrew.getJSONObject(i);
-                Result<Coordinate> res = fromStringToCoordinate(o.getString("coordinate"));
-                if(res.isErr())
-                    return Result.err("coordinate not valid");
-
-                Coordinate cord = res.getData();
-                int qty = o.getInt("removeCount");
-                ShipBoard.CrewType type = ShipBoard.CrewType.valueOf(o.getString("crewType"));
-
-                if(!player.getBoard().checkEnough(cord, type, qty))
-                    return Result.err("not enough");
-
-                count+=qty;
-
-                switch(type){
-                    case ASTRONAUT -> positionsCrew.add(new Pair<>(cord, qty));
-                    case B_ALIEN -> brownPosition = Optional.of(cord);
-                    case P_ALIEN -> purplePosition = Optional.of(cord);
-                }
+        if(!someoneAccepted && getChoice(json)){
+            if(model.getRemovedItems(player).guys >= astronaut){
+                someoneAccepted = true;
+                descendingPlayer = player;
             }
-            if(count < this.astronaut)
-                return Result.err("not enough astronaut");
-
-            someoneAccepted = true;
-            descendingPlayer = player;
         }
 
         register(player);
-        return Result.ok(someoneAccepted);
+        return Result.ok("");
     }
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all players declared their decision");
-        if(someoneAccepted)
-        {
-            // remove the purple/brown alien
-            brownPosition.ifPresent(coordinate -> {
-                descendingPlayer.getBoard().getBrown().remove(coordinate, 1);
-            });
-            purplePosition.ifPresent(coordinate -> {
-                descendingPlayer.getBoard().getPurple().remove(coordinate, 1);
-            });
-            // remove the astronauts
-            descendingPlayer.getBoard().getAstronaut().remove(positionsCrew);
-            // give the credits to the player
+
+        if(someoneAccepted){
             descendingPlayer.giveCash(cash);
             board.moveRocket(descendingPlayer.getPawn(), -days);
-            return Result.ok(descendingPlayer);
+            return Result.ok("");
         }
 
         return Result.ok("Nobody wanted to descend on the abandoned ship");
@@ -115,6 +66,8 @@ public class AbandonedShip extends Card {
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject data = new JSONObject();
+        data.put("abandonedship", "");
+        return data;
     }
 }

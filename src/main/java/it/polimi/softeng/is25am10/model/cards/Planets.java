@@ -4,7 +4,7 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -19,15 +19,15 @@ public class Planets extends Card{
         PLANET1, PLANET2, PLANET3, NOPLANET
     }
 
-    public Planets(Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
-        super(true, id);
+    public Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
+        super(null, true, board, id);
         this.goods = goodsType;
         this.flightDays = backmoves;
 
     }
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -51,12 +51,12 @@ public class Planets extends Card{
             ready = true;
 
         register(player);
-        return Result.ok(null);
+        return Result.ok("");
     }
 
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
@@ -76,16 +76,27 @@ public class Planets extends Card{
             }
         }
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override
     public boolean ready() {
-        return ready;
+        return ready || allRegistered();
     }
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject json = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
+        Arrays.asList(Planet.values()).forEach(planet -> {
+            if(planet != Planet.NOPLANET && !playerChoice.containsValue(planet)){
+                jsonArray.put(planet);
+            }
+        });
+
+        json.put("planets", jsonArray);
+
+        return json;
     }
 }

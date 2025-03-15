@@ -1,28 +1,30 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.*;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.Player;
+import it.polimi.softeng.is25am10.model.Projectile;
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MeteorSwarm extends Card {
-    private Map<Player, Map<Integer, Optional<Coordinate>>> playerChoice;
+    private Map<Player, List<Integer>> useBattery;
     List<Projectile> projectiles;
 
     public static int rollDice() {
         return new Random().nextInt(6) + 1;
     }
 
-    public MeteorSwarm(List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
-        super(true, id);
+    public MeteorSwarm(FlightBoard board, List<Pair<Tile.Side, Projectile.ProjectileType>> meteors, int id) {
+        super(null, true, board, id);
         projectiles = new ArrayList<>();
-        playerChoice = new HashMap<>();
+        useBattery = new HashMap<>();
         AtomicInteger counter = new AtomicInteger();
         counter.set(0);
 
@@ -31,12 +33,11 @@ public class MeteorSwarm extends Card {
             Projectile p = new Projectile(pair.getValue(), pair.getKey(), number, counter.getAndIncrement());
             projectiles.add(p);
         });
-
     }
 
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         if (isRegistered(player))
             return Result.err("player already registered");
 
@@ -45,48 +46,30 @@ public class MeteorSwarm extends Card {
 
         }
 
+        JSONArray array = json.getJSONArray("use");
+        List<Integer> use = new ArrayList<>();
 
-        AtomicBoolean error = new AtomicBoolean(false);
-        Map<Integer, Optional<Coordinate>> map = new HashMap<>();
-
-        projectiles.forEach(projectile -> {
-            Result<Coordinate> c = Coordinate.fromStringToCoordinate(json.getString("" + projectile.getID()));
-
-            if(c.isOk()){
-                if(player.getBoard().getBattery().get(c.getData()) > 0)
-                    map.put(projectile.getID(), Optional.of(c.getData()));
-                else
-                    error.set(true);
-            }
-            else
-                map.put(projectile.getID(), Optional.empty());
+        array.forEach(item -> {
+            use.add(Integer.parseInt(item.toString()));
         });
 
-        if (error.get()) {
+        if(use.size() > model.getRemovedItems(player).battery)
             return Result.err("not enough battery");
-        }
 
-        playerChoice.put(player, map);
+        useBattery.put(player, use);
         register(player);
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         if (!ready())
             return Result.err("not all player declared their decision");
 
-        playerChoice.forEach((player, choice) -> {
-            projectiles.forEach(projectile -> {
-                Optional<Coordinate> choiceOptional = choice.get(player);
-
-                player.getBoard().hit(projectile, choiceOptional.isPresent());
-
-                choiceOptional.ifPresent(coordinate -> {
-                    player.getBoard().getBattery().remove(coordinate, 1);
-                });
-
+        projectiles.forEach(projectile -> {
+            registered.forEach((pawn, p) -> {
+                p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.getID()));
             });
         });
 
@@ -104,9 +87,10 @@ public class MeteorSwarm extends Card {
         JSONObject json = new JSONObject();
         JSONArray meteors = new JSONArray();
         projectiles.forEach(projectile -> {
-            meteors.put(projectile.toString());
+            if(projectile.getType() == Projectile.ProjectileType.SMALL_ASTEROID)
+                meteors.put(projectile.toString());
         });
-        json.put("meteors", meteors);
+        json.put("meteorswarm", meteors);
         return json;
 
     }

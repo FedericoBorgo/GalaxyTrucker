@@ -2,30 +2,29 @@ package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.Map;
 
 public class AbandonedStation extends Card {
     private List<GoodsBoard.Type> goods;
-    private Map<Player, Boolean> playerChoice;
+    private Player p;
     private int requiredCrew;
     private int flightDays;
     private boolean ready = false;
 
-    public AbandonedStation(int Crew,List<GoodsBoard.Type> goodsType, int id, int backmoves) {
-        super(true, id);
+    public AbandonedStation(FlightBoard board, int crew, List<GoodsBoard.Type> goodsType, int id, int backmoves) {
+        super(null, true, board, id);
         this.goods = goodsType;
-        this.requiredCrew = Crew;
+        this.requiredCrew = crew;
         this.flightDays = backmoves;
 
     }
 
     @Override
-    public Result<Object> set(Player player, JSONObject json) {
+    public Result<String> set(Player player, JSONObject json) {
         if(isRegistered(player))
             return Result.err("player already registered");
 
@@ -33,47 +32,42 @@ public class AbandonedStation extends Card {
             return Result.err("player choice is not in order");
         }
 
-        boolean choice = json.getBoolean("choice");
-
-
         //enough crew?
-        if(choice) {
+        if(!ready && getChoice(json)) {
             int crew = player.getBoard().getAstronaut().getTotal();
             if (crew < requiredCrew) {
                 return Result.err("not enough crew");
             }else{
                 ready = true;
             }
+            p = player;
         }
 
-        playerChoice.put(player, choice);
         register(player);
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override
-    public Result<Object> play() {
+    public Result<String> play() {
         if(!ready())
             return Result.err("nobody chose yes");
 
-        registered.forEach((pawn, player) -> {
-            if(playerChoice.get(player)) {
-                player.setGoodsReward(goods);
-                board.moveRocket(player.getPawn(), flightDays);
-            }
-        });
+        p.setGoodsReward(goods);
+        board.moveRocket(p.getPawn(), -flightDays);
 
-        return Result.ok(null);
+        return Result.ok("");
     }
 
     @Override
     public boolean ready() {
-        return ready;
+        return ready || allRegistered();
     }
 
     @Override
     public JSONObject getData() {
-        return null;
+        JSONObject json = new JSONObject();
+        json.put("abandonedstation", "");
+        return json;
     }
 }

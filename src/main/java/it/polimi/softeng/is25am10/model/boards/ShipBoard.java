@@ -92,8 +92,8 @@ public class ShipBoard {
         return goods.get(type);
     }
 
-    public double getDrillsPower(List<Coordinate> activate){
-        double drills = tiles.countDrillsPower(activate);
+    public double getDrillsPower(Map<Tile.Rotation, Integer> count){
+        double drills = tiles.countDrillsPower(count);
 
         if(drills > 0){
             drills += purple.getTotal()*2;
@@ -102,8 +102,8 @@ public class ShipBoard {
         return drills;
     }
 
-    public int getRocketPower(List<Coordinate> activate){
-        int rocket = tiles.countRocketPower(activate);
+    public int getRocketPower(int count){
+        int rocket = tiles.countRocketPower(count);
 
         if(rocket > 0){
             rocket += brown.getTotal()*2;
@@ -116,21 +116,23 @@ public class ShipBoard {
         return purple.get(c) + astronaut.get(c) + brown.get(c) > 0;
     }
 
-    private void removeSomeone(Coordinate c){
+    public boolean removeSomeone(Coordinate c){
         if(astronaut.get(c) > 0) {
             astronaut.remove(c, 1);
-            return;
+            return true;
         }
 
         if(purple.get(c) > 0) {
             purple.remove(c, 1);
-            return;
+            return true;
         }
 
         if(brown.get(c) > 0) {
             brown.remove(c, 1);
-            return;
+            return true;
         }
+
+        return false;
     }
 
     private void toRemove(boolean[][] marked, Coordinate c){

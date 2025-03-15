@@ -421,45 +421,46 @@ public class TilesBoard {
         return count.get();
     }
 
-    public double countDrillsPower(List<Coordinate> dDrills) {
+    public double countDrillsPower(Map<Tile.Rotation, Integer> count) {
         AtomicInteger drills = new AtomicInteger();
         AtomicInteger d_drills = new AtomicInteger();
 
         Coordinate.forEach(c -> {
-            if (get(c).getType() != Tile.Type.DRILLS)
-                return;
+            Tile.Rotation rotation = getRotation(c);
 
-            if (getRotation(c) == Tile.Rotation.NONE)
-                drills.addAndGet(2);
-            else
-                drills.addAndGet(1);
+            if (get(c).getType() == Tile.Type.DRILLS){
+                if (rotation == Tile.Rotation.NONE)
+                    drills.addAndGet(2);
+                else
+                    drills.addAndGet(1);
+            }
+            else if(get(c).getType() == Tile.Type.D_DRILLS){
+                if(count.getOrDefault(rotation, 0) > 0){
+                    count.put(rotation, count.get(rotation) - 1);
+
+                    if (rotation == Tile.Rotation.NONE)
+                        d_drills.addAndGet(2);
+                    else
+                        d_drills.addAndGet(1);
+                }
+            }
         });
-
-        dDrills.forEach(d -> {
-            if (get(d).getType() != Tile.Type.D_DRILLS)
-                return;
-
-            if (getRotation(d) == Tile.Rotation.NONE)
-                d_drills.addAndGet(2);
-            else
-                d_drills.addAndGet(1);
-        });
-
 
         return drills.get()/2.0 + d_drills.get();
     }
 
-    public int countRocketPower(List<Coordinate> dDrills) {
+    public int countRocketPower(int count) {
         AtomicInteger power = new AtomicInteger();
+        AtomicInteger atomicCount = new AtomicInteger();
+        atomicCount.set(count);
 
         Coordinate.forEach(c -> {
             if (get(c).getType() == Tile.Type.ROCKET && getRotation(c) == Tile.Rotation.NONE)
                 power.getAndIncrement();
-        });
-
-        dDrills.forEach(d -> {
-            if (get(d).getType() == Tile.Type.D_ROCKET && getRotation(d) == Tile.Rotation.NONE)
+            else if(get(c).getType() == Tile.Type.D_ROCKET && atomicCount.get() > 0){
                 power.addAndGet(2);
+                atomicCount.addAndGet(-1);
+            }
         });
 
         return power.get();

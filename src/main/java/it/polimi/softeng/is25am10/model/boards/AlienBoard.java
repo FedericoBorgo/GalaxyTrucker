@@ -4,8 +4,8 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 
 import java.io.IOException;
-import java.util.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class offers the capacity to change the number of aliens held on a tile

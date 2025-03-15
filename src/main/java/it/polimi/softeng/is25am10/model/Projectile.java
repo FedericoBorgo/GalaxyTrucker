@@ -1,6 +1,5 @@
 package it.polimi.softeng.is25am10.model;
 
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import org.json.JSONObject;
 
 public class Projectile{

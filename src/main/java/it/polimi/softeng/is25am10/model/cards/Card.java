@@ -1,19 +1,19 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Card {
     private final boolean needPlayerChoice;
-    protected FlightBoard board;
-    protected Map<FlightBoard.RocketPawn, Player> registered;
+    protected final FlightBoard board;
+    protected final Map<FlightBoard.RocketPawn, Player> registered;
+    protected final Model model;
     public final int ID;
 
     public enum InputType {
@@ -22,14 +22,12 @@ public abstract class Card {
         PLANET
     }
 
-    public Card(boolean needPlayerChoice, int id) {
+    public Card(Model model, boolean needPlayerChoice, FlightBoard board, int id) {
         this.needPlayerChoice = needPlayerChoice;
+        this.board = board;
+        this.model = model;
         ID = id;
         registered = new HashMap<>();
-    }
-
-    public void setBoard(FlightBoard board) {
-        this.board = board;
     }
 
     /**
@@ -74,9 +72,13 @@ public abstract class Card {
         return needPlayerChoice;
     }
 
-    public abstract Result<Object> set(Player player, JSONObject json);
+    protected boolean getChoice(JSONObject json){
+        return json.getBoolean("choice");
+    }
 
-    public abstract Result<Object> play();
+    public abstract Result<String> set(Player player, JSONObject json);
+
+    public abstract Result<String> play();
 
     public abstract boolean ready();
 
