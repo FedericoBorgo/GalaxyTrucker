@@ -236,5 +236,17 @@ public class Tile {
             case INV -> Arrays.asList(Side.LEFT, Side.UP);
         };
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Tile tile = (Tile) o;
+        return type == tile.type && Objects.equals(connectors, tile.connectors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, connectors);
+    }
 }
 

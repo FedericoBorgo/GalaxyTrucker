@@ -40,7 +40,6 @@ public class Model {
         WAITING,
         ENDED;
     }
-
     private Status status;
     private Status prevStatus;
     private final Map<String, Player> players;
@@ -53,6 +52,16 @@ public class Model {
     private final Map<String, Player> quitters;
     private final int nPlayers;
     private int countPlayers;
+    private AtomicBoolean canMove;
+    private Timer timer;
+    private TimerTask task = new TimerTask() {
+        public void run() {
+            canMove.set(true);
+            if(flight.getTimer() == 2){
+                moveTimer();
+            }
+        }
+    };
 
     //Constructs a new Match instance
     public Model(int nPlayers) {
@@ -64,10 +73,16 @@ public class Model {
         unusedPawns = new ArrayList<>(List.of(Pawn.values()));
         removedItems = new HashMap<>();
         drillsToUse = new HashMap<>();
+        canMove = new AtomicBoolean(false);
         deck = new Deck(this, flight);
         status = Status.JOINING;
         prevStatus = null;
         countPlayers = 0;
+        timer = new Timer();
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public Result<Pawn> addPlayer(String name) {
@@ -97,6 +112,7 @@ public class Model {
         prevStatus = Status.JOINING;
         status = Status.BUILDING;
         countPlayers = 0;
+        timer.schedule(task, 90000L);
         return Result.ok("started");
     }
 
@@ -111,7 +127,17 @@ public class Model {
     public synchronized Result<Integer> moveTimer(){
         if(status != Status.BUILDING)
             return Result.err("not BUILDING status");
-        flight.moveTimer();
+        if(canMove.get())
+            flight.moveTimer();
+
+        if(flight.getTimer() == 2){
+            players.forEach((name,v)->{
+                setReady(name);
+            });
+        }
+        else
+            timer.schedule(task, 90000L);
+
         return Result.ok(flight.getTimer());
     }
 
@@ -122,6 +148,9 @@ public class Model {
     public synchronized Result<String> setReady(String name){
         if(status != Status.BUILDING)
             return Result.err("not BUILDING status");
+
+        if(flight.getOrder().contains(get(name).getPawn()))
+            return Result.err("player already ready");
 
         flight.setRocketReady(players.get(name).getPawn());
         countPlayers++;
@@ -154,6 +183,14 @@ public class Model {
         if(status != Status.BUILDING)
             return Result.err("not BUILDING status");
         return ship(name).getTiles().setTile(c, t, rotation);
+    }
+
+    public Result<Tile> getTile(String name, Coordinate c){
+        return ship(name).getTiles().getTile(c);
+    }
+
+    public Tile.Rotation getRotation(String name, Coordinate c){
+        return ship(name).getTiles().getRotation(c);
     }
 
     public synchronized Result<Tile> bookTile(String name, Tile t){
@@ -203,11 +240,14 @@ public class Model {
     private boolean allShipOk(){
         AtomicBoolean ok = new AtomicBoolean();
         ok.set(true);
+        Status status = this.status;
+        this.status = Status.CHECKING;
 
         players.forEach((n, p) -> {
             if(!checkShip(n).getData().isEmpty())
                 ok.set(false);
         });
+        this.status = status;
 
         return ok.get();
     }

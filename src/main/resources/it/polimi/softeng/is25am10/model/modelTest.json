@@ -1,0 +1,303 @@
+{
+  "n_players" : 3,
+  "players" : [
+    {
+      "name" : "player1",
+      "wrong" : "x2y0",
+      "brown" : "x2y3",
+      "purple": "x2y1",
+      "battery": ["x4y2", "x4y4"],
+      "astronaut": ["x3y2"],
+      "0" : {
+        "coords": "x2y2",
+        "type" : "B_BOX_2",
+        "connectors" : "sosu",
+        "rotation" : "NONE"
+      },
+      "1" : {
+        "coords": "x4y2",
+        "type" : "BATTERY_2",
+        "connectors" : "tosu",
+        "rotation" : "NONE"
+      },
+      "2" : {
+        "coords": "x5y2",
+        "type" : "DRILLS",
+        "connectors" : "stuo",
+        "rotation" : "CLOCK"
+      },
+      "3" : {
+        "coords": "x5y3",
+        "type" : "ROCKET",
+        "connectors" : "usso",
+        "rotation" : "NONE"
+      },
+      "4" : {
+        "coords": "x4y3",
+        "type" : "SHIELD",
+        "connectors" : "ssut",
+        "rotation" : "INV"
+      },
+      "5" : {
+        "coords": "x4y4",
+        "type" : "BATTERY_3",
+        "connectors" : "tsoo",
+        "rotation" : "NONE"
+      },
+      "6" : {
+        "coords": "x4y1",
+        "type" : "B_BOX_2",
+        "connectors" : "suus",
+        "rotation" : "NONE"
+      },
+      "7" : {
+        "coords": "x5y1",
+        "type" : "R_BOX_1",
+        "connectors" : "ttut",
+        "rotation" : "NONE"
+      },
+      "8" : {
+        "coords": "x3y3",
+        "type" : "D_ROCKET",
+        "connectors" : "tssu",
+        "rotation" : "NONE"
+      },
+      "9" : {
+        "coords": "x2y3",
+        "type" : "HOUSE",
+        "connectors" : "sust",
+        "rotation" : "NONE"
+      },
+      "10" : {
+        "coords": "x1y3",
+        "type" : "B_ADDON",
+        "connectors" : "sust",
+        "rotation" : "NONE"
+      },
+      "11" : {
+        "coords": "x0y3",
+        "type" : "ROCKET",
+        "connectors" : "tuss",
+        "rotation" : "NONE"
+      },
+      "12" : {
+        "coords": "x0y2",
+        "type" : "B_BOX_2",
+        "connectors" : "ssus",
+        "rotation" : "NONE"
+      },
+      "13" : {
+        "coords": "x2y1",
+        "type" : "HOUSE",
+        "connectors" : "utso",
+        "rotation" : "NONE"
+      },
+      "14" : {
+        "coords": "x1y1",
+        "type" : "SHIELD",
+        "connectors" : "otot",
+        "rotation" : "CLOCK"
+      },
+      "15" : {
+        "coords": "x2y0",
+        "type" : "D_ROCKET",
+        "connectors" : "ooso",
+        "rotation" : "DOUBLE"
+      },
+      "16" : {
+        "coords": "x3y1",
+        "type" : "P_ADDON",
+        "connectors" : "sstu",
+        "rotation" : "NONE"
+      }
+    },
+    {
+      "name": "player2",
+      "wrong": "x5y3",
+      "purple": "x5y4",
+      "battery": ["x1y2", "x4y3", "x6y2"],
+      "astronaut": ["x4y1", "x6y3", "x3y2"],
+      "0": {
+        "coords": "x3y3",
+        "type": "B_BOX_3",
+        "connectors": "tsss",
+        "rotation": "NONE"
+      },
+      "1": {
+        "coords": "x2y2",
+        "type": "B_BOX_3",
+        "connectors": "stoo",
+        "rotation": "NONE"
+      },
+      "2": {
+        "coords": "x1y2",
+        "type": "BATTERY_2",
+        "connectors": "tutt",
+        "rotation": "NONE"
+      },
+      "3": {
+        "coords": "x2y3",
+        "type": "R_BOX_1",
+        "connectors": "usus",
+        "rotation": "NONE"
+      },
+      "4": {
+        "coords": "x2y4",
+        "type": "DRILLS",
+        "connectors": "ssot",
+        "rotation": "CLOCK"
+      },
+      "5": {
+        "coords": "x3y1",
+        "type": "D_DRILLS",
+        "connectors": "ssts",
+        "rotation": "NONE"
+      },
+      "6": {
+        "coords": "x4y2",
+        "type": "PIPES",
+        "connectors": "ouou",
+        "rotation": "NONE"
+      },
+      "7": {
+        "coords": "x4y1",
+        "type": "HOUSE",
+        "connectors": "tuos",
+        "rotation": "NONE"
+      },
+      "8": {
+        "coords": "x4y0",
+        "type": "R_BOX_1",
+        "connectors": "tutt",
+        "rotation": "NONE"
+      },
+      "9" : {
+        "coords": "x4y3",
+        "type": "BATTERY_2",
+        "connectors": "usus",
+        "rotation": "NONE"
+      },
+      "10": {
+        "coords": "x4y4",
+        "type": "P_ADDON",
+        "connectors": "tuss",
+        "rotation": "NONE"
+      },
+      "11": {
+        "coords": "x5y2",
+        "type": "DRILLS",
+        "connectors": "sttt",
+        "rotation": "NONE"
+      },
+      "12": {
+        "coords": "x5y3",
+        "type": "D_ROCKET",
+        "connectors": "usst",
+        "rotation": "NONE"
+      },
+      "13": {
+        "coords": "x5y4",
+        "type": "HOUSE",
+        "connectors": "toot",
+        "rotation": "NONE"
+      },
+      "14": {
+        "coords": "x6y2",
+        "type": "BATTERY_2",
+        "connectors": "osut",
+        "rotation": "NONE"
+      },
+      "15": {
+        "coords": "x6y3",
+        "type": "HOUSE",
+        "connectors": "tsus",
+        "rotation": "NONE"
+      },
+      "16": {
+        "coords": "x6y4",
+        "type": "ROCKET",
+        "connectors": "usso",
+        "rotation": "NONE"
+      }
+    },
+    {
+      "name": "player3",
+      "wrong": "x2y2",
+      "purple": "x2y3",
+      "battery": [],
+      "astronaut": ["x1y1", "x3y2"],
+      "0": {
+        "coords": "x4y2",
+        "type": "D_DRILLS",
+        "connectors": "ssts",
+        "rotation": "CLOCK"
+      },
+      "1": {
+        "coords": "x3y3",
+        "type": "P_ADDON",
+        "connectors": "usst",
+        "rotation": "NONE"
+      },
+      "2": {
+        "coords": "x2y2",
+        "type": "BATTERY_2",
+        "connectors": "tutt",
+        "rotation": "NONE"
+      },
+      "3": {
+        "coords": "x2y1",
+        "type": "DRILLS",
+        "connectors": "stto",
+        "rotation": "NONE"
+      },
+      "4": {
+        "coords": "x2y3",
+        "type": "HOUSE",
+        "connectors": "stuo",
+        "rotation": "NONE"
+      },
+      "5": {
+        "coords": "x2y4",
+        "type": "B_BOX_3",
+        "connectors": "tsss",
+        "rotation": "NONE"
+      },
+      "6": {
+        "coords": "x1y1",
+        "type": "HOUSE",
+        "connectors": "outs",
+        "rotation": "NONE"
+      },
+      "7": {
+        "coords": "x1y2",
+        "type": "PIPES",
+        "connectors": "uouo",
+        "rotation": "NONE"
+      },
+      "8": {
+        "coords": "x1y3",
+        "type": "SHIELD",
+        "connectors": "stot",
+        "rotation": "INV"
+      },
+      "9": {
+        "coords": "x1y4",
+        "type": "D_ROCKET",
+        "connectors": "usst",
+        "rotation": "NONE"
+      },
+      "10": {
+        "coords": "x0y4",
+        "type": "ROCKET",
+        "connectors": "utso",
+        "rotation": "NONE"
+      },
+      "11": {
+        "coords": "x0y3",
+        "type": "PIPES",
+        "connectors": "tsuu",
+        "rotation": "NONE"
+      }
+    }
+  ]
+}
