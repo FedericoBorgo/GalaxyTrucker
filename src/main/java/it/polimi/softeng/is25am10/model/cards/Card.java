@@ -8,7 +8,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -144,5 +146,13 @@ public abstract class Card {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Get registered players.
+     * @return the already registered players.
+     */
+    public List<Player> getRegistered(){
+        return new ArrayList<>(registered.values());
     }
 }

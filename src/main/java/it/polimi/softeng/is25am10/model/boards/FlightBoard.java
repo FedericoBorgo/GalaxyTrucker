@@ -94,6 +94,7 @@ public class FlightBoard {
         checkDuped();
     }
 
+    ///  normalize the offsets of the players
     private void shift(){
         int shift = offset.getFirst();
         offset.replaceAll(val -> val - shift);
@@ -155,6 +156,11 @@ public class FlightBoard {
         return new CompressedFlightBoard(order, offset, leaderPosition);
     }
 
+    /**
+     * The player quits the game. It can be intentional by
+     * the player or an automatic decision from the model.
+     * @param pawn the player to quit
+     */
     public void quit(Pawn pawn) {
         offset.remove(order.indexOf(pawn));
         order.remove(pawn);
@@ -162,10 +168,12 @@ public class FlightBoard {
         shift();
     }
 
+    ///  get the list of player quits
     public List<Pawn> getQuitters() {
         return quitters;
     }
 
+    ///  check if the leader made a total lap over some player
     public void checkDuped(){
         for(int i = order.size()-1; i >= 0; i--)
             if(offset.get(i) <= -24)

@@ -6,6 +6,13 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Record used to store all the coordinates of the ship board.
+ * If a coordinate is not valid, it throws a IndexOutOfBoundsException.
+ *
+ * @param x
+ * @param y
+ */
 public record Coordinate(int x, int y) {
     private boolean check(int x, int y) {
         return x < 0 || x >= TilesBoard.BOARD_WIDTH || y < 0 || y >= TilesBoard.BOARD_HEIGHT;
