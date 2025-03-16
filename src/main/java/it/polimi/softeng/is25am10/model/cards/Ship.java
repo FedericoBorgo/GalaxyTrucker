@@ -28,7 +28,7 @@ public class Ship extends Card {
     }
 
     @Override
-    public Result<String> set(Player player, JSONObject json) {
+    public Result<JSONObject> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -47,22 +47,30 @@ public class Ship extends Card {
         }
 
         register(player);
-        return Result.ok("");
+        return Result.ok(genAccepted());
     }
 
     @Override
-    public Result<String> play() {
+    public Result<JSONObject> play() {
         //begin common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
+        JSONObject result = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        JSONObject moved = new JSONObject();
+
         if(someoneAccepted){
             descendingPlayer.giveCash(cash);
             board.moveRocket(descendingPlayer.getPawn(), -days);
-            return Result.ok("");
+            moved.put("pawn", descendingPlayer.getPawn());
+            moved.put("days", -days);
+            jsonArray.put(moved);
         }
 
-        return Result.ok("Nobody wanted to descend on the abandoned ship");
+        result.put("moved", jsonArray);
+
+        return Result.ok(result);
         //end
     }
 

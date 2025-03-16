@@ -120,13 +120,13 @@ public abstract class Card {
      * @param json this is dependent of every card
      * @return ok if the input is accepted, err if not
      */
-    public abstract Result<String> set(Player player, JSONObject json);
+    public abstract Result<JSONObject> set(Player player, JSONObject json);
 
     /**
      * Apply the actions of a card. It is dependent of the specific card.
      * @return ok if succeeded, err if not
      */
-    public abstract Result<String> play();
+    public abstract Result<JSONObject> play();
 
     /**
      * Check if a card is ready to be played.
@@ -154,5 +154,11 @@ public abstract class Card {
      */
     public List<Player> getRegistered(){
         return new ArrayList<>(registered.values());
+    }
+
+    protected static JSONObject genAccepted(){
+        JSONObject accepted = new JSONObject();
+        accepted.put("accepted", true);
+        return accepted;
     }
 }

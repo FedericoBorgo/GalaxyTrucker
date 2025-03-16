@@ -9,6 +9,7 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -557,13 +558,15 @@ public class Model {
      * @param json
      * @return
      */
-    public synchronized Result<String> setInput(String name, JSONObject json){
+    public synchronized Result<JSONObject> setInput(String name, JSONObject json){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
-        Result<String> res = deck.set(get(name), json);
+        Result<JSONObject> res = deck.set(get(name), json);
 
-        if(deck.ready())
+        if(deck.ready()) {
             res = playCard();
+            res.getData().put("accepted", true);
+        }
         return res;
     }
 
@@ -577,11 +580,11 @@ public class Model {
         return Result.ok(deck.getData());
     }
 
-    private Result<String> playCard(){
+    private Result<JSONObject> playCard(){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
 
-        Result<String> res = deck.play();
+        Result<JSONObject> res = deck.play();
 
         if(res.isOk()){
             removedItems.forEach((name, item) -> {

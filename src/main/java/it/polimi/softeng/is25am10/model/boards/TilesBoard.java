@@ -514,22 +514,65 @@ public class TilesBoard {
         return cover.get();
     }
 
-    private boolean hasExposedConnector(Tile.Side side, int where){
-        boolean hasExposed = false;
+    private Optional<Coordinate> whatWillHit(Projectile p){
+        Coordinate c = null;
+        switch(p.getSide()){
+            case UP -> {
+                for(int i = 0; i < BOARD_HEIGHT; i++){
+                    if(Tile.real(board[p.getWhere()][i])){
+                        c = new Coordinate(p.getWhere(), i);
+                        break;
+                    }
+                }
+            }
+            case RIGHT -> {
+                for(int i = BOARD_WIDTH-1; i >= 0; i--){
+                    if(Tile.real(board[i][p.getWhere()])){
+                        c = new Coordinate(p.getWhere(), i);
+                        break;
+                    }
+                }
+            }
+            case DOWN -> {
+                for(int i = BOARD_HEIGHT-1; i >= 0; i--){
+                    if(Tile.real(board[p.getWhere()][i])){
+                        c = new Coordinate(p.getWhere(), i);
+                        break;
+                    }
+                }
+            }
+            case LEFT -> {
+                for(int i = 0; i < BOARD_WIDTH; i++){
+                    if(Tile.real(board[i][p.getWhere()])){
+                        c = new Coordinate(p.getWhere(), i);
+                        break;
+                    }
+                }
+            }
+        }
 
-        return hasExposed;
+        return c == null? Optional.empty() : Optional.of(c);
     }
 
-    public void hit(Projectile.Type p, Tile.Side side, int where, boolean useBattery){
-        AtomicBoolean saved = new AtomicBoolean(false);
+    public Optional<Coordinate> hit(Projectile p, boolean useBattery){
+        boolean saved = false;
+        Optional<Coordinate> pos = whatWillHit(p);
 
-        if(p.stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(side)){
-            saved.set(true);
-        }
-        else if(p.stoppedBy() == Tile.Type.DRILLS && doesDrillsCover(side, where, useBattery)){
-            saved.set(true);
+        if(pos.isEmpty())
+            saved = true;
+        else if(p.getType() == Projectile.Type.SMALL_ASTEROID && Tile.ConnectorType.SMOOTH == Tile.getSide(get(pos.get()), getRotation(pos.get()), p.getSide()))
+            saved = true;
+        else if(p.getType().stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(p.getSide()))
+            saved = true;
+        else if(p.getType().stoppedBy() == Tile.Type.DRILLS && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
+            saved = true;
+
+        if(!saved){
+            remove(pos.get());
+            return pos;
         }
 
+        return Optional.empty();
     }
 }
 

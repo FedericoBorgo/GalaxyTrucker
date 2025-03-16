@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.*;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
@@ -34,7 +35,7 @@ public class Meteors extends Card {
 
 
     @Override
-    public Result<String> set(Player player, JSONObject json) {
+    public Result<JSONObject> set(Player player, JSONObject json) {
         if (isRegistered(player))
             return Result.err("player already registered");
 
@@ -56,21 +57,33 @@ public class Meteors extends Card {
         useBattery.put(player, use);
         register(player);
 
-        return Result.ok("");
+        return Result.ok(genAccepted());
     }
 
     @Override
-    public Result<String> play() {
+    public Result<JSONObject> play() {
         if (!ready())
             return Result.err("not all player declared their decision");
 
+        JSONObject result = new JSONObject();
+        JSONArray array = new JSONArray();
+
         projectiles.forEach(projectile -> {
             registered.forEach((pawn, p) -> {
-                p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.getID()));
+                Optional<Coordinate> destroyed = p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.getID()));
+
+                destroyed.ifPresent(c -> {
+                    JSONObject obj = new JSONObject();
+                    obj.put("name", p.getName());
+                    obj.put("where", c.toString());
+                    array.put(obj);
+                });
             });
         });
 
-        return Result.ok(null);
+        result.put("destroyed", array);
+
+        return Result.ok(result);
     }
 
     @Override

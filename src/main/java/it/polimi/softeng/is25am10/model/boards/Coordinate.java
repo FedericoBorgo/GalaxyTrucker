@@ -87,4 +87,9 @@ public record Coordinate(int x, int y) {
                 return Result.err("out of bound");
             }
     }
+
+    @Override
+    public String toString(){
+        return "x" + x + " y" + y;
+    }
 }

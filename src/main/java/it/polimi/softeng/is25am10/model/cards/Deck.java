@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.Model;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -97,12 +98,12 @@ public class Deck {
         return selectedCard;
     }
 
-    public Result<String> set(Player player, JSONObject json){
+    public Result<JSONObject> set(Player player, JSONObject json){
         return selectedCard.set(player, json);
     }
 
-    public Result<String> play(){
-        Result<String> res = selectedCard.play();
+    public Result<JSONObject> play(){
+        Result<JSONObject> res = selectedCard.play();
 
         if(res.isOk()){
             players.forEach(player -> {

@@ -29,7 +29,7 @@ public class Station extends Card {
     }
 
     @Override
-    public Result<String> set(Player player, JSONObject json) {
+    public Result<JSONObject> set(Player player, JSONObject json) {
         if(isRegistered(player))
             return Result.err("player already registered");
 
@@ -50,18 +50,27 @@ public class Station extends Card {
 
         register(player);
 
-        return Result.ok("");
+        return Result.ok(genAccepted());
     }
 
     @Override
-    public Result<String> play() {
+    public Result<JSONObject> play() {
         if(!ready())
             return Result.err("nobody chose yes");
+
+        JSONObject result = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        JSONObject moved = new JSONObject();
 
         p.setGoodsReward(goods);
         board.moveRocket(p.getPawn(), -flightDays);
 
-        return Result.ok("");
+        moved.put("pawn", p.getPawn());
+        moved.put("days", -flightDays);
+        jsonArray.put(moved);
+        result.put("moved", jsonArray);
+
+        return Result.ok(result);
     }
 
     @Override

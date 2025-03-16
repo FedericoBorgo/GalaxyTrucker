@@ -27,7 +27,7 @@ public class Planets extends Card{
     }
 
     @Override
-    public Result<String> set(Player player, JSONObject json) {
+    public Result<JSONObject> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -54,12 +54,12 @@ public class Planets extends Card{
             ready = true;
 
         register(player);
-        return Result.ok("");
+        return Result.ok(genAccepted());
     }
 
 
     @Override
-    public Result<String> play() {
+    public Result<JSONObject> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
@@ -69,17 +69,23 @@ public class Planets extends Card{
             player.setGoodsReward(goods.get(playerChoice.get(player)));
         });
 
+        JSONObject result = new JSONObject();
+        JSONArray rewarded = new JSONArray();
+
         //move pawns in reverse flight order
         List<FlightBoard.Pawn> reversed = new ArrayList<>(board.getOrder());
         Collections.reverse(reversed);
         for(FlightBoard.Pawn pawn : reversed){
             Player player = registered.get(pawn);
             if(Planet.NOPLANET != playerChoice.get(player)){
+                rewarded.put(player.getName());
                 board.moveRocket(player.getPawn(), flightDays);
             }
         }
 
-        return Result.ok("");
+        result.put("rewarded", rewarded);
+
+        return Result.ok(result);
     }
 
     @Override

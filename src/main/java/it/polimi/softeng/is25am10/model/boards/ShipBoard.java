@@ -146,8 +146,9 @@ public class ShipBoard {
         try {toRemove(marked, c.down());} catch (IOException _) {}
     }
 
-    public void epidemic(){
+    public List<Coordinate> epidemic(){
         boolean[][] marked = new boolean[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+        List<Coordinate> removed = new ArrayList<>();
 
         for(boolean[] b: marked)
             Arrays.fill(b, false);
@@ -157,9 +158,13 @@ public class ShipBoard {
         });
 
         Coordinate.forEach(c -> {
-            if(marked[c.x()][c.y()])
+            if(marked[c.x()][c.y()]) {
                 removeSomeone(c);
+                removed.add(c);
+            }
         });
+
+        return removed;
     }
 
     public CompressedShipBoard compress(){
@@ -186,8 +191,10 @@ public class ShipBoard {
         });
     }
 
-    public void hit(Projectile projectile, boolean useBattery) {
-
+    public Optional<Coordinate> hit(Projectile projectile, boolean useBattery) {
+        Optional<Coordinate> res = tiles.hit(projectile, useBattery);
+        removeIllegals();
+        return res;
     }
 
     public void init(Optional<Coordinate> purple, Optional<Coordinate> brown){

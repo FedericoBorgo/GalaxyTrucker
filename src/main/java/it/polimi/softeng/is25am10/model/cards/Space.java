@@ -20,7 +20,7 @@ public class Space extends Card {
     }
 
     @Override
-    public Result<String> set(Player player, JSONObject json) {
+    public Result<JSONObject> set(Player player, JSONObject json) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -33,23 +33,32 @@ public class Space extends Card {
 
         enginePower.put(player.getPawn(), player.getBoard().getRocketPower(model.getRemovedItems(player).battery));
         register(player);
-        return Result.ok("" + enginePower.get(player.getPawn()));
+        return Result.ok(genAccepted());
     }
 
 
     @Override
-    public Result<String> play() {
+    public Result<JSONObject> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
+        JSONObject result = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
         for(int i = board.getOrder().size() - 1; i >= 0; i--){
+            JSONObject player = new JSONObject();
             FlightBoard.Pawn p = board.getOrder().get(i);
             board.moveRocket(p, enginePower.get(p));
-        }
 
-        return Result.ok("");
+            player.put("days", enginePower.get(p));
+            player.put("pawn", p);
+            jsonArray.put(player);
+        }
+        result.put("moved", jsonArray);
+
+        return Result.ok(result);
     }
 
     @Override
