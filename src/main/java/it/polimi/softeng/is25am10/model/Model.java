@@ -15,46 +15,124 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Stores all the information of a single game including the players and all their data,
- * the tiles for that game and the flightboard.
+ * This class is responsible for the state and evolution of the game.
+ * Every possible game evolution is inside here.
+ * The game is divided in Status.
+ * Only the methods corresponding to the state can be called.
+ * <br/>
+ * JOINING PHASE:
+ * The game start with a number of player to wait.
+ * In this phase, players can join but cant do anything.
+ * After every player has joined, it starts the timer and
+ * the ship building begin.
+ * <br/>
+ * BUILDING PHASE:
+ * In this phase the only methods that can be called are the one
+ * that change the state of the ship.
+ * The player can draw tiles, place them, book tiles and so on.
+ * This phase ends when the timer ends or every player declared that
+ * they finished.
+ * After that every player need to declare where to put (if he can)
+ * the aliens.
+ * <br/>
+ * CARDS PHASE:
+ * Now the leader can draw a card. The ship can not be modified anymore.
+ * When a card is drawn, every player need to declare their choices.
+ * In this phase, players can also "drop" elements from their, such as
+ * astronauts, batteries, goods or aliens.
+ * When something is drop, it increments a counter, this will be used
+ * inside the card to determinate some input required by the player.
+ * After every player input, the card is automatically activated and the
+ * reward is given to the player.
+ * If a player reached 0 crew is automatically removed from the game.
+ * This phase repeats until the cards are finished or if there is no player left.
+ * It is possible that at the end of a card, it is required to correct the ship.
  */
 public class Model {
+    /**
+     * Counter for the removed items.
+     */
     public static class RemovedItems{
         public int battery;
         public int guys;
         public int goods;
 
         public RemovedItems(){
+            reset();
+        }
+        
+        public void reset(){
             this.battery = 0;
             this.guys = 0;
             this.goods = 0;
         }
     }
 
-    public enum Status{
-        JOINING,
-        BUILDING,
-        CHECKING,
-        ALIEN,
-        DRAW,
-        WAITING,
-        ENDED;
+    /**
+     * Keeps track of the current state of the game.
+     */
+    public static class State {
+        public enum Type{
+            JOINING,
+            BUILDING,
+            //checking the board and fixing
+            CHECKING,
+            //setting where to put the alien
+            ALIEN,
+            DRAW,
+            //waiting player input
+            WAITING,
+            ENDED;
+        }
+        private Type prev;
+        private Type curr;
+        
+        public State(Type curr){
+            prev = null;
+            this.curr = curr;
+        };
+        
+        public void next(Type next){
+            prev = curr;
+            curr = next;
+        }
+        
+        public Type get(){
+            return curr;
+        }
+        
+        public Type getPrev(){
+            return prev;
+        }
     }
-    private Status status;
-    private Status prevStatus;
-    private final Map<String, Player> players;
-    private final TilesCollection tiles;
-    private final FlightBoard flight;
-    private final List<Pawn> unusedPawns;
-    private final Map<Player, RemovedItems> removedItems;
-    private final Map<Player, Map<Tile.Rotation, Integer>> drillsToUse;
+
+    //Tiles, flight board, deck: game specific
+    private final TilesCollection tiles = new TilesCollection();
+    private final FlightBoard flight = new FlightBoard();
     private final Deck deck;
-    private final Map<String, Player> quitters;
+
+    //Data about the single player.
+    private final Map<String, Player> players = new HashMap<>();
+    private final Map<Player, RemovedItems> removedItems = new HashMap<>();
+    private final Map<Player, Map<Tile.Rotation, Integer>> drillsToUse = new HashMap<>();
+    private final Map<String, Player> quitters = new HashMap<>();
+
+    //Current state of the game
+    private final State state = new State(State.Type.JOINING);
+
+    //pawns still not assigned to a player
+    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));;
+
+    //number of players
     private final int nPlayers;
-    private int countPlayers;
-    private AtomicBoolean canMove;
-    private Timer timer;
-    private TimerTask task = new TimerTask() {
+    private int countPlayers = 0;
+
+    /**
+     * Used for the timer
+     */
+    private final AtomicBoolean canMove = new AtomicBoolean(false);
+    private final Timer timer = new Timer();
+    private final TimerTask task = new TimerTask() {
         public void run() {
             canMove.set(true);
             if(flight.getTimer() == 2){
@@ -63,31 +141,31 @@ public class Model {
         }
     };
 
-    //Constructs a new Match instance
+    /**
+     * Builds a new Model with the number of required players.
+     * @param nPlayers number of required players
+     */
     public Model(int nPlayers) {
         this.nPlayers = nPlayers;
-        quitters = new HashMap<>();
-        players = new HashMap<>();
-        tiles = new TilesCollection();
-        flight = new FlightBoard();
-        unusedPawns = new ArrayList<>(List.of(Pawn.values()));
-        removedItems = new HashMap<>();
-        drillsToUse = new HashMap<>();
-        canMove = new AtomicBoolean(false);
         deck = new Deck(this, flight);
-        status = Status.JOINING;
-        prevStatus = null;
-        countPlayers = 0;
-        timer = new Timer();
     }
 
-    public Status getStatus() {
-        return status;
+    /**
+     * @return get the current state of the game
+     */
+    public State.Type getStatus() {
+        return state.get();
     }
 
+    /**
+     * Join a player to the game.
+     * Can be called only during the JOINING state.
+     * @param name nickname
+     * @return the pawn that has been assigned to the game
+     */
     public Result<Pawn> addPlayer(String name) {
-        if(status != Status.JOINING)
-            return Result.err("to JOINING status");
+        if(state.get() != State.Type.JOINING)
+            return Result.err("to JOINING state");
 
         if(players.containsKey(name))
             return Result.err("player already connected");
@@ -96,37 +174,50 @@ public class Model {
             return Result.err("too many players");
 
         countPlayers++;
-        Pawn pawn = unusedPawns.removeFirst();
-        Player p = new Player(name, pawn);
-        players.put(name, p);
-        removedItems.put(p, new RemovedItems());
-        return Result.ok(pawn);
+        //associate name -> player
+        players.put(name, new Player(name, unusedPawns.removeFirst()));
+        //associate player -> removed items
+        removedItems.put(get(name), new RemovedItems());
+        return Result.ok(get(name).getPawn());
     }
 
+    /**
+     * Start the game. Move the state from JOINING to BUILDING.
+     * If not all players joined, it fails.
+     * @return ok if it started, err if not
+     */
     public Result<String> startGame(){
-        if(status != Status.JOINING)
-            return Result.err("not JOINING status");
+        if(state.get() != State.Type.JOINING)
+            return Result.err("not JOINING state");
         if(countPlayers != nPlayers)
             return Result.err("waiting for players");
 
-        prevStatus = Status.JOINING;
-        status = Status.BUILDING;
+        state.next(State.Type.BUILDING);
         countPlayers = 0;
         timer.schedule(task, 90000L);
-        return Result.ok("started");
+        return Result.ok("");
     }
 
+    /// name -> player
     private Player get(String name){
         return players.get(name);
     }
-
+    /// name -> player -> ship
     private ShipBoard ship(String name){
         return get(name).getBoard();
     }
 
+    /**
+     * Move the position of the timer only if it ended.
+     * If the timer finish in the last spot all the players
+     * are set automatically to ready.
+     * Can be called only in BUILDING state.
+     * It eventually moves the BUILDING state to CHECKING or ALIEN.
+     * @return the position of the timer.
+     */
     public synchronized Result<Integer> moveTimer(){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         if(canMove.get())
             flight.moveTimer();
 
@@ -141,13 +232,21 @@ public class Model {
         return Result.ok(flight.getTimer());
     }
 
+    /// get the flight board
     public CompressedFlightBoard getFlight() {
         return flight.compress();
     }
 
+    /**
+     * Set a player ready after he finished building their own ship.
+     * Can be called only during BUILDING.
+     * Moves the BUILDING state to CHECKING or ALIEN.
+     * @param name the name of the player that finished.
+     * @return err in case of fail
+     */
     public synchronized Result<String> setReady(String name){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
 
         if(flight.getOrder().contains(get(name).getPawn()))
             return Result.err("player already ready");
@@ -156,131 +255,143 @@ public class Model {
         countPlayers++;
 
         if(countPlayers == nPlayers){
-            prevStatus = Status.BUILDING;
             countPlayers = 0;
 
             if(!allShipOk())
-                status = Status.CHECKING;
+                state.next(State.Type.CHECKING);
             else
-                status = Status.ALIEN;
+                state.next(State.Type.ALIEN);
         }
 
         return Result.ok("");
     }
 
-    public synchronized void quit(String name){
+    /// quit ignoring the state
+    private void quitIgnore(String name){
         quitters.put(name, get(name));
         flight.quit(players.get(name).getPawn());
         players.remove(name);
 
         if(players.isEmpty())
-            status = Status.ENDED;
+            state.next(State.Type.ENDED);
     }
 
+    /**
+     * A player can decide if the wants to quit the flight.
+     * If he decides to do, he can only during the DRAW state.
+     * @param name the name of the player that wants to quit
+     * @return err if it fails
+     */
+    public synchronized Result<String> quit(String name){
+        if(state.get() != State.Type.DRAW)
+            return Result.err("cant quit");
+        quitIgnore(name);
+        return Result.ok("");
+    }
 
-    //player building board section
+    /// place tile
     public synchronized Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return ship(name).getTiles().setTile(c, t, rotation);
     }
 
+    /// get tile
     public Result<Tile> getTile(String name, Coordinate c){
         return ship(name).getTiles().getTile(c);
     }
 
+    /// get rotaion
     public Tile.Rotation getRotation(String name, Coordinate c){
         return ship(name).getTiles().getRotation(c);
     }
 
+    /// book tile
     public synchronized Result<Tile> bookTile(String name, Tile t){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return ship(name).getTiles().bookTile(t);
     }
 
+    /// use a booked tile
     public synchronized Result<Tile> useBookedTile(String name, Tile t, Tile.Rotation rotation, Coordinate c){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return ship(name).getTiles().useBookedTile(t, rotation, c);
     }
 
+    /// get booked tiles
     public synchronized List<Tile> getBooked(String name) {
         return ship(name).getTiles().getBooked();
     }
 
+    /// remove a tile
     public synchronized Result<String> remove(String name, Coordinate c){
-        if(status != Status.CHECKING)
-            return Result.err("not CHECKING status");
+        if(state.get() != State.Type.CHECKING)
+            return Result.err("not CHECKING state");
 
         ship(name).getTiles().remove(c);
         ship(name).removeIllegals();
 
+        //if every board is ok, move the state
         if(allShipOk()){
-            if(prevStatus == Status.BUILDING){
-                status = Status.ALIEN;
-            }
-            else if(prevStatus == Status.WAITING){
-                status = Status.DRAW;
-            }
-
-            prevStatus = Status.CHECKING;
+            if(state.getPrev() == State.Type.BUILDING)
+                state.next(State.Type.ALIEN);
+            else if(state.getPrev() == State.Type.WAITING)
+                state.next(State.Type.DRAW);
         }
 
         return Result.ok("");
     }
 
-    public synchronized Result<Set<Coordinate>> checkShip(String name){
-        if(status != Status.CHECKING)
-            return Result.err("not CHECKING status");
-
-        return Result.ok(ship(name).getTiles().isOK());
+    public synchronized Set<Coordinate> checkShip(String name){
+        return ship(name).getTiles().isOK();
     }
 
+    /**
+     * Check if every ship is ok.
+     * @return true if yes, false if not
+     */
     private boolean allShipOk(){
         AtomicBoolean ok = new AtomicBoolean();
         ok.set(true);
-        Status status = this.status;
-        this.status = Status.CHECKING;
 
         players.forEach((n, p) -> {
-            if(!checkShip(n).getData().isEmpty())
+            if(!checkShip(n).isEmpty())
                 ok.set(false);
         });
-        this.status = status;
 
         return ok.get();
     }
 
+    /// compress ship
     public CompressedShipBoard getShip(String name){
         return ship(name).compress();
     }
 
-    public synchronized Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown){
-        if(status != Status.ALIEN)
-            return Result.err("not ALIEN status");
+    /**
+     * The player declare where to put the aliens.
+     * Can be called only in the ALIEN state.
+     * @param name name of the player that wants to place aliens
+     * @param purple coordinate
+     * @param brown coordinate
+     * @return result
+     */
+    public synchronized Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown) {
+        if (state.get() != State.Type.ALIEN)
+            return Result.err("not ALIEN state");
 
-        if(ship(name).getAstronaut().get(new Coordinate(3, 2)) == 2)
+        if (ship(name).getAstronaut().get(new Coordinate(3, 2)) == 2)
             return Result.err("player already declared");
         ship(name).init(purple, brown);
         countPlayers++;
 
-        if(countPlayers == nPlayers){
-            prevStatus = Status.ALIEN;
-            status = Status.DRAW;
-        }
+        if (countPlayers == nPlayers)
+            state.next(State.Type.DRAW);
         return Result.ok("");
     }
-    //end player building methods
 
-
-
-
-
-
-
-
-    //player methods
+    //TODO reward state
     public synchronized List<GoodsBoard.Type> getReward(String name){
         return get(name).getGoodsReward();
     }
@@ -293,9 +404,20 @@ public class Model {
         return get(name).getCash();
     }
 
+    /**
+     * Use an item in the specified place. It automatically finds
+     * if the coordinate holds an astronaut, battery or an alien.
+     * The corresponding counter is incremented for every type of element.
+     * This can be called only in a WAITING state.
+     * A player that already set the card input, cant execute this anymore.
+     *
+     * @param name name of the player
+     * @param c coordinate to remove the single element
+     * @return ok if its accepted, err if not
+     */
     public synchronized Result<Integer> drop(String name, Coordinate c){
-        if(status != Status.WAITING)
-            return Result.err("not WAITING status");
+        if(state.get() != State.Type.WAITING)
+            return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
             return Result.err("player already registered");
@@ -325,9 +447,17 @@ public class Model {
         return Result.ok(1);
     }
 
+    /**
+     * Same drop but for goods.
+     *
+     * @param name
+     * @param c
+     * @param t
+     * @return
+     */
     public synchronized Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
-        if(status != Status.WAITING)
-            return Result.err("not WAITING status");
+        if(state.get() != State.Type.WAITING)
+            return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
             return Result.err("player already registered");
@@ -339,138 +469,147 @@ public class Model {
         return res;
     }
 
+    /// removed items
     public RemovedItems getRemovedItems(Player player){
         return removedItems.get(player);
     }
 
-    public RemovedItems getRemovedItems(String name){
-        return getRemovedItems(get(name));
-    }
-
+    /**
+     * Configure how many drills use to shoot.
+     * Can be called only in a waiting state.
+     *
+     * @param name name of the player
+     * @param map witch drills activate to shoot
+     * @return
+     */
     public synchronized Result<String> setDrillsToUse(String name, Map<Tile.Rotation, Integer> map){
-        if(status != Status.WAITING)
-            return Result.err("not WAITING status");
+        if(state.get() != State.Type.WAITING)
+            return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
             return Result.err("player already registered");
+
         drillsToUse.put(get(name), map);
         return Result.ok("");
     }
 
-    public Map<Tile.Rotation, Integer> getDrillsToUse(String name){
-        return getDrillsToUse(get(name));
-    }
-
+    /// drills
     public Map<Tile.Rotation, Integer> getDrillsToUse(Player p){
         return drillsToUse.getOrDefault(p, null);
     }
-    //end
-
-
-
-
-
-
-
-
-
 
     //tiles section
     public synchronized Result<Tile> drawTile(){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return Result.ok(tiles.getNew());
     }
 
     public synchronized Result<List<Tile>> getSeenTiles(){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return Result.ok(tiles.getSeen());
     }
 
     public synchronized Result<String> giveTile(Tile t){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         tiles.give(t);
         return Result.ok("");
     }
 
     public synchronized Result<Tile> getTileFromSeen(Tile t){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return Result.ok(tiles.getFromSeen(t));
     }
     //end tiles section
 
-
-    //cards
+    /**
+     * Draw a card from the deck.
+     * Can be called only in a DRAW state.
+     * Only the leader can call.
+     *
+     * @param name name of the leader
+     * @return the card
+     */
     public synchronized Result<Card> drawCard(String name){
-        if(status != Status.DRAW)
-            return Result.err("not DRAW status");
+        if(state.get() != State.Type.DRAW)
+            return Result.err("not DRAW state");
         if(flight.getOrder().getFirst() != get(name).getPawn())
             return Result.err("only the leader can draw");
 
         Card c = deck.draw(new ArrayList<>(players.values()));
-        prevStatus = Status.DRAW;
 
         if(c == null)
-            status = Status.ENDED;
+            state.next(State.Type.ENDED);
         else
-            status = Status.WAITING;
+            state.next(State.Type.WAITING);
 
         return Result.ok(c);
     }
 
+    /**
+     * Give the players input to the drew card.
+     * Can be called only in a WAITING state.
+     *
+     * @param name
+     * @param json
+     * @return
+     */
     public synchronized Result<String> setInput(String name, JSONObject json){
-        if(status != Status.WAITING)
-            return Result.err("not WAITING status");
+        if(state.get() != State.Type.WAITING)
+            return Result.err("not WAITING state");
         Result<String> res = deck.set(get(name), json);
 
         if(deck.ready())
-            res = deck.play();
+            res = playCard();
         return res;
     }
 
-    public boolean cardReady(){
-        return deck.ready();
-    }
-
+    /**
+     * Get the temporary data about the drew card.
+     * @return
+     */
     public synchronized Result<JSONObject> getCardData(){
-        if(status != Status.WAITING)
-            return Result.err("not WAITING status");
+        if(state.get() != State.Type.WAITING)
+            return Result.err("not WAITING state");
         return Result.ok(deck.getData());
     }
 
-    public synchronized Result<String> playCard(){
-        if(status != Status.WAITING)
-            return Result.err("not WAITING status");
+    private Result<String> playCard(){
+        if(state.get() != State.Type.WAITING)
+            return Result.err("not WAITING state");
 
         Result<String> res = deck.play();
 
         if(res.isOk()){
+            removedItems.forEach((name, item) -> {
+                item.reset();
+            });
+            
             List<Pawn> quitted = new ArrayList<>(flight.getQuitters());
             quitted.removeAll(quitters.values().stream().map(Player::getPawn).toList());
 
             quitted.forEach(pawn -> {
                 players.forEach((name, player) -> {
                     if(pawn == player.getPawn())
-                        quit(name);
+                        quitIgnore(name);
                 });
             });
 
-            prevStatus = Status.WAITING;
             if(allShipOk())
-                status = Status.DRAW;
+                state.next(State.Type.DRAW);
             else
-                status = Status.CHECKING;
+                state.next(State.Type.CHECKING);
         }
 
         return res;
     }
 
     public synchronized Result<Card[][]> getVisible(){
-        if(status != Status.BUILDING)
-            return Result.err("not BUILDING status");
+        if(state.get() != State.Type.BUILDING)
+            return Result.err("not BUILDING state");
         return Result.ok(deck.getVisible());
     }
     //end cards section

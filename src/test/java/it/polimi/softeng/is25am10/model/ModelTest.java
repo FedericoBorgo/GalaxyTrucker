@@ -108,7 +108,7 @@ class ModelTest {
         Model model = new Model(obj.getInt("n_players"));
         JSONArray players = obj.getJSONArray("players");
 
-        assertEquals(Model.Status.JOINING, model.getStatus());
+        assertEquals(Model.State.Type.JOINING, model.getStatus());
 
         players.forEach(player -> {
             JSONObject playerObj = (JSONObject) player;
@@ -116,14 +116,14 @@ class ModelTest {
         });
 
         model.startGame();
-        assertEquals(Model.Status.BUILDING, model.getStatus());
+        assertEquals(Model.State.Type.BUILDING, model.getStatus());
         loadPlayers(model, players);
         checkTiles(model, players);
-        assertEquals(Model.Status.CHECKING, model.getStatus());
+        assertEquals(Model.State.Type.CHECKING, model.getStatus());
         removeWrong(model, players);
-        assertEquals(Model.Status.ALIEN, model.getStatus());
+        assertEquals(Model.State.Type.ALIEN, model.getStatus());
         initShip(model, players);
-        assertEquals(Model.Status.DRAW, model.getStatus());
+        assertEquals(Model.State.Type.DRAW, model.getStatus());
         checkInit(model, players);
 
         //TODO cards
