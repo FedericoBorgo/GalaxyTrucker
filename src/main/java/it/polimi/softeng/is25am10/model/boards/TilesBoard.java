@@ -528,7 +528,7 @@ public class TilesBoard {
             case RIGHT -> {
                 for(int i = BOARD_WIDTH-1; i >= 0; i--){
                     if(Tile.real(board[i][p.getWhere()])){
-                        c = new Coordinate(p.getWhere(), i);
+                        c = new Coordinate(i, p.getWhere());
                         break;
                     }
                 }
@@ -544,7 +544,7 @@ public class TilesBoard {
             case LEFT -> {
                 for(int i = 0; i < BOARD_WIDTH; i++){
                     if(Tile.real(board[i][p.getWhere()])){
-                        c = new Coordinate(p.getWhere(), i);
+                        c = new Coordinate(i, p.getWhere());
                         break;
                     }
                 }

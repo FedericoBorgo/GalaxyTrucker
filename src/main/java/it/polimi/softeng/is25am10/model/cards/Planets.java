@@ -1,9 +1,9 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.*;
+import it.polimi.softeng.is25am10.model.Player;
+import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

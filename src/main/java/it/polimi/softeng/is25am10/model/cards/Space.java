@@ -7,9 +7,10 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Space extends Card {
     private final Map<FlightBoard.Pawn, Integer> enginePower = new HashMap<>();

@@ -1,6 +1,9 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.*;
+import it.polimi.softeng.is25am10.model.Player;
+import it.polimi.softeng.is25am10.model.Projectile;
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;

@@ -9,7 +9,6 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -566,7 +565,9 @@ public class Model {
         if(deck.ready()) {
             res = playCard();
             res.getData().put("accepted", true);
+            res.getData().put("played", true);
         }
+
         return res;
     }
 

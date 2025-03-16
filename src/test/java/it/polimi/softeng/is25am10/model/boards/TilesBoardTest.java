@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import org.junit.jupiter.api.BeforeEach;
@@ -221,5 +222,37 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
         assertEquals(3, tilesBoard.countRocketPower(1));
+    }
+
+    @Test
+    void testHit(){
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.DRILLS, "sstu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ROCKET, "suss"), Tile.Rotation.INV);
+
+        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_DRILLS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ROCKET, "otst"), Tile.Rotation.NONE);
+
+        tilesBoard.setTile(new Coordinate(1, 2), new Tile(Tile.Type.BATTERY_2, "otot"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ROCKET, "uoss"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
+
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.DRILLS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
+
+        Optional<Coordinate> res;
+
+        res = tilesBoard.hit(new Projectile(Projectile.Type.BIG_ASTEROID, Tile.Side.LEFT, 1, 0), true);
+        assertTrue(res.isEmpty());
+        res = tilesBoard.hit(new Projectile(Projectile.Type.BIG_FIRE, Tile.Side.LEFT, 1, 0), true);
+        assertTrue(res.isPresent());
+        assertEquals(new Coordinate(2, 1), res.get());
+        res = tilesBoard.hit(new Projectile(Projectile.Type.SMALL_ASTEROID, Tile.Side.UP, 1, 0), true);
+        assertTrue(res.isEmpty());
+        res = tilesBoard.hit(new Projectile(Projectile.Type.SMALL_ASTEROID, Tile.Side.UP, 1, 0), false);
+        assertTrue(res.isPresent());
+        assertEquals(new Coordinate(1, 2), res.get());
     }
 }
