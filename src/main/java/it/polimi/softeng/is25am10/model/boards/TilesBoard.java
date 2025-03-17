@@ -314,7 +314,7 @@ public class TilesBoard {
                 if (Tile.engine(get(c))) {
                     if (getRotation(c) != Tile.Rotation.NONE || Tile.real(get(c.down())))
                         result.add(c);
-                } else if (Tile.cannons(get(c))) {
+                } else if (Tile.cannon(get(c))) {
                     Tile t = switch (getRotation(c)) {
                         case NONE -> get(c.up());
                         case CLOCK -> get(c.right());
@@ -327,7 +327,7 @@ public class TilesBoard {
                 }
             } catch (IOException _) {
             }
-            ;
+
         });
     }
 
@@ -347,7 +347,7 @@ public class TilesBoard {
                 }
             } catch (IOException _) {
             }
-            ;
+
 
             try {
                 Tile rightTile = get(c.right());
@@ -362,7 +362,6 @@ public class TilesBoard {
                 }
             } catch (IOException _) {
             }
-            ;
 
         });
     }
@@ -428,13 +427,13 @@ public class TilesBoard {
         Coordinate.forEach(c -> {
             Tile.Rotation rotation = getRotation(c);
 
-            if (get(c).getType() == Tile.Type.CANNONS){
+            if (get(c).getType() == Tile.Type.CANNON){
                 if (rotation == Tile.Rotation.NONE)
                     cannons.addAndGet(2);
                 else
                     cannons.addAndGet(1);
             }
-            else if(get(c).getType() == Tile.Type.D_CANNONS){
+            else if(get(c).getType() == Tile.Type.D_CANNON){
                 if(count.getOrDefault(rotation, 0) > 0){
                     count.put(rotation, count.get(rotation) - 1);
 
@@ -487,8 +486,8 @@ public class TilesBoard {
 
         Predicate<Coordinate> checkDrill = c -> {
             if (getRotation(c).toSide() == side &&
-                    (get(c).getType() == Tile.Type.CANNONS ||
-                            (useBattery && get(c).getType() == Tile.Type.D_CANNONS))) {
+                    (get(c).getType() == Tile.Type.CANNON ||
+                            (useBattery && get(c).getType() == Tile.Type.D_CANNON))) {
                 cover.set(true);
                 return false;
             }
@@ -564,7 +563,7 @@ public class TilesBoard {
             saved = true;
         else if(p.getType().stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(p.getSide()))
             saved = true;
-        else if(p.getType().stoppedBy() == Tile.Type.CANNONS && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
+        else if(p.getType().stoppedBy() == Tile.Type.CANNON && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
             saved = true;
 
         if(!saved){

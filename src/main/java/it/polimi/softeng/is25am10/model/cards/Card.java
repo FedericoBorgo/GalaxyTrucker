@@ -34,7 +34,7 @@ public abstract class Card {
     protected final Map<FlightBoard.Pawn, Player> registered;
 
     public enum Type{
-        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION;
+        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION
     }
 
     protected final Type type;
@@ -60,8 +60,8 @@ public abstract class Card {
 
     /**
      * Checks if the player has already set their input.
-     * @param player
-     * @return
+     * @param player to check
+     * @return true if registered, false otherwise
      */
     public boolean isRegistered(Player player) {
         return registered.containsValue(player);
@@ -69,7 +69,7 @@ public abstract class Card {
 
     /**
      * Check if the given player is the one that should declare the next input.
-     * @param player
+     * @param player to check
      * @return true if he's him, false if not
      */
     protected boolean isCorrectOrder(Player player) {
@@ -78,15 +78,15 @@ public abstract class Card {
 
     /**
      * Check if all the players gave their input
-     * @return
+     * @return true if all players did, false otherwise
      */
     protected boolean allRegistered(){
         return registered.size() == board.getOrder().size();
     }
 
     /**
-     * Register a player as already given the input.
-     * @param player
+     * Register a player as having already given the input.
+     * @param player to register
      */
     public void register(Player player){
         registered.put(player.getPawn(), player);
@@ -94,8 +94,8 @@ public abstract class Card {
 
     /**
      * Standardization of a player choice
-     * @param json
-     * @return
+     * @param json from player
+     * @return player choice
      */
     protected boolean getChoice(JSONObject json){
         return json.getBoolean("choice");
@@ -119,13 +119,13 @@ public abstract class Card {
 
     /**
      * Check if a card is ready to be played.
-     * @return
+     * @return true if ready, false otherwise
      */
     public abstract boolean ready();
 
     /**
      * Get some specific data about the card.
-     * @return
+     * @return the data
      */
     public abstract JSONObject getData();
 

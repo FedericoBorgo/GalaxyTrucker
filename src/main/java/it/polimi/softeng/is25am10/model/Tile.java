@@ -28,9 +28,7 @@ public class Tile {
         this.type = type;
         HashMap<Side, ConnectorType> map = new HashMap<>();
 
-        Arrays.stream(Side.order).forEach(side -> {
-            map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal())));
-        });
+        Arrays.stream(Side.order).forEach(side -> map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal()))));
 
         this.connectors = Collections.unmodifiableMap(map);
     }
@@ -112,7 +110,7 @@ public class Tile {
     /**
      * Check if a tile is an engine or a double engine
      * @param t the tile to check
-     * @return true if it's a engine false otherwise
+     * @return true if it's an engine false otherwise
      */
     static public boolean engine(Tile t){
         return t.type == Type.ENGINE || t.type == Type.D_ENGINE;
@@ -123,8 +121,8 @@ public class Tile {
      * @param t the tile to check
      * @return true if it's a cannon false otherwise
      */
-    static public boolean cannons(Tile t){
-        return t.type == Type.CANNONS || t.type == Type.D_CANNONS;
+    static public boolean cannon(Tile t){
+        return t.type == Type.CANNON || t.type == Type.D_CANNON;
     }
 
     /**
@@ -168,8 +166,8 @@ public class Tile {
     // Enum class for the type of tile
     public enum Type {
         PIPES,
-        CANNONS,
-        D_CANNONS,
+        CANNON,
+        D_CANNON,
         ENGINE,
         D_ENGINE,
         HOUSE,

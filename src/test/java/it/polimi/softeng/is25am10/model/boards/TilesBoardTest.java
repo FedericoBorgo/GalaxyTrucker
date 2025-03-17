@@ -55,7 +55,7 @@ class TilesBoardTest {
     @Test
     void testBook(){
         Tile tile1 = new Tile(Tile.Type.ENGINE, "otus");
-        Tile tile2 = new Tile(Tile.Type.CANNONS, "otus");
+        Tile tile2 = new Tile(Tile.Type.CANNON, "otus");
         Tile tile3 = new Tile(Tile.Type.HOUSE, "otus");
 
         Result<Tile> result;
@@ -94,12 +94,12 @@ class TilesBoardTest {
     }
 
     @Test
-    void testCannonsEngine(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNONS, "sstu"), Tile.Rotation.INV);
+    void testCannonEngine(){
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ENGINE, "suss"), Tile.Rotation.INV);
 
         tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNONS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNON, "sssu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ENGINE, "otst"), Tile.Rotation.NONE);
 
@@ -107,7 +107,7 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ENGINE, "uoss"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNONS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
@@ -121,7 +121,7 @@ class TilesBoardTest {
 
     @Test
     void testConnectors(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNONS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
 
         tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
@@ -129,7 +129,7 @@ class TilesBoardTest {
 
         tilesBoard.setTile(new Coordinate(4, 1), new Tile(Tile.Type.PIPES, "uouo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(4, 2), new Tile(Tile.Type.P_ADDON, "tstt"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(4, 3), new Tile(Tile.Type.CANNONS, "sstu"), Tile.Rotation.CLOCK);
+        tilesBoard.setTile(new Coordinate(4, 3), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.CLOCK);
 
         Set<Coordinate> result = tilesBoard.isOK();
         assertFalse(result.isEmpty());
@@ -140,10 +140,10 @@ class TilesBoardTest {
 
     @Test
     void testUnreachable(){
-        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.CANNONS, "suso"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.CANNON, "suso"), Tile.Rotation.NONE);
 
         tilesBoard.setTile(new Coordinate(1, 2), new Tile(Tile.Type.HOUSE, "ouos"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(1, 1), new Tile(Tile.Type.CANNONS, "ssos"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(1, 1), new Tile(Tile.Type.CANNON, "ssos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.ENGINE, "osss"), Tile.Rotation.NONE);
 
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.R_BOX_1, "tutt"), Tile.Rotation.NONE);
@@ -161,11 +161,11 @@ class TilesBoardTest {
 
     @Test
     void checkExposedConnectors(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNONS, "sstu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ENGINE, "suss"), Tile.Rotation.INV);
 
         tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNONS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNON, "sssu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ENGINE, "otst"), Tile.Rotation.NONE);
 
@@ -173,7 +173,7 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ENGINE, "uoss"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNONS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
@@ -181,12 +181,12 @@ class TilesBoardTest {
     }
 
     @Test
-    void testCountCannons(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNONS, "sstu"), Tile.Rotation.INV);
+    void testCountCannon(){
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ENGINE, "suss"), Tile.Rotation.INV);
 
         tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNONS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNON, "sssu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ENGINE, "otst"), Tile.Rotation.NONE);
 
@@ -194,7 +194,7 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ENGINE, "uoss"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNONS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
@@ -205,11 +205,11 @@ class TilesBoardTest {
 
     @Test
     void testCountEngine(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNONS, "sstu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ENGINE, "suss"), Tile.Rotation.INV);
 
         tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNONS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNON, "sssu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ENGINE, "otst"), Tile.Rotation.NONE);
 
@@ -217,7 +217,7 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ENGINE, "uoss"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNONS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 
@@ -226,11 +226,11 @@ class TilesBoardTest {
 
     @Test
     void testHit(){
-        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNONS, "sstu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(3, 3), new Tile(Tile.Type.ENGINE, "suss"), Tile.Rotation.INV);
 
         tilesBoard.setTile(new Coordinate(2, 2), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
-        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNONS, "sssu"), Tile.Rotation.INV);
+        tilesBoard.setTile(new Coordinate(2, 1), new Tile(Tile.Type.D_CANNON, "sssu"), Tile.Rotation.INV);
         tilesBoard.setTile(new Coordinate(2, 3), new Tile(Tile.Type.SHIELD, "ssou"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(2, 4), new Tile(Tile.Type.ENGINE, "otst"), Tile.Rotation.NONE);
 
@@ -238,7 +238,7 @@ class TilesBoardTest {
         tilesBoard.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ENGINE, "uoss"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(1, 4), new Tile(Tile.Type.P_ADDON, "sttt"), Tile.Rotation.NONE);
 
-        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNONS, "stuo"), Tile.Rotation.NONE);
+        tilesBoard.setTile(new Coordinate(0, 2), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 3), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
         tilesBoard.setTile(new Coordinate(0, 4), new Tile(Tile.Type.PIPES, "ouou"), Tile.Rotation.NONE);
 

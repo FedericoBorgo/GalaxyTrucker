@@ -78,7 +78,7 @@ public class Model {
             DRAW,
             //waiting player input
             WAITING,
-            ENDED;
+            ENDED
         }
         private Type prev;
         private Type curr;
@@ -86,7 +86,7 @@ public class Model {
         public State(Type curr){
             prev = null;
             this.curr = curr;
-        };
+        }
         
         public void next(Type next){
             prev = curr;
@@ -117,7 +117,7 @@ public class Model {
     private final State state = new State(State.Type.JOINING);
 
     //pawns still not assigned to a player
-    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));;
+    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));
 
     //number of players
     private final int nPlayers;
@@ -218,9 +218,7 @@ public class Model {
             flight.moveTimer();
 
         if(flight.getTimer() == 2){
-            players.forEach((name,v)->{
-                setReady(name);
-            });
+            players.forEach((name,v)-> setReady(name));
         }
         else
             timer.schedule(task, 90000L);

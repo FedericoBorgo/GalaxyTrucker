@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents the entire set of tiles used for one game.
@@ -25,7 +26,7 @@ public class TilesCollection {
         tiles = new ArrayList<>();
         seen = new ArrayList<>();
 
-        String out = Card.dump(TilesCollection.class.getResourceAsStream("tiles.json"));
+        String out = Card.dump(Objects.requireNonNull(TilesCollection.class.getResourceAsStream("tiles.json")));
         JSONObject object = new JSONObject(out);
 
         for (Tile.Type type : Tile.Type.values()) {
@@ -34,9 +35,7 @@ public class TilesCollection {
 
             JSONArray array = object.getJSONArray(type.name());
 
-            array.forEach(e -> {
-                tiles.add(new Tile(type, e.toString()));
-            });
+            array.forEach(e -> tiles.add(new Tile(type, e.toString())));
         }
 
         Collections.shuffle(tiles);

@@ -54,9 +54,7 @@ public class ShipBoard {
         battery = new BatteryBoard(tiles);
 
         goods = new HashMap<>();
-        Arrays.stream(GoodsBoard.Type.values()).forEach(type -> {
-            goods.put(type, new GoodsBoard(tiles, type));
-        });
+        Arrays.stream(GoodsBoard.Type.values()).forEach(type -> goods.put(type, new GoodsBoard(tiles, type)));
 
         astronaut.setOthers(Arrays.asList(brown, purple));
         purple.setOthers(Arrays.asList(brown, astronaut));
@@ -153,9 +151,7 @@ public class ShipBoard {
         for(boolean[] b: marked)
             Arrays.fill(b, false);
 
-        Coordinate.forEach(c ->  {
-            toRemove(marked, c);
-        });
+        Coordinate.forEach(c -> toRemove(marked, c));
 
         Coordinate.forEach(c -> {
             if(marked[c.x()][c.y()]) {
@@ -170,9 +166,7 @@ public class ShipBoard {
     public CompressedShipBoard compress(){
         Map<GoodsBoard.Type, Map<Coordinate, Integer>> goodMap = new HashMap<>();
 
-        goods.forEach((type, board) -> {
-            goodMap.put(type, board.positions);
-        });
+        goods.forEach((type, board) -> goodMap.put(type, board.positions));
 
         return new CompressedShipBoard(tiles.getBoard(), tiles.getRotation(),
                 astronaut.getPositions(),
@@ -186,9 +180,7 @@ public class ShipBoard {
         purple.removeIllegals();
         brown.removeIllegals();
         battery.removeIllegals();
-        goods.forEach((type, board) -> {
-            board.removeIllegals();
-        });
+        goods.forEach((type, board) -> board.removeIllegals());
     }
 
     public Optional<Coordinate> hit(Projectile projectile, boolean useBattery) {
@@ -198,13 +190,9 @@ public class ShipBoard {
     }
 
     public void init(Optional<Coordinate> purple, Optional<Coordinate> brown){
-        purple.ifPresent(c -> {
-            this.purple.put(c, 1);
-        });
+        purple.ifPresent(c -> this.purple.put(c, 1));
 
-        brown.ifPresent(c -> {
-            this.brown.put(c, 1);
-        });
+        brown.ifPresent(c -> this.brown.put(c, 1));
 
         Coordinate.forEach(c -> {
             Result<Tile> res = tiles.getTile(c);

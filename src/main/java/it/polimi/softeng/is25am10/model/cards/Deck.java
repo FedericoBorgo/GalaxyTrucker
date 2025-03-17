@@ -88,9 +88,7 @@ public class Deck {
         this.players = players;
 
         if(selectedCard != null && !selectedCard.needInput){
-            players.forEach(player -> {
-               selectedCard.set(player, null);
-            });
+            players.forEach(player -> selectedCard.set(player, null));
         }
 
         return selectedCard;
@@ -98,7 +96,7 @@ public class Deck {
 
     /**
      * Plays the specific method from the subclass and checks the number of astronauts.
-     * @return
+     * @return 
      */
     public Result<JSONObject> play(){
         Result<JSONObject> res = selectedCard.play();

@@ -43,7 +43,7 @@ public class Projectile{
         public Tile.Type stoppedBy(){
             return switch (this){
                 case SMALL_ASTEROID, SMALL_FIRE -> Tile.Type.SHIELD;
-                case BIG_ASTEROID -> Tile.Type.CANNONS;
+                case BIG_ASTEROID -> Tile.Type.CANNON;
                 case BIG_FIRE -> null;
             };
         }
