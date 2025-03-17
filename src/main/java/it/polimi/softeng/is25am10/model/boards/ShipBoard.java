@@ -6,9 +6,10 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
-public class ShipBoard {
+public class ShipBoard implements Serializable {
     public static class CompressedShipBoard{
         public final Tile[][] board;
         public final Tile.Rotation[][] rotation;
@@ -220,5 +221,12 @@ public class ShipBoard {
                     battery.put(c, 3);
             }
         });
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ShipBoard shipBoard = (ShipBoard) o;
+        return Objects.equals(tiles, shipBoard.tiles) && Objects.equals(astronaut, shipBoard.astronaut) && Objects.equals(purple, shipBoard.purple) && Objects.equals(brown, shipBoard.brown) && Objects.equals(battery, shipBoard.battery) && Objects.equals(goods, shipBoard.goods);
     }
 }

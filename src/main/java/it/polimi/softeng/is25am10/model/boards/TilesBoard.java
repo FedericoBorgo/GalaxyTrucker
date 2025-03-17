@@ -6,6 +6,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import javafx.util.Pair;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,7 @@ import java.util.function.Predicate;
  * It offers methods to place a tile, to get it, to read its orientation,
  * to manage the booking process of tiles (and to manage trashed tiles). To be added.
  */
-public class TilesBoard {
+public class TilesBoard implements Serializable {
     // coordinates of unplaceable tiles
     private static final Coordinate[] WALL_POSITION = new Coordinate[]{
             new Coordinate(0, 0),
@@ -516,35 +517,35 @@ public class TilesBoard {
 
     private Optional<Coordinate> whatWillHit(Projectile p){
         Coordinate c = null;
-        switch(p.getSide()){
+        switch(p.side()){
             case UP -> {
                 for(int i = 0; i < BOARD_HEIGHT; i++){
-                    if(Tile.real(board[p.getWhere()][i])){
-                        c = new Coordinate(p.getWhere(), i);
+                    if(Tile.real(board[p.where()][i])){
+                        c = new Coordinate(p.where(), i);
                         break;
                     }
                 }
             }
             case RIGHT -> {
                 for(int i = BOARD_WIDTH-1; i >= 0; i--){
-                    if(Tile.real(board[i][p.getWhere()])){
-                        c = new Coordinate(i, p.getWhere());
+                    if(Tile.real(board[i][p.where()])){
+                        c = new Coordinate(i, p.where());
                         break;
                     }
                 }
             }
             case DOWN -> {
                 for(int i = BOARD_HEIGHT-1; i >= 0; i--){
-                    if(Tile.real(board[p.getWhere()][i])){
-                        c = new Coordinate(p.getWhere(), i);
+                    if(Tile.real(board[p.where()][i])){
+                        c = new Coordinate(p.where(), i);
                         break;
                     }
                 }
             }
             case LEFT -> {
                 for(int i = 0; i < BOARD_WIDTH; i++){
-                    if(Tile.real(board[i][p.getWhere()])){
-                        c = new Coordinate(i, p.getWhere());
+                    if(Tile.real(board[i][p.where()])){
+                        c = new Coordinate(i, p.where());
                         break;
                     }
                 }
@@ -560,11 +561,11 @@ public class TilesBoard {
 
         if(pos.isEmpty())
             saved = true;
-        else if(p.getType() == Projectile.Type.SMALL_ASTEROID && Tile.ConnectorType.SMOOTH == Tile.getSide(get(pos.get()), getRotation(pos.get()), p.getSide()))
+        else if(p.type() == Projectile.Type.SMALL_ASTEROID && Tile.ConnectorType.SMOOTH == Tile.getSide(get(pos.get()), getRotation(pos.get()), p.side()))
             saved = true;
-        else if(p.getType().stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(p.getSide()))
+        else if(p.type().stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(p.side()))
             saved = true;
-        else if(p.getType().stoppedBy() == Tile.Type.DRILLS && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
+        else if(p.type().stoppedBy() == Tile.Type.DRILLS && doesDrillsCover(p.side(), p.where(), useBattery))
             saved = true;
 
         if(!saved){
@@ -573,6 +574,13 @@ public class TilesBoard {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        TilesBoard that = (TilesBoard) o;
+        return Objects.deepEquals(board, that.board) && Objects.deepEquals(rotation, that.rotation) && Objects.equals(booked, that.booked) && Objects.equals(trashed, that.trashed);
     }
 }
 

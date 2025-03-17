@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -8,7 +9,7 @@ import java.util.*;
  * by {@code ConnectorType}s. The methods in this class reveal the nature of a tile: its type
  * and the connectors that it exposes.
  */
-public class Tile {
+public class Tile implements Serializable {
     public enum Side{
         UP, RIGHT, DOWN, LEFT;
         public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
@@ -242,11 +243,6 @@ public class Tile {
         if (o == null || getClass() != o.getClass()) return false;
         Tile tile = (Tile) o;
         return type == tile.type && Objects.equals(connectors, tile.connectors);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, connectors);
     }
 }
 

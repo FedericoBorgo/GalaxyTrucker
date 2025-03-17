@@ -1,14 +1,16 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The board used by all the players, manages everything done on the flightboard in the physical game.
  * Includes methods for moving pawns
  */
-public class FlightBoard {
+public class FlightBoard implements Serializable {
     public static class CompressedFlightBoard{
         public final List<Pawn> order;
         public final List<Integer> offset;
@@ -178,5 +180,12 @@ public class FlightBoard {
         for(int i = order.size()-1; i >= 0; i--)
             if(offset.get(i) <= -24)
                 quit(order.get(i));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        FlightBoard that = (FlightBoard) o;
+        return timer == that.timer && leaderPosition == that.leaderPosition && Objects.equals(order, that.order) && Objects.equals(offset, that.offset) && Objects.equals(quitters, that.quitters);
     }
 }

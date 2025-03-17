@@ -6,6 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -27,6 +30,8 @@ class ModelTest {
             r = Tile.Rotation.valueOf(j.getString("rotation"));
         }
     }
+
+    Model model;
 
     void jsonForEach(JSONArray array, BiConsumer<String, JSONObject> consumer){
         array.forEach(e -> {
@@ -105,7 +110,7 @@ class ModelTest {
     @Test
     void testModel(){
         JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
-        Model model = new Model(obj.getInt("n_players"));
+        model = new Model(obj.getInt("n_players"));
         JSONArray players = obj.getJSONArray("players");
 
         assertEquals(Model.State.Type.JOINING, model.getStatus());
@@ -127,6 +132,16 @@ class ModelTest {
         checkInit(model, players);
 
         //TODO cards
+    }
 
+    @Test
+    void testStore() throws IOException, ClassNotFoundException {
+        testModel();
+
+        model.store("out.bin");
+        Model m = Model.load("out.bin");
+        System.out.println();
+
+        assertEquals(model, m);
     }
 }
