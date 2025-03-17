@@ -311,10 +311,10 @@ public class TilesBoard {
     private void checkTiles(Set<Coordinate> result) {
         Coordinate.forEach(c -> {
             try {
-                if (Tile.rocket(get(c))) {
+                if (Tile.engine(get(c))) {
                     if (getRotation(c) != Tile.Rotation.NONE || Tile.real(get(c.down())))
                         result.add(c);
-                } else if (Tile.drills(get(c))) {
+                } else if (Tile.cannons(get(c))) {
                     Tile t = switch (getRotation(c)) {
                         case NONE -> get(c.up());
                         case CLOCK -> get(c.right());
@@ -421,43 +421,43 @@ public class TilesBoard {
         return count.get();
     }
 
-    public double countDrillsPower(Map<Tile.Rotation, Integer> count) {
-        AtomicInteger drills = new AtomicInteger();
-        AtomicInteger d_drills = new AtomicInteger();
+    public double countCannonsPower(Map<Tile.Rotation, Integer> count) {
+        AtomicInteger cannons = new AtomicInteger();
+        AtomicInteger d_cannons = new AtomicInteger();
 
         Coordinate.forEach(c -> {
             Tile.Rotation rotation = getRotation(c);
 
-            if (get(c).getType() == Tile.Type.DRILLS){
+            if (get(c).getType() == Tile.Type.CANNONS){
                 if (rotation == Tile.Rotation.NONE)
-                    drills.addAndGet(2);
+                    cannons.addAndGet(2);
                 else
-                    drills.addAndGet(1);
+                    cannons.addAndGet(1);
             }
-            else if(get(c).getType() == Tile.Type.D_DRILLS){
+            else if(get(c).getType() == Tile.Type.D_CANNONS){
                 if(count.getOrDefault(rotation, 0) > 0){
                     count.put(rotation, count.get(rotation) - 1);
 
                     if (rotation == Tile.Rotation.NONE)
-                        d_drills.addAndGet(2);
+                        d_cannons.addAndGet(2);
                     else
-                        d_drills.addAndGet(1);
+                        d_cannons.addAndGet(1);
                 }
             }
         });
 
-        return drills.get()/2.0 + d_drills.get();
+        return cannons.get()/2.0 + d_cannons.get();
     }
 
-    public int countRocketPower(int count) {
+    public int countEnginePower(int count) {
         AtomicInteger power = new AtomicInteger();
         AtomicInteger atomicCount = new AtomicInteger();
         atomicCount.set(count);
 
         Coordinate.forEach(c -> {
-            if (get(c).getType() == Tile.Type.ROCKET && getRotation(c) == Tile.Rotation.NONE)
+            if (get(c).getType() == Tile.Type.ENGINE && getRotation(c) == Tile.Rotation.NONE)
                 power.getAndIncrement();
-            else if(get(c).getType() == Tile.Type.D_ROCKET && atomicCount.get() > 0){
+            else if(get(c).getType() == Tile.Type.D_ENGINE && atomicCount.get() > 0){
                 power.addAndGet(2);
                 atomicCount.addAndGet(-1);
             }
@@ -487,8 +487,8 @@ public class TilesBoard {
 
         Predicate<Coordinate> checkDrill = c -> {
             if (getRotation(c).toSide() == side &&
-                    (get(c).getType() == Tile.Type.DRILLS ||
-                            (useBattery && get(c).getType() == Tile.Type.D_DRILLS))) {
+                    (get(c).getType() == Tile.Type.CANNONS ||
+                            (useBattery && get(c).getType() == Tile.Type.D_CANNONS))) {
                 cover.set(true);
                 return false;
             }
@@ -564,7 +564,7 @@ public class TilesBoard {
             saved = true;
         else if(p.getType().stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(p.getSide()))
             saved = true;
-        else if(p.getType().stoppedBy() == Tile.Type.DRILLS && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
+        else if(p.getType().stoppedBy() == Tile.Type.CANNONS && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
             saved = true;
 
         if(!saved){

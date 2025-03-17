@@ -46,7 +46,7 @@ public class Deck {
         cards.addAll(Epidemic.construct(board));
         cards.addAll(Meteors.construct(board));
         cards.addAll(Planets.construct(board));
-        cards.addAll(Ship.construct(model, board));
+        cards.addAll(AbandonedShip.construct(model, board));
         cards.addAll(Space.construct(model, board));
         cards.addAll(Stardust.construct(board));
         cards.addAll(Station.construct(board));

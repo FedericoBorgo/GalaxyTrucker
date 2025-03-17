@@ -110,21 +110,21 @@ public class Tile {
     }
 
     /**
-     * Check if a tile is a rocket or a double rocket
+     * Check if a tile is an engine or a double engine
      * @param t the tile to check
-     * @return true if it's a rocket false otherwise
+     * @return true if it's a engine false otherwise
      */
-    static public boolean rocket(Tile t){
-        return t.type == Type.ROCKET || t.type == Type.D_ROCKET;
+    static public boolean engine(Tile t){
+        return t.type == Type.ENGINE || t.type == Type.D_ENGINE;
     }
 
     /**
-     * Check if a tile is a drill or a double drill
+     * Check if a tile is a cannon or a double cannon
      * @param t the tile to check
-     * @return true if it's a drill false otherwise
+     * @return true if it's a cannon false otherwise
      */
-    static public boolean drills(Tile t){
-        return t.type == Type.DRILLS || t.type == Type.D_DRILLS;
+    static public boolean cannons(Tile t){
+        return t.type == Type.CANNONS || t.type == Type.D_CANNONS;
     }
 
     /**
@@ -168,10 +168,10 @@ public class Tile {
     // Enum class for the type of tile
     public enum Type {
         PIPES,
-        DRILLS,
-        D_DRILLS,
-        ROCKET,
-        D_ROCKET,
+        CANNONS,
+        D_CANNONS,
+        ENGINE,
+        D_ENGINE,
         HOUSE,
         C_HOUSE,
         B_BOX_3,

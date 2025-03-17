@@ -9,19 +9,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Ship extends Card {
-    private final int cash;
-    private final int days;
-    private final int astronaut;
+public class AbandonedShip extends Card {
+    private final int cashReward;
+    private final int daysLost;
+    private final int astronautCost;
     private boolean someoneAccepted;
     private Player descendingPlayer;
 
-    public Ship(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
-        super(model, true, board, id, Type.SHIP);
-       this.cash = cash;
-       this.days = days;
-       this.astronaut = astronaut;
+    public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
+        super(model, true, board, id, Type.AB_SHIP);
+       this.cashReward = cash;
+       this.daysLost = days;
+       this.astronautCost = astronaut;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class Ship extends Card {
         //end
 
         if(!someoneAccepted && getChoice(json)){
-            if(model.getRemovedItems(player).guys >= astronaut){
+            if(model.getRemovedItems(player).guys >= astronautCost){
                 someoneAccepted = true;
                 descendingPlayer = player;
             }
@@ -58,10 +59,10 @@ public class Ship extends Card {
         JSONObject moved = new JSONObject();
 
         if(someoneAccepted){
-            descendingPlayer.giveCash(cash);
-            board.moveRocket(descendingPlayer.getPawn(), -days);
+            descendingPlayer.giveCash(cashReward);
+            board.moveRocket(descendingPlayer.getPawn(), -daysLost);
             moved.put("pawn", descendingPlayer.getPawn());
-            moved.put("days", -days);
+            moved.put("days", -daysLost);
             jsonArray.put(moved);
         }
 
@@ -84,7 +85,7 @@ public class Ship extends Card {
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Ship.class.getResourceAsStream("ship.json"));
+        String out = dump(Objects.requireNonNull(AbandonedShip.class.getResourceAsStream("ship.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
@@ -95,7 +96,7 @@ public class Ship extends Card {
             int guys = entry.getInt("guys");
             int cash = entry.getInt("cash");
 
-            cards.add(new Ship(model, board, id, guys, cash, days));
+            cards.add(new AbandonedShip(model, board, id, guys, cash, days));
         });
 
         return cards;

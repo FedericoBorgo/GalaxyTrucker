@@ -23,7 +23,7 @@ public class Meteors extends Card {
     }
 
     public Meteors(FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
-        super(null, true, board, id, Card.Type.METEOR);
+        super(null, true, board, id, Card.Type.METEORS);
         projectiles = new ArrayList<>();
         useBattery = new HashMap<>();
         AtomicInteger counter = new AtomicInteger();

@@ -110,7 +110,7 @@ public class Model {
     //Data about the single player.
     private final Map<String, Player> players = new HashMap<>();
     private final Map<Player, RemovedItems> removedItems = new HashMap<>();
-    private final Map<Player, Map<Tile.Rotation, Integer>> drillsToUse = new HashMap<>();
+    private final Map<Player, Map<Tile.Rotation, Integer>> cannonsToUse = new HashMap<>();
     private final Map<String, Player> quitters = new HashMap<>();
 
     //Current state of the game
@@ -471,27 +471,27 @@ public class Model {
     }
 
     /**
-     * Configure how many drills use to shoot.
+     * Configure how many cannons use to shoot.
      * Can be called only in a waiting state.
      *
      * @param name name of the player
-     * @param map witch drills activate to shoot
+     * @param map witch cannons activate to shoot
      * @return
      */
-    public synchronized Result<String> setDrillsToUse(String name, Map<Tile.Rotation, Integer> map){
+    public synchronized Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
             return Result.err("player already registered");
 
-        drillsToUse.put(get(name), map);
+        cannonsToUse.put(get(name), map);
         return Result.ok("");
     }
 
-    /// drills
-    public Map<Tile.Rotation, Integer> getDrillsToUse(Player p){
-        return drillsToUse.getOrDefault(p, null);
+    /// cannons
+    public Map<Tile.Rotation, Integer> getCannonsToUse(Player p){
+        return cannonsToUse.getOrDefault(p, null);
     }
 
     //tiles section

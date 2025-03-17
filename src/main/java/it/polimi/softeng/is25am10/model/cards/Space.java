@@ -7,17 +7,14 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Space extends Card {
     private final Map<FlightBoard.Pawn, Integer> enginePower = new HashMap<>();
     private final Map<String, Integer> enginePowerName = new HashMap<>();
 
     public Space(Model model, FlightBoard board, int id) {
-        super(model, true, board, id, Type.SPACE);
+        super(model, true, board, id, Type.OPEN_SPACE);
     }
 
     @Override
@@ -32,7 +29,7 @@ public class Space extends Card {
         }
         //end
 
-        enginePower.put(player.getPawn(), player.getBoard().getRocketPower(model.getRemovedItems(player).battery));
+        enginePower.put(player.getPawn(), player.getBoard().getEnginePower(model.getRemovedItems(player).battery));
         register(player);
         return Result.ok(genAccepted());
     }
@@ -85,7 +82,7 @@ public class Space extends Card {
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Space.class.getResourceAsStream("space.json"));
+        String out = dump(Objects.requireNonNull(Space.class.getResourceAsStream("space.json")));
         JSONObject jsonObject = new JSONObject(out);
         JSONArray jsonArray = jsonObject.getJSONArray("ids");
         List<Card> cards = new ArrayList<>();

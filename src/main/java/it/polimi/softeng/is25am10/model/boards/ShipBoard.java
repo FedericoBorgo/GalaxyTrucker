@@ -93,24 +93,24 @@ public class ShipBoard {
         return goods.get(type);
     }
 
-    public double getDrillsPower(Map<Tile.Rotation, Integer> count){
-        double drills = tiles.countDrillsPower(count);
+    public double getCannonsPower(Map<Tile.Rotation, Integer> count){
+        double cannons = tiles.countCannonsPower(count);
 
-        if(drills > 0){
-            drills += purple.getTotal()*2;
+        if(cannons > 0){
+            cannons += purple.getTotal()*2;
         }
 
-        return drills;
+        return cannons;
     }
 
-    public int getRocketPower(int count){
-        int rocket = tiles.countRocketPower(count);
+    public int getEnginePower(int count){
+        int engines = tiles.countEnginePower(count);
 
-        if(rocket > 0){
-            rocket += brown.getTotal()*2;
+        if(engines > 0){
+            engines += brown.getTotal()*2;
         }
 
-        return rocket;
+        return engines;
     }
 
     private boolean thereIsSomeone(Coordinate c){

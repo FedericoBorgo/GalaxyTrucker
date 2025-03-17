@@ -34,7 +34,7 @@ public abstract class Card {
     protected final Map<FlightBoard.Pawn, Player> registered;
 
     public enum Type{
-        EPIDEMIC, METEOR, PLANETS, SHIP, SPACE, STARDUST, STATION;
+        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION;
     }
 
     protected final Type type;
