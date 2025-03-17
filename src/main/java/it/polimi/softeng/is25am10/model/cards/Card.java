@@ -14,33 +14,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generic class used by all types of space.json.
- * The necessary info about every card is if its
- * need an input by the player (needInput) and
- * some data (getData). We also need to know the
- * type of the card (Type) in some cases.
+ * Generic class used by all types of cards, it contains the necessary info about every card:
+ * if it needs an input by the player (needInput) and some data (getData).
+ * We also need to know the type of the card (Type) in some cases.
  */
 public abstract class Card {
-    /**
-     * Does the player need to declare something?
-     */
-    public final boolean needInput;
 
     protected final FlightBoard board;
-
-    /**
-     * When a player is ready o has declared their input,
-     * we can set the player as "registered" it means that
-     * he has already given the input.
-     */
-    protected final Map<FlightBoard.Pawn, Player> registered;
     protected final Model model;
 
-    /**
-     * ID unique to every card.
-     * Even same card type has different IDs.
-     */
+    // ID unique to every card, even if they share the same type they have different IDs
     public final int id;
+
+    // Does the player need to declare something?
+    public final boolean needInput;
+
+    // When a player is ready or has declared their input, we can set the player
+    // as "registered", which means that they have already given the input.
+    protected final Map<FlightBoard.Pawn, Player> registered;
 
     public enum Type{
         EPIDEMIC, METEOR, PLANETS, SHIP, SPACE, STARDUST, STATION;
@@ -49,8 +40,8 @@ public abstract class Card {
     protected final Type type;
 
     /**
-     * Create the card by giving the model to get player data, such as
-     * the number of removed battery, astronaut or goods.
+     * Creates the card by giving the model from which to get player data, such as
+     * the number of removed batteries, astronauts or goods.
      *
      * @param model where to get the player data
      * @param needInput does the player need to give some input?
@@ -68,7 +59,7 @@ public abstract class Card {
     }
 
     /**
-     * Check if the player already set their input.
+     * Checks if the player has already set their input.
      * @param player
      * @return
      */
@@ -77,8 +68,7 @@ public abstract class Card {
     }
 
     /**
-     * Check if the given player is the one that should declare the next
-     * input.
+     * Check if the given player is the one that should declare the next input.
      * @param player
      * @return true if he's him, false if not
      */
@@ -87,7 +77,7 @@ public abstract class Card {
     }
 
     /**
-     * Check if all the player gave their input
+     * Check if all the players gave their input
      * @return
      */
     protected boolean allRegistered(){
@@ -103,7 +93,7 @@ public abstract class Card {
     }
 
     /**
-     * Standardisation of a player choice.
+     * Standardization of a player choice
      * @param json
      * @return
      */
@@ -112,9 +102,8 @@ public abstract class Card {
     }
 
     /**
-     * Give the player input to the card. If the player does not have
-     * to give any input, someone still need to give the card all
-     * the players using this method.
+     * Give the player's input to the card. If the player does not need to give any input,
+     * this method can still be used to give all the players to the card.
      *
      * @param player the player that execute the action
      * @param json this is dependent of every card

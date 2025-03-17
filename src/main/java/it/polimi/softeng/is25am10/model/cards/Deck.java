@@ -15,15 +15,14 @@ import java.util.List;
  * It has visible cards during the ship building (total 9)
  * and the 3 not visible.
  * The Card is played inside this class.
- * All the Card's method should be called by the Deck and not
- * by the player.
+ * All the Card's method should be called by the Deck and not by the player.
  */
 public class Deck {
     /// the list of the cards in a single game.
     private final List<Card> deck;
     /// the 9 visible cards during the building
     private final Card[][] visible;
-    /// drew card
+    /// drawn card
     private Card selectedCard;
 
     private List<Player> players;
@@ -31,10 +30,10 @@ public class Deck {
 
     /**
      * The constructor builds all the types of cards.
-     * Then shuffle them, takes 12 and shuffle again.
+     * Then shuffles them, takes 12 of them and shuffles again.
      *
      * @param model model used by the cards to get removed items
-     * @param board flight board to move the Pawn.
+     * @param board flight board to move the Pawns.
      */
     public Deck(Model model, FlightBoard board){
         List<Card> cards = new ArrayList<>();
@@ -80,8 +79,8 @@ public class Deck {
 
     /**
      * Draw a card from a deck.
-     * @param players the cards that does not require any input
-     *                give already the player ready status.
+     * @param players the cards that do not require any input
+     * automatically put the player in the ready status.
      * @return the drew card
      */
     public Card draw(List<Player> players){
@@ -97,10 +96,10 @@ public class Deck {
         return selectedCard;
     }
 
-    public Result<JSONObject> set(Player player, JSONObject json){
-        return selectedCard.set(player, json);
-    }
-
+    /**
+     * Plays the specific method from the subclass and checks the number of astronauts.
+     * @return
+     */
     public Result<JSONObject> play(){
         Result<JSONObject> res = selectedCard.play();
 
@@ -113,6 +112,10 @@ public class Deck {
         }
 
         return res;
+    }
+
+    public Result<JSONObject> set(Player player, JSONObject json){
+        return selectedCard.set(player, json);
     }
 
     public boolean ready(){

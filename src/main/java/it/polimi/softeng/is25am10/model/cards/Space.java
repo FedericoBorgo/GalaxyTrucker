@@ -17,7 +17,7 @@ public class Space extends Card {
     private final Map<String, Integer> enginePowerName = new HashMap<>();
 
     public Space(Model model, FlightBoard board, int id) {
-        super(model, true, board, id, Type.SHIP);
+        super(model, true, board, id, Type.SPACE);
     }
 
     @Override
