@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is responsible for the state and evolution of the game.
@@ -512,6 +513,17 @@ public class Model implements Serializable {
     /// cannons
     public Map<Tile.Rotation, Integer> getCannonsToUse(Player p){
         return cannonsToUse.getOrDefault(p, null);
+    }
+
+    public int batteryRequiredForCannon(String name){
+        AtomicInteger total = new AtomicInteger();
+        total.set(0);
+
+        cannonsToUse.get(get(name)).forEach((_, val) -> {
+            total.addAndGet(val);
+        });
+
+        return total.get();
     }
 
     //tiles section
