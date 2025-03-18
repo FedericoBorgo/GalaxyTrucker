@@ -11,6 +11,9 @@ import java.util.*;
  */
 
 public class Tile implements Serializable {
+    private final Type type;
+    private final Map<Side, ConnectorType> connectors;
+
     public enum Side{
         UP, RIGHT, DOWN, LEFT;
         public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
@@ -34,10 +37,10 @@ public class Tile implements Serializable {
      */
     public enum Type {
         PIPES,
-        DRILLS,
-        D_DRILLS,
-        ROCKET,
-        D_ROCKET,
+        CANNON,
+        D_CANNON,
+        ENGINE,
+        D_ENGINE,
         HOUSE,
         C_HOUSE,
         B_BOX_3,
@@ -181,48 +184,6 @@ public class Tile implements Serializable {
      */
     static public boolean battery(Tile t){
         return t.type == Type.BATTERY_2 || t.type == Type.BATTERY_3;
-    }
-
-    // Enum class for each of the sides
-    public enum Side{
-        UP, RIGHT, DOWN, LEFT;
-        public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
-    }
-
-    // Enum  class for the rotation of the tile
-    public enum Rotation{
-        CLOCK, INV, DOUBLE, NONE;
-
-        public Side toSide(){
-            return switch (this){
-                case CLOCK -> Side.RIGHT;
-                case INV -> Side.LEFT;
-                case DOUBLE -> Side.DOWN;
-                case NONE -> Side.UP;
-            };
-        }
-    }
-
-    // Enum class for the type of tile
-    public enum Type {
-        PIPES,
-        CANNON,
-        D_CANNON,
-        ENGINE,
-        D_ENGINE,
-        HOUSE,
-        C_HOUSE,
-        B_BOX_3,
-        B_BOX_2,
-        R_BOX_2,
-        R_BOX_1,
-        P_ADDON,
-        B_ADDON,
-        BATTERY_3,
-        BATTERY_2,
-        SHIELD,
-        EMPTY,
-        WALL
     }
 
     public enum ConnectorType {

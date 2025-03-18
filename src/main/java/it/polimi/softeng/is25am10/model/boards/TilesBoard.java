@@ -564,7 +564,7 @@ public class TilesBoard implements Serializable {
             saved = true;
         else if(p.type().stoppedBy() == Tile.Type.SHIELD && useBattery && doesShieldsCover(p.side()))
             saved = true;
-        else if(p.getType().stoppedBy() == Tile.Type.CANNON && doesDrillsCover(p.getSide(), p.getWhere(), useBattery))
+        else if(p.type().stoppedBy() == Tile.Type.CANNON && doesDrillsCover(p.side(), p.where(), useBattery))
             saved = true;
 
         if(!saved){

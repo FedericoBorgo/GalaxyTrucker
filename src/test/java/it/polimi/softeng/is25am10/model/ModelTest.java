@@ -111,7 +111,7 @@ class ModelTest {
     @Test
     void testModel(){
         JSONObject obj = new JSONObject(Card.dump(Objects.requireNonNull(ModelTest.class.getResourceAsStream("modelTest.json"))));
-        Model model = new Model(obj.getInt("n_players"));
+        model = new Model(obj.getInt("n_players"));
         JSONArray players = obj.getJSONArray("players");
 
         assertEquals(Model.State.Type.JOINING, model.getStatus());

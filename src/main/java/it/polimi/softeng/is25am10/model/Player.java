@@ -109,10 +109,6 @@ public class Player implements Serializable {
         return res;
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

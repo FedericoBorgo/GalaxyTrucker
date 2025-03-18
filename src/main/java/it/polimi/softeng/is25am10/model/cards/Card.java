@@ -29,9 +29,6 @@ public abstract class Card implements Serializable {
     // ID unique to every card, even if they share the same type they have different IDs
     public final int id;
 
-    // Does the player need to declare something?
-    public final boolean needInput;
-
     // When a player is ready or has declared their input, we can set the player
     // as "registered", which means that they have already given the input.
     protected final Map<FlightBoard.Pawn, Player> registered;
