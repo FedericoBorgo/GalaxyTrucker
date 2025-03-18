@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,8 +15,7 @@ import java.util.Objects;
  * Stores the tiles in 2 lists: {@code tiles} for the face-down ones,
  * {@code seen} for the face-up ones.
  */
-public class TilesCollection {
-    static List<Tile> TILES;
+public class TilesCollection implements Serializable {
     private final List<Tile> tiles;
     private final List<Tile> seen;
 
@@ -85,5 +85,12 @@ public class TilesCollection {
      */
     public void give(Tile tile){
         seen.add(tile);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        TilesCollection that = (TilesCollection) o;
+        return Objects.equals(tiles, that.tiles) && Objects.equals(seen, that.seen);
     }
 }

@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -8,10 +9,49 @@ import java.util.*;
  * by {@code ConnectorType}s. The methods in this class reveal the nature of a tile: its type
  * and the connectors that it exposes.
  */
-public class Tile {
-    // Attributes of the class
-    private final Type type;
-    private final Map<Side, ConnectorType> connectors;
+
+public class Tile implements Serializable {
+    public enum Side{
+        UP, RIGHT, DOWN, LEFT;
+        public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
+    }
+
+    public enum Rotation{
+        CLOCK, INV, DOUBLE, NONE;
+
+        public Side toSide(){
+            return switch (this){
+                case CLOCK -> Side.RIGHT;
+                case INV -> Side.LEFT;
+                case DOUBLE -> Side.DOWN;
+                case NONE -> Side.UP;
+            };
+        }
+    }
+
+    /**
+     * This class enumerates the types of tiles.
+     */
+    public enum Type {
+        PIPES,
+        DRILLS,
+        D_DRILLS,
+        ROCKET,
+        D_ROCKET,
+        HOUSE,
+        C_HOUSE,
+        B_BOX_3,
+        B_BOX_2,
+        R_BOX_2,
+        R_BOX_1,
+        P_ADDON,
+        B_ADDON,
+        BATTERY_3,
+        BATTERY_2,
+        SHIELD,
+        EMPTY,
+        WALL;
+    }
 
     // "Special tiles": WALL and EMPTY
     public static final Tile WALL_TILE = new Tile(Type.WALL, "ssss");
@@ -268,11 +308,6 @@ public class Tile {
         if (o == null || getClass() != o.getClass()) return false;
         Tile tile = (Tile) o;
         return type == tile.type && Objects.equals(connectors, tile.connectors);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, connectors);
     }
 }
 

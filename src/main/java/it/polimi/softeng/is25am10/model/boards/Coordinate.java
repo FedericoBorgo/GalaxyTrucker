@@ -3,6 +3,8 @@ package it.polimi.softeng.is25am10.model.boards;
 import it.polimi.softeng.is25am10.model.Result;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -13,7 +15,7 @@ import java.util.function.Predicate;
  * @param x
  * @param y
  */
-public record Coordinate(int x, int y) {
+public record Coordinate(int x, int y) implements Serializable {
     private boolean check(int x, int y) {
         return x < 0 || x >= TilesBoard.BOARD_WIDTH || y < 0 || y >= TilesBoard.BOARD_HEIGHT;
     }
@@ -91,5 +93,12 @@ public record Coordinate(int x, int y) {
     @Override
     public String toString(){
         return "x" + x + " y" + y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Coordinate that = (Coordinate) o;
+        return x == that.x && y == that.y;
     }
 }

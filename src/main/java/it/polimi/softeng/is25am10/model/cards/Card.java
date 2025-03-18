@@ -8,17 +8,20 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Generic class used by all types of cards, it contains the necessary info about every card:
  * if it needs an input by the player (needInput) and some data (getData).
  * We also need to know the type of the card (Type) in some cases.
  */
-public abstract class Card {
+
+public abstract class Card implements Serializable {
+    /**
+     * Does the player need to declare something?
+     */
+    public final boolean needInput;
 
     protected final FlightBoard board;
     protected final Model model;
@@ -149,5 +152,12 @@ public abstract class Card {
         JSONObject accepted = new JSONObject();
         accepted.put("accepted", true);
         return accepted;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return needInput == card.needInput && id == card.id && type == card.type;
     }
 }

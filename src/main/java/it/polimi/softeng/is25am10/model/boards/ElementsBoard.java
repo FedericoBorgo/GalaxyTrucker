@@ -4,10 +4,8 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Used as a superclass by the classes AstronautBoard, AlienBoard, BatteryBoard and GoodsBoard.
@@ -15,7 +13,7 @@ import java.util.Map;
  * Contains some functions such as constructor, get methods, and some basic management such as
  * removing units or moving units between tiles.
  */
-public abstract class ElementsBoard {
+public abstract class ElementsBoard implements Serializable {
     protected final Map<Coordinate, Integer> positions;
     protected int total;
     // The matrix containing all the tiles (including empty spaces); board is associated with a specific player
@@ -225,4 +223,11 @@ public abstract class ElementsBoard {
      * @return
      */
     public abstract boolean check(Coordinate c, int qty);
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ElementsBoard that = (ElementsBoard) o;
+        return total == that.total && Objects.equals(positions, that.positions);
+    }
 }

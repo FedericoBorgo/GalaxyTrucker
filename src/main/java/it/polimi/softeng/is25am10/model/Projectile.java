@@ -2,18 +2,10 @@ package it.polimi.softeng.is25am10.model;
 
 import org.json.JSONObject;
 
-public class Projectile{
-    private final Type type;
-    private final Tile.Side side;
-    private final int where;
-    private final int ID;
+import java.io.Serializable;
 
-    public Projectile(Type type, Tile.Side side, int where, int ID) {
-        this.type = type;
-        this.side = side;
-        this.where = where;
-        this.ID = ID;
-    }
+public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, Tile.Side side, int where,
+                         int ID) implements Serializable {
 
     @Override
     public String toString() {
@@ -40,31 +32,13 @@ public class Projectile{
         SMALL_FIRE,
         BIG_FIRE;
 
-        public Tile.Type stoppedBy(){
-            return switch (this){
+        public Tile.Type stoppedBy() {
+            return switch (this) {
                 case SMALL_ASTEROID, SMALL_FIRE -> Tile.Type.SHIELD;
                 case BIG_ASTEROID -> Tile.Type.CANNON;
                 case BIG_FIRE -> null;
             };
         }
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-
-    public Tile.Side getSide() {
-        return side;
-    }
-
-
-    public int getWhere() {
-        return where;
-    }
-
-    public int getID() {
-        return ID;
     }
 }
 

@@ -5,13 +5,15 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Stores all the information of the single player, associating it with a pawn and the nickname.
  */
 
-public class Player {
+public class Player implements Serializable {
     private final FlightBoard.Pawn pawn;
     private int cash;
     private final ShipBoard board;
@@ -105,5 +107,16 @@ public class Player {
             return res;
         goodsReward.remove(reward);
         return res;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return cash == player.cash && pawn == player.pawn && Objects.equals(board, player.board) && Objects.equals(goodsReward, player.goodsReward) && Objects.equals(name, player.name);
     }
 }

@@ -6,9 +6,8 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Used to contains all the cards relative to a single game.
@@ -17,7 +16,7 @@ import java.util.List;
  * The Card is played inside this class.
  * All the Card's method should be called by the Deck and not by the player.
  */
-public class Deck {
+public class Deck implements Serializable {
     /// the list of the cards in a single game.
     private final List<Card> deck;
     /// the 9 visible cards during the building
@@ -126,5 +125,12 @@ public class Deck {
 
     public List<Player> getRegistered(){
         return selectedCard.getRegistered();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Deck deck1 = (Deck) o;
+        return Objects.equals(deck, deck1.deck) && Objects.deepEquals(visible, deck1.visible) && Objects.equals(selectedCard, deck1.selectedCard) && Objects.equals(players, deck1.players) && Objects.equals(flightBoard, deck1.flightBoard);
     }
 }

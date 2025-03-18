@@ -73,7 +73,7 @@ public class Meteors extends Card {
 
         projectiles.forEach(projectile -> {
             registered.forEach((pawn, p) -> {
-                Optional<Coordinate> destroyed = p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.getID()));
+                Optional<Coordinate> destroyed = p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.ID()));
 
                 destroyed.ifPresent(c -> {
                     JSONObject obj = new JSONObject();
