@@ -85,7 +85,7 @@ public class AbandonedShip extends Card {
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Objects.requireNonNull(AbandonedShip.class.getResourceAsStream("ship.json")));
+        String out = dump(Objects.requireNonNull(AbandonedShip.class.getResourceAsStream("abandoned_ship.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 

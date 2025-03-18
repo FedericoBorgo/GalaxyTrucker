@@ -82,7 +82,7 @@ public class Space extends Card {
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Objects.requireNonNull(Space.class.getResourceAsStream("space.json")));
+        String out = dump(Objects.requireNonNull(Space.class.getResourceAsStream("open_space.json")));
         JSONObject jsonObject = new JSONObject(out);
         JSONArray jsonArray = jsonObject.getJSONArray("ids");
         List<Card> cards = new ArrayList<>();

@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -104,7 +105,7 @@ class ModelTest {
 
     @Test
     void testModel(){
-        JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
+        JSONObject obj = new JSONObject(Card.dump(Objects.requireNonNull(ModelTest.class.getResourceAsStream("modelTest.json"))));
         Model model = new Model(obj.getInt("n_players"));
         JSONArray players = obj.getJSONArray("players");
 
