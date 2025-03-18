@@ -37,20 +37,15 @@ public class Stardust extends Card {
         //end
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
 
         FlightBoard.Pawn pawn;
         for(int i= board.getOrder().size()-1; i >= 0; i--){
-            JSONObject player = new JSONObject();
             pawn = board.getOrder().get(i);
             int days = -registered.get(pawn).getBoard().getTiles().countExposedConnectors();
             board.moveRocket(pawn, days);
-            player.put("days", days);
-            player.put("pawn", pawn);
-            jsonArray.put(player);
         }
 
-        result.put("moved", jsonArray);
+        result.put("flight", board.toJSON());
 
         return Result.ok(result);
     }
@@ -63,7 +58,8 @@ public class Stardust extends Card {
     @Override
     public JSONObject getData() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("stardust", "");
+        jsonObject.put("type", type);
+        jsonObject.put("id", id);
         return jsonObject;
     }
 

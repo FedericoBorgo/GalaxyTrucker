@@ -1,5 +1,8 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -187,5 +190,18 @@ public class FlightBoard implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         FlightBoard that = (FlightBoard) o;
         return timer == that.timer && leaderPosition == that.leaderPosition && Objects.equals(order, that.order) && Objects.equals(offset, that.offset) && Objects.equals(quitters, that.quitters);
+    }
+
+    public JSONArray toJSON(){
+        JSONArray array = new JSONArray();
+
+        for(int i = 0; i < order.size(); i++){
+            JSONObject entry = new JSONObject();
+            entry.put("pawn", order.get(i));
+            entry.put("offset", offset.get(i));
+            array.put(entry);
+        }
+
+        return array;
     }
 }

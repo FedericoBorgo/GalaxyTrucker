@@ -77,7 +77,7 @@ public class Meteors extends Card {
                 destroyed.ifPresent(c -> {
                     JSONObject obj = new JSONObject();
                     obj.put("name", p.getName());
-                    obj.put("where", c.toString());
+                    obj.put("coord", c.toString());
                     array.put(obj);
                 });
             });
@@ -95,14 +95,16 @@ public class Meteors extends Card {
 
     @Override
     public JSONObject getData() {
+        JSONObject data = new JSONObject();
+        data.put("type", type);
+        data.put("id", id);
 
-        JSONObject json = new JSONObject();
         JSONArray meteors = new JSONArray();
         projectiles.forEach(projectile -> {
             meteors.put(projectile.toString());
         });
-        json.put("meteors", meteors);
-        return json;
+        data.put("meteors", meteors);
+        return data;
     }
 
     public static List<Card> construct(FlightBoard board){

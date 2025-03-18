@@ -92,7 +92,6 @@ public class Pirates extends Card {
 
         JSONObject result = new JSONObject();
         JSONArray array = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         projectiles.forEach(projectile -> {
             defeatedPlayers.forEach(( p) -> {
@@ -100,22 +99,25 @@ public class Pirates extends Card {
                 destroyed.ifPresent(c -> {
                     JSONObject obj = new JSONObject();
                     obj.put("name", p.getName());
-                    obj.put("where", c.toString());
+                    obj.put("coord", c.toString());
                     array.put(obj);
                 });
             });
         });
 
+        JSONObject prize = new JSONObject();
+
         if(rewardedPlayer != null){
             rewardedPlayer.giveCash(cash);
             board.moveRocket(rewardedPlayer.getPawn(), -days);
-            moved.put("pawn", rewardedPlayer.getPawn());
-            moved.put("days", -days);
+            prize.put(rewardedPlayer.getName(), days);
+            result.put("flight", board.toJSON());
+            result.put("cash", prize);
         }
 
-        result.put("destroyed", array);
-        result.put("moved", moved);
-        result.put("cash", cash);
+        if(!array.isEmpty())
+            result.put("destroyed", array);
+
         return Result.ok(result);
     }
 
@@ -128,10 +130,12 @@ public class Pirates extends Card {
     public JSONObject getData() {
         JSONObject json = new JSONObject();
         JSONArray fires = new JSONArray();
+        json.put("type", type);
+        json.put("id", id);
         projectiles.forEach(projectile -> {
             fires.put(projectile.toString());
         });
-        json.put("pirates", fires);
+        json.put("fires", fires);
         return json;
     }
 
