@@ -110,7 +110,12 @@ class ModelTest {
     @Test
     void testModel(){
         JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
-        model = new Model(obj.getInt("n_players"));
+        model = new Model(obj.getInt("n_players"), new BiConsumer<Model, Model.State.Type>() {
+            @Override
+            public void accept(Model model, Model.State.Type type) {
+
+            }
+        });
         JSONArray players = obj.getJSONArray("players");
 
         assertEquals(Model.State.Type.JOINING, model.getStatus());
@@ -139,7 +144,12 @@ class ModelTest {
         testModel();
 
         model.store("out.bin");
-        Model m = Model.load("out.bin");
+        Model m = Model.load("out.bin", new BiConsumer<Model, Model.State.Type>() {
+            @Override
+            public void accept(Model model, Model.State.Type type) {
+
+            }
+        });
         System.out.println();
 
         assertEquals(model, m);

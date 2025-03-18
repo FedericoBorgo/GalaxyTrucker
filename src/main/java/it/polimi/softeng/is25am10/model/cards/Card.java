@@ -19,6 +19,9 @@ import java.util.*;
  * type of the card (Type) in some cases.
  */
 public abstract class Card implements Serializable {
+    public record CompressedCard(int ID, JSONObject data){
+
+    }
     /**
      * Does the player need to declare something?
      */
@@ -165,5 +168,9 @@ public abstract class Card implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
         return needInput == card.needInput && id == card.id && type == card.type;
+    }
+
+    public CompressedCard compress(){
+        return new CompressedCard(this.id, getData());
     }
 }

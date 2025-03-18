@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
+import it.polimi.softeng.is25am10.PlayerControls;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
@@ -14,6 +15,8 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * This class is responsible for the state and evolution of the game.
@@ -49,7 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * This phase repeats until the cards are finished or if there is no player left.
  * It is possible that at the end of a card, it is required to correct the ship.
  */
-public class Model implements Serializable {
+public class Model implements Serializable, PlayerControls {
     /**
      * Counter for the removed items.
      */
@@ -102,15 +105,24 @@ public class Model implements Serializable {
         }
         private Type prev;
         private Type curr;
+        private final Model m;
+        private transient BiConsumer<Model, Type> notify;
         
-        public State(Type curr){
+        public State(Type curr, BiConsumer<Model, Type> notify, Model m){
             prev = null;
             this.curr = curr;
+            this.m = m;
+            this.notify = notify;
         };
+
+        public void setNotify(BiConsumer<Model, Type> notify){
+            this.notify = notify;
+        }
         
         public void next(Type next){
             prev = curr;
             curr = next;
+            notify.accept(m, next);
         }
         
         public Type get(){
@@ -134,7 +146,7 @@ public class Model implements Serializable {
     private final Map<String, Player> quitters = new HashMap<>();
 
     //Current state of the game
-    private final State state = new State(State.Type.JOINING);
+    private final State state;
 
     //pawns still not assigned to a player
     private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));;
@@ -154,9 +166,10 @@ public class Model implements Serializable {
      * Builds a new Model with the number of required players.
      * @param nPlayers number of required players
      */
-    public Model(int nPlayers) {
+    public Model(int nPlayers, BiConsumer<Model, State.Type> notify) {
         this.nPlayers = nPlayers;
         deck = new Deck(this, flight);
+        this.state = new State(State.Type.JOINING, notify, this);
         loadTimer();
     }
 
@@ -166,7 +179,7 @@ public class Model implements Serializable {
             public void run() {
                 canMove.set(true);
                 if(flight.getTimer() == 2){
-                    moveTimer();
+                    moveTimer("");
                 }
         }
         };
@@ -192,14 +205,15 @@ public class Model implements Serializable {
         if(players.containsKey(name))
             return Result.err("player already connected");
 
-        if(countPlayers >= nPlayers)
-            return Result.err("too many players");
-
         countPlayers++;
         //associate name -> player
         players.put(name, new Player(name, unusedPawns.removeFirst()));
         //associate player -> removed items
         removedItems.put(get(name), new RemovedItems());
+
+        if(countPlayers == nPlayers)
+            startGame();
+
         return Result.ok(get(name).getPawn());
     }
 
@@ -237,15 +251,15 @@ public class Model implements Serializable {
      * It eventually moves the BUILDING state to CHECKING or ALIEN.
      * @return the position of the timer.
      */
-    public synchronized Result<Integer> moveTimer(){
+    public synchronized Result<Integer> moveTimer(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         if(canMove.get())
             flight.moveTimer();
 
         if(flight.getTimer() == 2){
-            players.forEach((name,v)->{
-                setReady(name);
+            players.forEach((p,v)->{
+                setReady(p);
             });
         }
         else
@@ -266,6 +280,7 @@ public class Model implements Serializable {
      * @param name the name of the player that finished.
      * @return err in case of fail
      */
+    @Override
     public synchronized Result<String> setReady(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
@@ -521,26 +536,26 @@ public class Model implements Serializable {
     }
 
     //tiles section
-    public synchronized Result<Tile> drawTile(){
+    public synchronized Result<Tile> drawTile(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getNew());
     }
 
-    public synchronized Result<List<Tile>> getSeenTiles(){
+    public synchronized Result<List<Tile>> getSeenTiles(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getSeen());
     }
 
-    public synchronized Result<String> giveTile(Tile t){
+    public synchronized Result<String> giveTile(String name, Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         tiles.give(t);
         return Result.ok("");
     }
 
-    public synchronized Result<Tile> getTileFromSeen(Tile t){
+    public synchronized Result<Tile> getTileFromSeen(String name, Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getFromSeen(t));
@@ -555,7 +570,7 @@ public class Model implements Serializable {
      * @param name name of the leader
      * @return the card
      */
-    public synchronized Result<Card> drawCard(String name){
+    public synchronized Result<Card.CompressedCard> drawCard(String name){
         if(state.get() != State.Type.DRAW)
             return Result.err("not DRAW state");
         if(flight.getOrder().getFirst() != get(name).getPawn())
@@ -563,12 +578,12 @@ public class Model implements Serializable {
 
         Card c = deck.draw(new ArrayList<>(players.values()));
 
-        if(c == null)
+        if(c == null) {
             state.next(State.Type.ENDED);
-        else
-            state.next(State.Type.WAITING);
-
-        return Result.ok(c);
+            return Result.ok(null);
+        }
+        state.next(State.Type.WAITING);
+        return Result.ok(c.compress());
     }
 
     /**
@@ -597,7 +612,7 @@ public class Model implements Serializable {
      * Get the temporary data about the drew card.
      * @return
      */
-    public synchronized Result<JSONObject> getCardData(){
+    public synchronized Result<JSONObject> getCardData(String name){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
         return Result.ok(deck.getData());
@@ -633,7 +648,7 @@ public class Model implements Serializable {
         return res;
     }
 
-    public synchronized Result<Card[][]> getVisible(){
+    public synchronized Result<Card[][]> getVisible(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(deck.getVisible());
@@ -671,10 +686,11 @@ public class Model implements Serializable {
      * @return
      * @throws IOException
      */
-    static public Model load(String filename) throws IOException, ClassNotFoundException {
+    static public Model load(String filename, BiConsumer<Model, State.Type> notifer) throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
         Model model = (Model) ois.readObject();
         model.loadTimer();
+        model.state.setNotify(notifer);
         ois.close();
         return model;
     }
