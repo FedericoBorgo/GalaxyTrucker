@@ -1,0 +1,17 @@
+[
+  {
+    "id": 3,
+    "cash": 4,
+    "days": 1,
+    "power": 5,
+    "fire": [ "SMALL_FIRE", "BIG_FIRE", "SMALL_FIRE"]
+  },
+  {
+    "id": 13,
+    "cash": 7,
+    "days": 2,
+    "power": 6,
+    "fire": [ "BIG_FIRE", "SMALL_FIRE", "BIG_FIRE"]
+  }
+]
+
