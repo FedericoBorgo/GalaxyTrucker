@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.util.Objects;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -109,8 +110,8 @@ class ModelTest {
 
     @Test
     void testModel(){
-        JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
-        model = new Model(obj.getInt("n_players"));
+        JSONObject obj = new JSONObject(Card.dump(Objects.requireNonNull(ModelTest.class.getResourceAsStream("modelTest.json"))));
+        Model model = new Model(obj.getInt("n_players"));
         JSONArray players = obj.getJSONArray("players");
 
         assertEquals(Model.State.Type.JOINING, model.getStatus());

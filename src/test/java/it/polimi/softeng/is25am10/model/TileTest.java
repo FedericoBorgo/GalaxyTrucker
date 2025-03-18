@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class TileTest {
     @Test
     void testTile(){
-        Tile tile = new Tile(Tile.Type.ROCKET, "suto");
+        Tile tile = new Tile(Tile.Type.ENGINE, "suto");
 
-        assertEquals(Tile.Type.ROCKET, tile.getType());
+        assertEquals(Tile.Type.ENGINE, tile.getType());
 
         Map<Tile.Side, Tile.ConnectorType> connectors = tile.getConnectors();
         assertEquals(Tile.ConnectorType.SMOOTH, connectors.get(Tile.Side.UP));

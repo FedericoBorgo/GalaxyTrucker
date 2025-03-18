@@ -21,7 +21,7 @@ class AlienBoardTest {
         board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
         board.setTile(new Coordinate(2, 1), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
         board.setTile(new Coordinate(1, 2), new Tile(Tile.Type.P_ADDON, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.ROCKET, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.ENGINE, "uuuu"), Tile.Rotation.NONE);
         board.setTile(new Coordinate(0, 3), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder astronaut = new ElementsPlaceholder(board);

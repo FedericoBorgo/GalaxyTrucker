@@ -22,13 +22,13 @@
       },
       "2" : {
         "coords": "x5y2",
-        "type" : "DRILLS",
+        "type" : "CANNON",
         "connectors" : "stuo",
         "rotation" : "CLOCK"
       },
       "3" : {
         "coords": "x5y3",
-        "type" : "ROCKET",
+        "type" : "ENGINE",
         "connectors" : "usso",
         "rotation" : "NONE"
       },
@@ -58,7 +58,7 @@
       },
       "8" : {
         "coords": "x3y3",
-        "type" : "D_ROCKET",
+        "type" : "D_ENGINE",
         "connectors" : "tssu",
         "rotation" : "NONE"
       },
@@ -76,7 +76,7 @@
       },
       "11" : {
         "coords": "x0y3",
-        "type" : "ROCKET",
+        "type" : "ENGINE",
         "connectors" : "tuss",
         "rotation" : "NONE"
       },
@@ -100,7 +100,7 @@
       },
       "15" : {
         "coords": "x2y0",
-        "type" : "D_ROCKET",
+        "type" : "D_ENGINE",
         "connectors" : "ooso",
         "rotation" : "DOUBLE"
       },
@@ -143,13 +143,13 @@
       },
       "4": {
         "coords": "x2y4",
-        "type": "DRILLS",
+        "type": "CANNON",
         "connectors": "ssot",
         "rotation": "CLOCK"
       },
       "5": {
         "coords": "x3y1",
-        "type": "D_DRILLS",
+        "type": "D_CANNON",
         "connectors": "ssts",
         "rotation": "NONE"
       },
@@ -185,13 +185,13 @@
       },
       "11": {
         "coords": "x5y2",
-        "type": "DRILLS",
+        "type": "CANNON",
         "connectors": "sttt",
         "rotation": "NONE"
       },
       "12": {
         "coords": "x5y3",
-        "type": "D_ROCKET",
+        "type": "D_ENGINE",
         "connectors": "usst",
         "rotation": "NONE"
       },
@@ -215,7 +215,7 @@
       },
       "16": {
         "coords": "x6y4",
-        "type": "ROCKET",
+        "type": "ENGINE",
         "connectors": "usso",
         "rotation": "NONE"
       }
@@ -228,7 +228,7 @@
       "astronaut": ["x1y1", "x3y2"],
       "0": {
         "coords": "x4y2",
-        "type": "D_DRILLS",
+        "type": "D_CANNON",
         "connectors": "ssts",
         "rotation": "CLOCK"
       },
@@ -246,7 +246,7 @@
       },
       "3": {
         "coords": "x2y1",
-        "type": "DRILLS",
+        "type": "CANNON",
         "connectors": "stto",
         "rotation": "NONE"
       },
@@ -282,13 +282,13 @@
       },
       "9": {
         "coords": "x1y4",
-        "type": "D_ROCKET",
+        "type": "D_ENGINE",
         "connectors": "usst",
         "rotation": "NONE"
       },
       "10": {
         "coords": "x0y4",
-        "type": "ROCKET",
+        "type": "ENGINE",
         "connectors": "utso",
         "rotation": "NONE"
       },

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The board used by all the players, manages everything done on the flightboard in the physical game.
+ * The board used by all the players, manages everything done on the flight board in the physical game.
  * Includes methods for moving pawns
  */
 public class FlightBoard implements Serializable {
@@ -63,7 +63,7 @@ public class FlightBoard implements Serializable {
 
     /**
      *  Method for moving the rocket pawn in a new position, moves the {@code pawn} to the position
-     *  {@code pos} while accounting for the order of the pawns and for possible overtakings of other pawns.
+     *  {@code pos} while accounting for the order of the pawns and for a possible overtaking of other pawns.
      * @param pawn the pawn to be moved.
      * @param pos the target position of the pawn. If overtaking happens {@code pos} is not the new position
      *            of the pawn {@code pawn}.
@@ -119,8 +119,8 @@ public class FlightBoard implements Serializable {
     }
 
     /**
-     * Get method for the order of the pawns on the flightboard. The pawns are stored in an ordered list,
-     * their position on the list is their order on the flightboard.
+     * Get method for the order of the pawns on the flight board. The pawns are stored in an ordered list,
+     * their position on the list is their order on the flight board.
      *
      * @return list of the order of the pawns.
      */
@@ -129,8 +129,8 @@ public class FlightBoard implements Serializable {
     }
 
     /**
-     * Get method for the relative distances between pawns on the flightboard. It is used to account for
-     * overtakings and for pawns lapping their opponents.
+     * Get method for the relative distances between pawns on the flight board. It is used to account for
+     * overtaking and for pawns lapping their opponents.
      * @return list of distances between each pawn and the leader.
      */
     public List<Integer> getOffset() {
@@ -138,7 +138,7 @@ public class FlightBoard implements Serializable {
     }
 
     /**
-     * Get method for the absolute position of the leader on the flightboard.
+     * Get method for the absolute position of the leader on the flight board.
      * @return leader position.
      */
     public int getLeaderPosition() {
@@ -151,7 +151,7 @@ public class FlightBoard implements Serializable {
      */
 
     public enum Pawn {
-        YELLOW, GREEN, BLUE, RED, EMPTY;
+        YELLOW, GREEN, BLUE, RED, EMPTY
     }
 
     public CompressedFlightBoard compress() {

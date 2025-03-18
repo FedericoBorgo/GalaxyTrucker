@@ -14,7 +14,7 @@ public class AlienBoard extends ElementsBoard{
     private final Tile.Type type;
 
     public enum Type{
-        PURPLE, BROWN;
+        PURPLE, BROWN
     }
 
     public AlienBoard(TilesBoard board, Type type) {
@@ -28,7 +28,7 @@ public class AlienBoard extends ElementsBoard{
     /**
      * Checks if there is an addon of the specified type in the tiles adjacent to the given coordinates.
      *
-     * @param c
+     * @param c central coordinate
      * @return true if an adjacent tile contains an addon of the specified type, false otherwise
      */
     private boolean thereIsAddon(Coordinate c){
