@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is responsible for the state and evolution of the game.
@@ -421,9 +422,8 @@ public class Model implements Serializable {
     }
 
     /**
-     * Use an item in the specified place. It automatically finds
-     * if the coordinate holds an astronaut, battery or an alien.
-     * The corresponding counter is incremented for every type of element.
+     * Removes one element on the coordinate {@code c}. It automatically finds if the coordinate
+     * holds an astronaut, battery or an alien. The corresponding counter is incremented for every type of element.
      * This can be called only in a WAITING state.
      * A player that already set the card input, can't execute this anymore.
      *
@@ -512,6 +512,22 @@ public class Model implements Serializable {
     /// cannons
     public Map<Tile.Rotation, Integer> getCannonsToUse(Player p){
         return cannonsToUse.getOrDefault(p, null);
+    }
+
+    /**
+     * Needed for checking that the player used enough batteries to activate the cannons
+     * @param name of the player
+     * @return number of batteries required for activating all the cannons
+     */
+    public int batteryRequiredForCannon(String name){
+        AtomicInteger total = new AtomicInteger();
+        total.set(0);
+
+        cannonsToUse.get(get(name)).forEach((_, val) -> {
+            total.addAndGet(val);
+        });
+
+        return total.get();
     }
 
     //tiles section

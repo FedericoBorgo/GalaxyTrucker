@@ -44,7 +44,6 @@ public class Meteors extends Card {
 
         if (!isCorrectOrder(player)) {
             return Result.err("player choice is not in order");
-
         }
 
         JSONArray array = json.getJSONArray("use");
@@ -107,7 +106,7 @@ public class Meteors extends Card {
     }
 
     public static List<Card> construct(FlightBoard board){
-        String out = dump(Meteors.class.getResourceAsStream("meteors.json"));
+        String out = dump(Objects.requireNonNull(Meteors.class.getResourceAsStream("meteors.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
