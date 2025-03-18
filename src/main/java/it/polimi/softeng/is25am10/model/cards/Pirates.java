@@ -127,17 +127,17 @@ public class Pirates extends Card {
     @Override
     public JSONObject getData() {
         JSONObject json = new JSONObject();
-        JSONArray meteors = new JSONArray();
+        JSONArray fires = new JSONArray();
         projectiles.forEach(projectile -> {
-            meteors.put(projectile.toString());
+            fires.put(projectile.toString());
         });
-        json.put("pirates", meteors);
+        json.put("pirates", fires);
         return json;
     }
 
 
     public static List<Card> construct(Model model,FlightBoard board) {
-        String out = dump(Meteors.class.getResourceAsStream("pirates.json"));
+        String out = dump(Pirates.class.getResourceAsStream("pirates.json"));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
