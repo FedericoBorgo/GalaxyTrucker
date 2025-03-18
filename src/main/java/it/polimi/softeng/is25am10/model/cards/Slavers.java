@@ -71,8 +71,6 @@ public class Slavers extends Card {
             return Result.err("not all players declared their decision");
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         // Giocatore che ha vinto e accetta il premio sacrificando giorni di volo
         if(winnerPlayer.isOk())
@@ -80,26 +78,25 @@ public class Slavers extends Card {
             Player p = winnerPlayer.getData();
             p.giveCash(cashReward);
             board.moveRocket(p.getPawn(), -daysLost);
-            moved.put("pawn", p.getPawn());
-            moved.put("days", -daysLost);
-            jsonArray.put(moved);
+
+            JSONObject rewarded = new JSONObject();
+            rewarded.put(p.getName(), cashReward);
+            result.put("cash", rewarded);
+            result.put("flight", board.toJSON());
         }
-        result.put("moved", jsonArray);
-
-        // Giocatori sconfitti sono già stati puniti
-
-        return null;
+        return Result.ok(result);
     }
 
     @Override
     public boolean ready() {
-        return allRegistered();
+        return allRegistered() || enemyIsDefeated;
     }
 
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("slavers", "");
+        data.put("type", type);
+        data.put("id", id);
         return data;
     }
 
