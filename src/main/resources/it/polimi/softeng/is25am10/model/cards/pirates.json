@@ -1,0 +1,17 @@
+[
+  {
+    "id": 3,
+    "cash": 4,
+    "days": 1,
+    "power": 5,
+    "asteroids": [ "SMALL_FIRE", "BIG_FIRE", "SMALL_FIRE"]
+  },
+  {
+    "id": 13,
+    "cash": 7,
+    "days": 2,
+    "power": 6,
+    "asteroids": [ "BIG_FIRE", "SMALL_FIRE", "BIG_FIRE"]
+  }
+]
+
