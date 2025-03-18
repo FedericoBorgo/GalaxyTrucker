@@ -34,7 +34,7 @@ public abstract class Card implements Serializable {
     protected final Map<FlightBoard.Pawn, Player> registered;
 
     public enum Type{
-        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION, PIRATES;
+        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION, PIRATES, SLAVERS;
     }
 
     protected final Type type;

@@ -50,7 +50,7 @@ public class AbandonedShip extends Card {
 
     @Override
     public Result<JSONObject> play() {
-        //begin common part
+        // common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
@@ -69,7 +69,6 @@ public class AbandonedShip extends Card {
         result.put("moved", jsonArray);
 
         return Result.ok(result);
-        //end
     }
 
     @Override
@@ -80,7 +79,7 @@ public class AbandonedShip extends Card {
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("ship", "");
+        data.put("abandoned_ship", "");
         return data;
     }
 

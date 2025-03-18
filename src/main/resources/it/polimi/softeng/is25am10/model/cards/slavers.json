@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "cash": 5,
+    "days": 1,
+    "power": 6,
+    "guys": 3
+  },
+  {
+    "id": 22,
+    "cash": 8,
+    "days": 2,
+    "power": 7,
+    "guys": 4
+  }
+]
