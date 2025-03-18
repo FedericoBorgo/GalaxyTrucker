@@ -30,9 +30,9 @@ public class Pirates extends Card {
      * @param board     flight board of the game
      * @param id        unique identification of the card
      * @param cash      player's reward if he wins
-     * @param days
+     * @param days      pawn's backward moves if the player accepts the reward
      */
-    public Pirates(Model model, FlightBoard board, List<Projectile.Type> meteors, int id, int cash, int days, int piratePower) {
+    public Pirates(Model model, FlightBoard board, List<Projectile.Type> fire, int id, int cash, int days, int piratePower) {
         super(model, true, board, id, Type.PIRATES);
         this.piratePower = piratePower;
         this.days = days;
@@ -40,7 +40,7 @@ public class Pirates extends Card {
         AtomicInteger counter = new AtomicInteger();
         counter.set(0);
 
-        meteors.forEach(type -> {
+        fire.forEach(type -> {
             int number = rollDice() + rollDice();
             Projectile p = new Projectile(type, Tile.Side.UP, number, counter.getAndIncrement());
             projectiles.add(p);
@@ -148,12 +148,12 @@ public class Pirates extends Card {
             int days = entry.getInt("days");
             int power = entry.getInt("power");
 
-            List<Projectile.Type> meteors = new ArrayList<>();
-            entry.getJSONArray("asteroids").forEach(str -> {
-                meteors.add(Projectile.Type.valueOf(str.toString()));
+            List<Projectile.Type> fire = new ArrayList<>();
+            entry.getJSONArray("fire").forEach(str -> {
+                fire.add(Projectile.Type.valueOf(str.toString()));
             });
 
-            cards.add(new Pirates(model, board, meteors, id, cash, days, power));
+            cards.add(new Pirates(model, board, fire, id, cash, days, power));
         });
 
         return cards;
