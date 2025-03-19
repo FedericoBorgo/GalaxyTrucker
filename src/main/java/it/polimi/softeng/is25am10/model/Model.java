@@ -65,6 +65,10 @@ public class Model implements Serializable {
             this.goods = 0;
         }
 
+        public boolean isDebt(){
+            return battery < 0 || guys < 0 || goods < 0;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) return false;
@@ -95,7 +99,8 @@ public class Model implements Serializable {
             //waiting player input
             WAITING,
             ENDED,
-            PAUSED
+            PAUSED,
+            DEBT
         }
         private Type prev;
         private Type curr;
@@ -432,7 +437,7 @@ public class Model implements Serializable {
      * @return ok if its accepted, err if not
      */
     public synchronized Result<Integer> drop(String name, Coordinate c){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING && state.get() != State.Type.DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -460,6 +465,8 @@ public class Model implements Serializable {
         else
             return Result.err("no one removed");
 
+        updateDebt();
+
         return Result.ok(1);
     }
 
@@ -472,7 +479,7 @@ public class Model implements Serializable {
      * @return
      */
     public synchronized Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING && state.get() != State.Type.DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -480,14 +487,36 @@ public class Model implements Serializable {
 
         Result<Integer> res = ship(name).getGoods(t).remove(c, 1);
 
+        updateDebt();
+
         if(res.isOk())
             removedItems.get(get(name)).goods++;
         return res;
     }
 
+    private void updateDebt() {
+        if(state.get() == State.Type.DEBT && !someoneDebt()){
+            state.next(State.Type.WAITING);
+
+            removedItems.forEach((_, item) -> {
+                item.reset();
+            });
+
+            if(allShipOk())
+                state.next(State.Type.DRAW);
+            else
+                state.next(State.Type.CHECKING);
+        }
+    }
+
     /// removed items
     public RemovedItems getRemovedItems(Player player){
         return removedItems.get(player);
+    }
+
+    /// removed items
+    public RemovedItems getRemovedItems(String name){
+        return getRemovedItems(get(name));
     }
 
     /**
@@ -613,6 +642,17 @@ public class Model implements Serializable {
         return Result.ok(deck.getData());
     }
 
+    private boolean someoneDebt(){
+        AtomicBoolean debt = new AtomicBoolean(false);
+
+        removedItems.values().forEach(rm -> {
+            if(rm.isDebt())
+                debt.set(true);
+        });
+
+        return debt.get();
+    }
+
     private Result<JSONObject> playCard(){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
@@ -620,10 +660,6 @@ public class Model implements Serializable {
         Result<JSONObject> res = deck.play();
 
         if(res.isOk()){
-            removedItems.forEach((name, item) -> {
-                item.reset();
-            });
-            
             List<Pawn> quitted = new ArrayList<>(flight.getQuitters());
             quitted.removeAll(quitters.values().stream().map(Player::getPawn).toList());
 
@@ -634,10 +670,19 @@ public class Model implements Serializable {
                 });
             });
 
-            if(allShipOk())
-                state.next(State.Type.DRAW);
-            else
-                state.next(State.Type.CHECKING);
+            if(someoneDebt()){
+                state.next(State.Type.DEBT);
+            }
+            else{
+                removedItems.forEach((name, item) -> {
+                    item.reset();
+                });
+
+                if(allShipOk())
+                    state.next(State.Type.DRAW);
+                else
+                    state.next(State.Type.CHECKING);
+            }
         }
 
         return res;
