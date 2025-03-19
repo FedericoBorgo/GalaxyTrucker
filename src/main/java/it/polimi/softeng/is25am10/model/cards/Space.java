@@ -43,18 +43,13 @@ public class Space extends Card {
         //end
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
 
         for(int i = board.getOrder().size() - 1; i >= 0; i--){
-            JSONObject player = new JSONObject();
             FlightBoard.Pawn p = board.getOrder().get(i);
             board.moveRocket(p, enginePower.get(p));
-
-            player.put("days", enginePower.get(p));
-            player.put("pawn", p);
-            jsonArray.put(player);
         }
-        result.put("moved", jsonArray);
+
+        result.put("flight", board.toJSON());
 
         return Result.ok(result);
     }
@@ -69,10 +64,13 @@ public class Space extends Card {
         JSONArray jsonArray = new JSONArray();
         JSONObject json = new JSONObject();
 
+        json.put("type", type);
+        json.put("id", id);
+
         enginePowerName.forEach((name, power) -> {
             JSONObject entry = new JSONObject();
             entry.put("name", name);
-            entry.put("val", power);
+            entry.put("power", power);
             jsonArray.put(entry);
         });
 

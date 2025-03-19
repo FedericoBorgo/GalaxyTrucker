@@ -13,8 +13,8 @@ import java.util.List;
 public class Station extends Card {
     private List<GoodsBoard.Type> goods;
     private Player p;
-    private int requiredCrew;
-    private int flightDays;
+    private final int requiredCrew;
+    private final int flightDays;
     private boolean ready = false;
 
     public Station(FlightBoard board, int crew, List<GoodsBoard.Type> goodsType, int id, int backmoves) {
@@ -56,16 +56,11 @@ public class Station extends Card {
             return Result.err("nobody chose yes");
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         p.setGoodsReward(goods);
         board.moveRocket(p.getPawn(), -flightDays);
 
-        moved.put("pawn", p.getPawn());
-        moved.put("days", -flightDays);
-        jsonArray.put(moved);
-        result.put("moved", jsonArray);
+        result.put("flight", board.toJSON());
 
         return Result.ok(result);
     }
@@ -78,7 +73,8 @@ public class Station extends Card {
     @Override
     public JSONObject getData() {
         JSONObject json = new JSONObject();
-        json.put("station", "");
+        json.put("type", type);
+        json.put("id", id);
         return json;
     }
 

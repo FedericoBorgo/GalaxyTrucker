@@ -30,9 +30,9 @@ public class Pirates extends Card {
      * @param board     flight board of the game
      * @param id        unique identification of the card
      * @param cash      player's reward if he wins
-     * @param days
+     * @param days      pawn's backward moves if the player accepts the reward
      */
-    public Pirates(Model model, FlightBoard board, List<Projectile.Type> meteors, int id, int cash, int days, int piratePower) {
+    public Pirates(Model model, FlightBoard board, List<Projectile.Type> fire, int id, int cash, int days, int piratePower) {
         super(model, true, board, id, Type.PIRATES);
         this.piratePower = piratePower;
         this.days = days;
@@ -40,7 +40,7 @@ public class Pirates extends Card {
         AtomicInteger counter = new AtomicInteger();
         counter.set(0);
 
-        meteors.forEach(type -> {
+        fire.forEach(type -> {
             int number = rollDice() + rollDice();
             Projectile p = new Projectile(type, Tile.Side.UP, number, counter.getAndIncrement());
             projectiles.add(p);
@@ -92,7 +92,6 @@ public class Pirates extends Card {
 
         JSONObject result = new JSONObject();
         JSONArray array = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         projectiles.forEach(projectile -> {
             defeatedPlayers.forEach(( p) -> {
@@ -100,22 +99,25 @@ public class Pirates extends Card {
                 destroyed.ifPresent(c -> {
                     JSONObject obj = new JSONObject();
                     obj.put("name", p.getName());
-                    obj.put("where", c.toString());
+                    obj.put("coord", c.toString());
                     array.put(obj);
                 });
             });
         });
 
+        JSONObject prize = new JSONObject();
+
         if(rewardedPlayer != null){
             rewardedPlayer.giveCash(cash);
             board.moveRocket(rewardedPlayer.getPawn(), -days);
-            moved.put("pawn", rewardedPlayer.getPawn());
-            moved.put("days", -days);
+            prize.put(rewardedPlayer.getName(), days);
+            result.put("flight", board.toJSON());
+            result.put("cash", prize);
         }
 
-        result.put("destroyed", array);
-        result.put("moved", moved);
-        result.put("cash", cash);
+        if(!array.isEmpty())
+            result.put("destroyed", array);
+
         return Result.ok(result);
     }
 
@@ -127,17 +129,19 @@ public class Pirates extends Card {
     @Override
     public JSONObject getData() {
         JSONObject json = new JSONObject();
-        JSONArray meteors = new JSONArray();
+        JSONArray fires = new JSONArray();
+        json.put("type", type);
+        json.put("id", id);
         projectiles.forEach(projectile -> {
-            meteors.put(projectile.toString());
+            fires.put(projectile.toString());
         });
-        json.put("pirates", meteors);
+        json.put("fires", fires);
         return json;
     }
 
 
     public static List<Card> construct(Model model,FlightBoard board) {
-        String out = dump(Meteors.class.getResourceAsStream("pirates.json"));
+        String out = dump(Pirates.class.getResourceAsStream("pirates.json"));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
@@ -148,12 +152,12 @@ public class Pirates extends Card {
             int days = entry.getInt("days");
             int power = entry.getInt("power");
 
-            List<Projectile.Type> meteors = new ArrayList<>();
-            entry.getJSONArray("asteroids").forEach(str -> {
-                meteors.add(Projectile.Type.valueOf(str.toString()));
+            List<Projectile.Type> fire = new ArrayList<>();
+            entry.getJSONArray("fire").forEach(str -> {
+                fire.add(Projectile.Type.valueOf(str.toString()));
             });
 
-            cards.add(new Pirates(model, board, meteors, id, cash, days, power));
+            cards.add(new Pirates(model, board, fire, id, cash, days, power));
         });
 
         return cards;

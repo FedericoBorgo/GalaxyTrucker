@@ -42,6 +42,8 @@ public class AbandonedShip extends Card {
                 someoneAccepted = true;
                 descendingPlayer = player;
             }
+            else
+                return Result.err("not enough astronaut");
         }
 
         register(player);
@@ -50,26 +52,22 @@ public class AbandonedShip extends Card {
 
     @Override
     public Result<JSONObject> play() {
-        //begin common part
+        // common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         if(someoneAccepted){
             descendingPlayer.giveCash(cashReward);
             board.moveRocket(descendingPlayer.getPawn(), -daysLost);
-            moved.put("pawn", descendingPlayer.getPawn());
-            moved.put("days", -daysLost);
-            jsonArray.put(moved);
+
+            JSONObject rewarded = new JSONObject();
+            rewarded.put(descendingPlayer.getName(), cashReward);
+            result.put("cash", rewarded);
+            result.put("flight", board.toJSON());
         }
-
-        result.put("moved", jsonArray);
-
         return Result.ok(result);
-        //end
     }
 
     @Override
@@ -80,7 +78,8 @@ public class AbandonedShip extends Card {
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("ship", "");
+        data.put("type", type);
+        data.put("id", id);
         return data;
     }
 
