@@ -25,14 +25,14 @@ public class Smugglers extends Card {
 
     private Map<Player, Map<Tile.Rotation, Integer>> playerChoice;
 
-    public Smugglers(Model model, FlightBoard board, int id, boolean needInput,
-                     int daysLost, int smugglersDrillPower, int goodsLost, List<GoodsBoard.Type> goodsGained) {
-        super( model, true, board, id, Type.PIRATES );
+    public Smugglers(Model model, FlightBoard board, int id, int daysLost, int smugglersDrillPower, int goodsLost, List<GoodsBoard.Type> goodsGained) {
+        super( model, true, board, id, Type.SMUGGLERS );
 
         this.enemyPower = smugglersDrillPower;
         this.daysLost = daysLost;
         this.goodsLost = goodsLost;
         this.goodsGained = goodsGained;
+        enemyIsDefeated = false;
         winnerPlayer = Result.err("No winner");
     }
 
@@ -75,7 +75,8 @@ public class Smugglers extends Card {
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("smugglers", "");
+        data.put("type", type);
+        data.put("id", id);
         return data;
     }
 
@@ -86,18 +87,13 @@ public class Smugglers extends Card {
             return Result.err("not all players declared their decision");
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         if(winnerPlayer.isOk()){
             Player p = winnerPlayer.getData();
             p.setGoodsReward(goodsGained);
             board.moveRocket(p.getPawn(), -daysLost);
-            moved.put("pawn", p.getPawn());
-            moved.put("days", -daysLost);
-            jsonArray.put(moved);
         }
-        result.put("moved", jsonArray);
+        result.put("flight", board.toJSON());
         return null;
 
     }
@@ -118,9 +114,8 @@ public class Smugglers extends Card {
             List<GoodsBoard.Type> goodsGained = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 goodsGained.add(GoodsBoard.Type.valueOf(jsonArray.getString(i)));
-                cards.add(new Smugglers(model, board, id, true, daysLost, smugglersDrillPower, goodsLost, goodsGained ));
-
             }
+            cards.add(new Smugglers(model, board, id, daysLost, smugglersDrillPower, goodsLost, goodsGained ));
         });
         return cards;
 
