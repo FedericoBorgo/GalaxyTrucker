@@ -51,6 +51,7 @@ public class Deck implements Serializable {
         cards.addAll(Station.construct(board));
         cards.addAll(Pirates.construct(model,board));
         cards.addAll(Slavers.construct(model,board));
+        cards.addAll(Smugglers.construct(model,board));
 
         Collections.shuffle(cards);
 
