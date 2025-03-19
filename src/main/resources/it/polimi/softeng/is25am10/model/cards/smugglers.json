@@ -1,0 +1,15 @@
+{
+  "id": 23,
+  "daysLost": 1,
+  "smugglersDrillPower": 8,
+  "goodsLost": 3,
+  "goodsGained": [ "RED", "YELLOW", "YELLOW"]
+  },
+
+  {
+  "id": 2,
+  "daysLost": 1,
+  "smugglersDrillPower": 4,
+  "goodsLost": 2,
+  "goodsGained": [ "YELLOW", "GREEN", "BLUE"]
+}
