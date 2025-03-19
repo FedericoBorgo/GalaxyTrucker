@@ -1,0 +1,30 @@
+[
+  {
+    "id" : 17,
+    "DAYS" : 3,
+    "GUYS" : 2,
+    "GOODS" : 0,
+    "FIRE" : [
+      { "type" :  "SMALL_FIRE", "side" :  "DOWN"},
+      { "type" :  "BIG_FIRE", "side" :  "DOWN"}
+    ],
+    "LEAST_GUYS" : "DAYS",
+    "LEAST_ENGINE" : "GUYS",
+    "LEAST_CANNON" : "FIRE"
+  },
+  {
+    "id" : 36,
+    "DAYS" : 4,
+    "GUYS" : 0,
+    "GOODS" : 3,
+    "FIRE" : [
+      { "type" :  "SMALL_FIRE", "side" :  "UP"},
+      { "type" :  "SMALL_FIRE", "side" :  "LEFT"},
+      { "type" :  "SMALL_FIRE", "side" :  "RIGHT"},
+      { "type" :  "BIG_FIRE", "side" :  "DOWN"}
+    ],
+    "LEAST_GUYS" : "FIRE",
+    "LEAST_ENGINE" : "GOODS",
+    "LEAST_CANNON" : "DAYS"
+  }
+]
