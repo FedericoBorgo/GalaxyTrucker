@@ -15,42 +15,39 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
  * This class is responsible for the state and evolution of the game.
- * Every possible game evolution is inside here.
- * The game is divided in Status.
- * Only the methods corresponding to the state can be called.
+ * Every possible game evolution is contained in this class.
+ * The game has an internal Status.
+ * Only the methods corresponding to the current state can be called.
  * <br/>
  * JOINING PHASE:
- * The game start with a number of player to wait.
- * In this phase, players can join but cant do anything.
- * After every player has joined, it starts the timer and
- * the ship building begin.
+ * This is the initial phase, where the players are waiting for the match to start.
+ * In this phase players can join, but can't do anything else.
+ * After every player has joined, the timer starts and the ship building phase begins.
  * <br/>
  * BUILDING PHASE:
- * In this phase the only methods that can be called are the one
- * that change the state of the ship.
+ * In this phase the only methods that can be called are the ones that change the state of the ship.
  * The player can draw tiles, place them, book tiles and so on.
- * This phase ends when the timer ends or every player declared that
- * they finished.
- * After that every player need to declare where to put (if he can)
- * the aliens.
+ * This phase ends when the timer ends or every player declared that they finished.
+ * After that every player need to declare where to put (if he can) the aliens.
  * <br/>
  * CARDS PHASE:
- * Now the leader can draw a card. The ship can not be modified anymore.
+ * Now the leader can draw a card. The ship cannot be modified anymore.
  * When a card is drawn, every player need to declare their choices.
- * In this phase, players can also "drop" elements from their, such as
+ * In this phase, players can also "drop" elements from their ship, such as
  * astronauts, batteries, goods or aliens.
- * When something is drop, it increments a counter, this will be used
- * inside the card to determinate some input required by the player.
+ * When something is dropped, it increments a counter, which will be used
+ * inside the card to determinate the required input from the player.
  * After every player input, the card is automatically activated and the
  * reward is given to the player.
- * If a player reached 0 crew is automatically removed from the game.
- * This phase repeats until the cards are finished or if there is no player left.
- * It is possible that at the end of a card, it is required to correct the ship.
+ * If a player reaches 0 crew they are automatically removed from the game.
+ * This phase repeats until the cards are finished or if there are no player left.
+ * It is possible that at the end of a card, it's required to correct the ship.
  */
 public class Model implements Serializable, PlayerControls {
     /**
@@ -69,6 +66,10 @@ public class Model implements Serializable, PlayerControls {
             this.battery = 0;
             this.guys = 0;
             this.goods = 0;
+        }
+
+        public boolean isDebt(){
+            return battery < 0 || guys < 0 || goods < 0;
         }
 
         @Override
@@ -101,13 +102,14 @@ public class Model implements Serializable, PlayerControls {
             //waiting player input
             WAITING,
             ENDED,
-            PAUSED;
+            PAUSED,
+            DEBT
         }
         private Type prev;
         private Type curr;
         private final Model m;
         private transient BiConsumer<Model, Type> notify;
-        
+
         public State(Type curr, BiConsumer<Model, Type> notify, Model m){
             prev = null;
             this.curr = curr;
@@ -118,7 +120,7 @@ public class Model implements Serializable, PlayerControls {
         public void setNotify(BiConsumer<Model, Type> notify){
             this.notify = notify;
         }
-        
+
         public void next(Type next){
             prev = curr;
             curr = next;
@@ -142,14 +144,14 @@ public class Model implements Serializable, PlayerControls {
     //Data about the single player.
     private final Map<String, Player> players = new HashMap<>();
     private final Map<Player, RemovedItems> removedItems = new HashMap<>();
-    private final Map<Player, Map<Tile.Rotation, Integer>> drillsToUse = new HashMap<>();
+    private final Map<Player, Map<Tile.Rotation, Integer>> cannonsToUse = new HashMap<>();
     private final Map<String, Player> quitters = new HashMap<>();
 
     //Current state of the game
     private final State state;
 
     //pawns still not assigned to a player
-    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));;
+    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));
 
     //number of players
     private final int nPlayers;
@@ -193,7 +195,7 @@ public class Model implements Serializable, PlayerControls {
     }
 
     /**
-     * Join a player to the game.
+     * Add a player to the game.
      * Can be called only during the JOINING state.
      * @param name nickname
      * @return the pawn that has been assigned to the game
@@ -258,9 +260,7 @@ public class Model implements Serializable, PlayerControls {
             flight.moveTimer();
 
         if(flight.getTimer() == 2){
-            players.forEach((p,v)->{
-                setReady(p);
-            });
+            players.forEach((p,v)-> setReady(p));
         }
         else
             timer.schedule(task, 90000L);
@@ -303,7 +303,7 @@ public class Model implements Serializable, PlayerControls {
         return Result.ok("");
     }
 
-    /// quit ignoring the state
+    /// quit: ignoring the state
     private void quitIgnore(String name){
         quitters.put(name, get(name));
         flight.quit(players.get(name).getPawn());
@@ -314,14 +314,14 @@ public class Model implements Serializable, PlayerControls {
     }
 
     /**
-     * A player can decide if the wants to quit the flight.
-     * If he decides to do, he can only during the DRAW state.
+     * A player can decide, if they want, to quit the flight.
+     * It can only be done in the DRAW state.
      * @param name the name of the player that wants to quit
      * @return err if it fails
      */
     public synchronized Result<String> quit(String name){
         if(state.get() != State.Type.DRAW)
-            return Result.err("cant quit");
+            return Result.err("can't quit, not in the DRAW phase");
         quitIgnore(name);
         return Result.ok("");
     }
@@ -338,7 +338,7 @@ public class Model implements Serializable, PlayerControls {
         return ship(name).getTiles().getTile(c);
     }
 
-    /// get rotaion
+    /// get rotation
     public Tile.Rotation getRotation(String name, Coordinate c){
         return ship(name).getTiles().getRotation(c);
     }
@@ -442,18 +442,17 @@ public class Model implements Serializable, PlayerControls {
     }
 
     /**
-     * Use an item in the specified place. It automatically finds
-     * if the coordinate holds an astronaut, battery or an alien.
-     * The corresponding counter is incremented for every type of element.
+     * Removes one element on the coordinate {@code c}. It automatically finds if the coordinate
+     * holds an astronaut, battery or an alien. The corresponding counter is incremented for every type of element.
      * This can be called only in a WAITING state.
-     * A player that already set the card input, cant execute this anymore.
+     * A player that already set the card input, can't execute this anymore.
      *
      * @param name name of the player
      * @param c coordinate to remove the single element
      * @return ok if its accepted, err if not
      */
     public synchronized Result<Integer> drop(String name, Coordinate c){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING && state.get() != State.Type.DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -481,6 +480,8 @@ public class Model implements Serializable, PlayerControls {
         else
             return Result.err("no one removed");
 
+        updateDebt();
+
         return Result.ok(1);
     }
 
@@ -493,7 +494,7 @@ public class Model implements Serializable, PlayerControls {
      * @return
      */
     public synchronized Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING && state.get() != State.Type.DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -501,9 +502,26 @@ public class Model implements Serializable, PlayerControls {
 
         Result<Integer> res = ship(name).getGoods(t).remove(c, 1);
 
+        updateDebt();
+
         if(res.isOk())
             removedItems.get(get(name)).goods++;
         return res;
+    }
+
+    private void updateDebt() {
+        if(state.get() == State.Type.DEBT && !someoneDebt()){
+            state.next(State.Type.WAITING);
+
+            removedItems.forEach((_, item) -> {
+                item.reset();
+            });
+
+            if(allShipOk())
+                state.next(State.Type.DRAW);
+            else
+                state.next(State.Type.CHECKING);
+        }
     }
 
     /// removed items
@@ -511,28 +529,49 @@ public class Model implements Serializable, PlayerControls {
         return removedItems.get(player);
     }
 
+    /// removed items
+    public RemovedItems getRemovedItems(String name){
+        return getRemovedItems(get(name));
+    }
+
     /**
-     * Configure how many drills use to shoot.
+     * Configure how many cannons use to shoot.
      * Can be called only in a waiting state.
      *
      * @param name name of the player
-     * @param map witch drills activate to shoot
+     * @param map witch cannons activate to shoot
      * @return
      */
-    public synchronized Result<String> setDrillsToUse(String name, Map<Tile.Rotation, Integer> map){
+    public synchronized Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
             return Result.err("player already registered");
 
-        drillsToUse.put(get(name), map);
+        cannonsToUse.put(get(name), map);
         return Result.ok("");
     }
 
-    /// drills
-    public Map<Tile.Rotation, Integer> getDrillsToUse(Player p){
-        return drillsToUse.getOrDefault(p, null);
+    /// cannons
+    public Map<Tile.Rotation, Integer> getCannonsToUse(Player p){
+        return cannonsToUse.getOrDefault(p, null);
+    }
+
+    /**
+     * Needed for checking that the player used enough batteries to activate the cannons
+     * @param name of the player
+     * @return number of batteries required for activating all the cannons
+     */
+    public int batteryRequiredForCannon(String name){
+        AtomicInteger total = new AtomicInteger();
+        total.set(0);
+
+        cannonsToUse.get(get(name)).forEach((_, val) -> {
+            total.addAndGet(val);
+        });
+
+        return total.get();
     }
 
     //tiles section
@@ -565,7 +604,7 @@ public class Model implements Serializable, PlayerControls {
     /**
      * Draw a card from the deck.
      * Can be called only in a DRAW state.
-     * Only the leader can call.
+     * Only the leader can call this method.
      *
      * @param name name of the leader
      * @return the card
@@ -587,11 +626,11 @@ public class Model implements Serializable, PlayerControls {
     }
 
     /**
-     * Give the players input to the drew card.
-     * Can be called only in a WAITING state.
+     * Give the player's input to the drawn card.
+     * Can be called only in the WAITING state.
      *
-     * @param name
-     * @param json
+     * @param name of the player
+     * @param json player input
      * @return
      */
     public synchronized Result<JSONObject> setInput(String name, JSONObject json){
@@ -609,13 +648,24 @@ public class Model implements Serializable, PlayerControls {
     }
 
     /**
-     * Get the temporary data about the drew card.
+     * Get the temporary data about the drawn card.
      * @return
      */
     public synchronized Result<JSONObject> getCardData(String name){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
         return Result.ok(deck.getData());
+    }
+
+    private boolean someoneDebt(){
+        AtomicBoolean debt = new AtomicBoolean(false);
+
+        removedItems.values().forEach(rm -> {
+            if(rm.isDebt())
+                debt.set(true);
+        });
+
+        return debt.get();
     }
 
     private Result<JSONObject> playCard(){
@@ -625,10 +675,6 @@ public class Model implements Serializable, PlayerControls {
         Result<JSONObject> res = deck.play();
 
         if(res.isOk()){
-            removedItems.forEach((name, item) -> {
-                item.reset();
-            });
-            
             List<Pawn> quitted = new ArrayList<>(flight.getQuitters());
             quitted.removeAll(quitters.values().stream().map(Player::getPawn).toList());
 
@@ -639,10 +685,19 @@ public class Model implements Serializable, PlayerControls {
                 });
             });
 
-            if(allShipOk())
-                state.next(State.Type.DRAW);
-            else
-                state.next(State.Type.CHECKING);
+            if(someoneDebt()){
+                state.next(State.Type.DEBT);
+            }
+            else{
+                removedItems.forEach((name, item) -> {
+                    item.reset();
+                });
+
+                if(allShipOk())
+                    state.next(State.Type.DRAW);
+                else
+                    state.next(State.Type.CHECKING);
+            }
         }
 
         return res;
@@ -716,6 +771,6 @@ public class Model implements Serializable, PlayerControls {
     /// AUTOGENERATED
     @Override
     public int hashCode() {
-        return Objects.hash(tiles, flight, deck, players, removedItems, drillsToUse, quitters, state, unusedPawns, nPlayers, countPlayers, canMove, timer, task);
+        return Objects.hash(tiles, flight, deck, players, removedItems, cannonsToUse, quitters, state, unusedPawns, nPlayers, countPlayers, canMove, timer, task);
     }
 }

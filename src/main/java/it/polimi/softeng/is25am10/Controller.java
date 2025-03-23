@@ -192,8 +192,8 @@ public class Controller implements PlayerControls{
     }
 
     @Override
-    public Result<String> setDrillsToUse(String name, Map<Tile.Rotation, Integer> map) {
-        return get(name).setDrillsToUse(name, map);
+    public Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map) {
+        return get(name).setCannonsToUse(name, map);
     }
 
     @Override

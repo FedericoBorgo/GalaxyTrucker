@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -150,7 +151,9 @@ class ModelTest {
 
             }
         });
-        System.out.println();
+        File file = new File("out.bin");
+        file.delete();
+
 
         assertEquals(model, m);
     }

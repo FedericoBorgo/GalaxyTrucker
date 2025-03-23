@@ -1,7 +1,5 @@
 package it.polimi.softeng.is25am10;
 
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
@@ -49,7 +47,7 @@ public interface PlayerControls {
 
     Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t);
 
-    Result<String> setDrillsToUse(String name, Map<Tile.Rotation, Integer> map);
+    Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map);
 
     Result<Tile> drawTile(String name);
 
