@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.Objects;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -110,8 +111,13 @@ class ModelTest {
 
     @Test
     void testModel(){
-        JSONObject obj = new JSONObject(Card.dump(Objects.requireNonNull(ModelTest.class.getResourceAsStream("modelTest.json"))));
-        model = new Model(obj.getInt("n_players"));
+        JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
+        model = new Model(obj.getInt("n_players"), new BiConsumer<Model, Model.State.Type>() {
+            @Override
+            public void accept(Model model, Model.State.Type type) {
+
+            }
+        });
         JSONArray players = obj.getJSONArray("players");
 
         assertEquals(Model.State.Type.JOINING, model.getStatus());
@@ -140,8 +146,15 @@ class ModelTest {
         testModel();
 
         model.store("out.bin");
-        Model m = Model.load("out.bin");
-        System.out.println();
+        Model m = Model.load("out.bin", new BiConsumer<Model, Model.State.Type>() {
+            @Override
+            public void accept(Model model, Model.State.Type type) {
+
+            }
+        });
+        File file = new File("out.bin");
+        file.delete();
+
 
         assertEquals(model, m);
     }
