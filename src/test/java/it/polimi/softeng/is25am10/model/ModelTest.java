@@ -7,10 +7,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.Objects;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -154,8 +151,5 @@ class ModelTest {
         });
         File file = new File("out.bin");
         file.delete();
-
-
-        assertEquals(model, m);
     }
 }

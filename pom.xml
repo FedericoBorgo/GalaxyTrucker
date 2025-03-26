@@ -70,7 +70,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>it.polimi.softeng.is25am10/it.polimi.softeng.is25am10.Main
+                            <mainClass>it.polimi.softeng.is25am10/it.polimi.softeng.is25am10.ServerMain
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

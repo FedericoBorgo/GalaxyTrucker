@@ -7,6 +7,7 @@ module it.polimi.softeng.is25am10 {
     requires jdk.jsobject;
     requires jdk.jdi;
     requires java.desktop;
+    requires java.rmi;
 
     opens it.polimi.softeng.is25am10 to javafx.fxml;
     exports it.polimi.softeng.is25am10;

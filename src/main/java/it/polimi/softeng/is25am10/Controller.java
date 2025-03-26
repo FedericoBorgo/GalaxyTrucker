@@ -9,62 +9,72 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.ClientToServer;
+import it.polimi.softeng.is25am10.network.Placeholder;
 import it.polimi.softeng.is25am10.network.ServerToClient;
 import org.json.JSONObject;
 
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class Controller implements ClientToServer {
-    private final Map<String, Model> nameToGame;
-    private final Map<Model, List<String>> gameToPlayers;
-    private final Map<String, ServerToClient> nameToNotifier;
-    private Model starting;
-    private final List<String> joining;
+public class Controller extends UnicastRemoteObject implements ClientToServer {
+    private final Map<String, Model> nameToGame = new HashMap<>();
+    private final Map<Model, List<String>> gameToPlayers = new HashMap<>();
+    private final Map<Model, Integer> modelID = new HashMap<>();
 
-    private BiConsumer<Model, Model.State.Type> stateChanged = new BiConsumer<Model, Model.State.Type>() {
-        @Override
-        public void accept(Model model, Model.State.Type type) {
-            forEveryOne(model, (n) -> {
-                n.notifyState(type);
-            });
+    private final Map<String, ServerToClient> nameToNotifier = new HashMap<>();
+    private Model starting = null;
+    private int counter = 0;
 
-            if(type == Model.State.Type.BUILDING){
-                gameToPlayers.put(starting, joining);
-                joining.clear();
-                starting = null;
-            }
+    private BiConsumer<Model, Model.State.Type> stateChanged = (model, type) -> {
+        Logger.modelLog(getID(model), "state changed to: " +type.toString());
 
-            if(type == Model.State.Type.ALIEN)
-                updatePosition(model);
-        }
+        if(type == Model.State.Type.BUILDING)
+            starting = null;
+
+        forEveryOne(model, (n) -> {
+            n.notifyState(type);
+        });
+
+        if(type == Model.State.Type.ALIEN)
+            updatePosition(model);
     };
 
-    public Controller(){
-        nameToGame = new HashMap<>();
-        gameToPlayers = new HashMap<>();
-        nameToNotifier = new HashMap<>();
-        joining = new ArrayList<>();
-        starting = null;
+    public Controller() throws RemoteException {
+        super();
+
+        Registry registry = LocateRegistry.createRegistry(1234);
+        try {
+            registry.rebind("controller", this);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public synchronized void join(String name, ServerToClient n){
-        nameToNotifier.put(name, n);
+    public synchronized void join(String name){
+        nameToNotifier.put(name, new Placeholder());
 
         if(nameToGame.containsKey(name))
             return;
 
-        if(starting == null)
-            starting = new Model(n.askHowManyPlayers(), stateChanged);
+        if(starting == null) {
+            starting = new Model(new Placeholder().askHowManyPlayers(), stateChanged);
+            modelID.put(starting, counter++);
+            gameToPlayers.put(starting, new ArrayList<>());
+        }
 
-        starting.addPlayer(name);
-        joining.add(name);
-        nameToGame.put(name, starting);
-
-        forEveryOneExept(starting, name, (player) -> {
-            player.joinedPlayer(name);
+        forEveryOneExept(starting, name, caller -> {
+            caller.joinedPlayer(name);
         });
+
+        gameToPlayers.get(starting).add(name);
+        nameToGame.put(name, starting);
+        Logger.playerLog(getID(starting), name, "joined");
+        starting.addPlayer(name);
     }
 
     private Model get(String name){
@@ -93,6 +103,10 @@ public class Controller implements ClientToServer {
         forEveryOne(model, (n) -> {
             n.pushPositions(order, offset);
         });
+    }
+
+    private int getID(Model model){
+        return modelID.get(model);
     }
 
     // player interaction
