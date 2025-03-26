@@ -1,6 +1,8 @@
 package it.polimi.softeng.is25am10;
 
 import it.polimi.softeng.is25am10.network.ClientToServer;
+import it.polimi.softeng.is25am10.network.RMICLient;
+import it.polimi.softeng.is25am10.network.ServerToClient;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -20,6 +22,7 @@ public class ClientMain {
 
     public static void main(String[] args) throws RemoteException {
         ClientToServer server = getRMIConnection("localhost", 1234);
-        server.join("fede");
+        ServerToClient client = new RMICLient();
+        server.join("fede", client);
     }
 }

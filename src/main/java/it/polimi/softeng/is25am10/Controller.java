@@ -9,13 +9,14 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.ClientToServer;
-import it.polimi.softeng.is25am10.network.Placeholder;
 import it.polimi.softeng.is25am10.network.ServerToClient;
 import org.json.JSONObject;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -26,7 +27,7 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
     private final Map<Model, List<String>> gameToPlayers = new HashMap<>();
     private final Map<Model, Integer> modelID = new HashMap<>();
 
-    private final Map<String, ServerToClient> nameToNotifier = new HashMap<>();
+    private final Map<String, ServerToClient> nameToCallback = new HashMap<>();
     private Model starting = null;
     private int counter = 0;
 
@@ -37,7 +38,11 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
             starting = null;
 
         forEveryOne(model, (n) -> {
-            n.notifyState(type);
+            try {
+                n.notifyState(type);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         if(type == Model.State.Type.ALIEN)
@@ -55,20 +60,28 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
         }
     }
 
-    public synchronized void join(String name){
-        nameToNotifier.put(name, new Placeholder());
+    public synchronized void join(String name, ServerToClient callback){
+        nameToCallback.put(name, callback);
 
         if(nameToGame.containsKey(name))
             return;
 
         if(starting == null) {
-            starting = new Model(new Placeholder().askHowManyPlayers(), stateChanged);
+            try {
+                starting = new Model(callback.askHowManyPlayers(), stateChanged);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
             modelID.put(starting, counter++);
             gameToPlayers.put(starting, new ArrayList<>());
         }
 
         forEveryOneExept(starting, name, caller -> {
-            caller.joinedPlayer(name);
+            try {
+                caller.joinedPlayer(name);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         gameToPlayers.get(starting).add(name);
@@ -86,13 +99,13 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
             if(playerName.equals(name))
                 return;
 
-            caller.accept(nameToNotifier.get(playerName));
+            caller.accept(nameToCallback.get(playerName));
         });
     }
 
     private void forEveryOne(Model m, Consumer<ServerToClient> caller){
         gameToPlayers.get(m).forEach(playerName -> {
-            caller.accept(nameToNotifier.get(playerName));
+            caller.accept(nameToCallback.get(playerName));
         });
     }
 
@@ -101,12 +114,25 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
         List<Integer> offset = model.getFlight().offset;
 
         forEveryOne(model, (n) -> {
-            n.pushPositions(order, offset);
+            try {
+                n.pushPositions(order, offset);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
     private int getID(Model model){
         return modelID.get(model);
+    }
+
+    public static boolean isRMI(){
+        try {
+            RemoteServer.getClientHost();
+            return true;
+        } catch (ServerNotActiveException e) {
+            return false;
+        }
     }
 
     // player interaction
@@ -117,7 +143,13 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
         Result<Integer> result = m.moveTimer(name);
 
         if(result.isOk())
-            forEveryOneExept(m, name, ServerToClient::movedTimer);
+            forEveryOneExept(m, name, p -> {
+                try {
+                    p.movedTimer();
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
         return result;
     }
@@ -237,7 +269,11 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
         Result<Card.CompressedCard> res = get(name).drawCard(name);
         if(res.isOk()){
             forEveryOneExept(get(name), name, player ->{
-                player.pushCard(res.getData());
+                try {
+                    player.pushCard(res.getData());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
         return res;
@@ -250,7 +286,11 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
             JSONObject obj = res.getData();
             if(obj.has("played"))
                 forEveryOne(get(name), player ->{
-                    player.pushCardChanges(obj);
+                    try {
+                        player.pushCardChanges(obj);
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
         }
         return get(name).setInput(name, json);

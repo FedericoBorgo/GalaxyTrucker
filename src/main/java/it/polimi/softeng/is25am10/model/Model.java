@@ -10,6 +10,7 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
 import it.polimi.softeng.is25am10.network.ClientToServer;
+import it.polimi.softeng.is25am10.network.ServerToClient;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -751,7 +752,7 @@ public class Model implements Serializable, ClientToServer {
 
 
     @Override
-    public void join(String name) {
+    public void join(String name, ServerToClient callback) {
         throw new IllegalCallerException("cant call join in the controller");
     }
 }

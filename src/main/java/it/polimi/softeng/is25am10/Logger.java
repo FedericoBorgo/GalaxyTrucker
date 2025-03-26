@@ -29,13 +29,7 @@ public class Logger {
     }
 
     public static void playerLog(int id, String player, String message){
-        String prefix = "";
-        try {
-            RemoteServer.getClientHost();
-            prefix = "RMI";
-        } catch (ServerNotActiveException e) {
-            prefix = "SOCKET";
-        }
+        String prefix = Controller.isRMI() ? "RMI" : "SOCKET";
         print("MODEL",
                 "[" + id + "]" +
                         "[" + prefix + "]" +

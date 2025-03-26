@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ClientToServer extends Remote {
-    void join(String name) throws RemoteException;
+    void join(String name, ServerToClient callback) throws RemoteException;
 
     Result<Integer> moveTimer(String name) throws RemoteException;
 

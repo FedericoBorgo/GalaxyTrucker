@@ -5,9 +5,15 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class Placeholder implements ServerToClient{
+public class RMICLient extends UnicastRemoteObject implements ServerToClient{
+    public RMICLient() throws RemoteException {
+        super();
+    }
+
     @Override
     public void joinedPlayer(String player) {
 
@@ -20,7 +26,7 @@ public class Placeholder implements ServerToClient{
 
     @Override
     public void notifyState(Model.State.Type state) {
-
+        System.out.println(state);
     }
 
     @Override

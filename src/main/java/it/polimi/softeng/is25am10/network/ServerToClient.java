@@ -5,20 +5,22 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.List;
 
-public interface ServerToClient {
-    void joinedPlayer(String player);
+public interface ServerToClient extends Remote {
+    void joinedPlayer(String player) throws RemoteException;
 
-    int askHowManyPlayers();
+    int askHowManyPlayers() throws RemoteException;
 
-    void notifyState(Model.State.Type state);
+    void notifyState(Model.State.Type state) throws RemoteException;
 
-    void movedTimer();
+    void movedTimer() throws RemoteException;
 
-    void pushPositions(List<FlightBoard.Pawn> order, List<Integer> offset);
+    void pushPositions(List<FlightBoard.Pawn> order, List<Integer> offset) throws RemoteException;
 
-    void pushCard(Card.CompressedCard card);
+    void pushCard(Card.CompressedCard card) throws RemoteException;
 
-    void pushCardChanges(JSONObject data);
+    void pushCardChanges(JSONObject data) throws RemoteException;
 }
