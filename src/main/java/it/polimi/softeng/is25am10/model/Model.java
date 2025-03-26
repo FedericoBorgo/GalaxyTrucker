@@ -1,6 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
-import it.polimi.softeng.is25am10.PlayerControls;
+import it.polimi.softeng.is25am10.network.PlayerControls;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * This class is responsible for the state and evolution of the game.

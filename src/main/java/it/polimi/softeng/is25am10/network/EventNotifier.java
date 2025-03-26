@@ -1,7 +1,6 @@
-package it.polimi.softeng.is25am10;
+package it.polimi.softeng.is25am10.network;
 
 import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;

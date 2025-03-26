@@ -8,13 +8,15 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.network.EventNotifier;
+import it.polimi.softeng.is25am10.network.PlayerControls;
 import org.json.JSONObject;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class Controller implements PlayerControls{
+public class Controller implements PlayerControls {
     private final Map<String, Model> nameToGame;
     private final Map<Model, List<String>> gameToPlayers;
     private final Map<String, EventNotifier> nameToNotifier;

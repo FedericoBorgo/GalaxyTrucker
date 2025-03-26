@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10;
+package it.polimi.softeng.is25am10.network;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
