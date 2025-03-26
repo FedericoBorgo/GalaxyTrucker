@@ -7,7 +7,10 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Used to contains all the cards relative to a single game.

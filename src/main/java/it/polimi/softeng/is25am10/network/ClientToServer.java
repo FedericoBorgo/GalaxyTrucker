@@ -8,9 +8,12 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-public interface PlayerControls {
+public interface ClientToServer {
     Result<Integer> moveTimer(String name);
 
     Result<String> setReady(String name);

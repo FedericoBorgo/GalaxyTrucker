@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public interface EventNotifier {
+public interface ServerToClient {
     void joinedPlayer(String player);
 
     int askHowManyPlayers();

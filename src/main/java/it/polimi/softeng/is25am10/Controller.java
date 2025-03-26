@@ -8,18 +8,18 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.network.EventNotifier;
-import it.polimi.softeng.is25am10.network.PlayerControls;
+import it.polimi.softeng.is25am10.network.ClientToServer;
+import it.polimi.softeng.is25am10.network.ServerToClient;
 import org.json.JSONObject;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class Controller implements PlayerControls {
+public class Controller implements ClientToServer {
     private final Map<String, Model> nameToGame;
     private final Map<Model, List<String>> gameToPlayers;
-    private final Map<String, EventNotifier> nameToNotifier;
+    private final Map<String, ServerToClient> nameToNotifier;
     private Model starting;
     private final List<String> joining;
 
@@ -49,7 +49,7 @@ public class Controller implements PlayerControls {
         starting = null;
     }
 
-    public synchronized void join(String name, EventNotifier n){
+    public synchronized void join(String name, ServerToClient n){
         nameToNotifier.put(name, n);
 
         if(nameToGame.containsKey(name))
@@ -71,7 +71,7 @@ public class Controller implements PlayerControls {
         return nameToGame.get(name);
     }
 
-    private void forEveryOneExept(Model m, String name, Consumer<EventNotifier> caller){
+    private void forEveryOneExept(Model m, String name, Consumer<ServerToClient> caller){
         gameToPlayers.get(m).forEach(playerName -> {
             if(playerName.equals(name))
                 return;
@@ -80,7 +80,7 @@ public class Controller implements PlayerControls {
         });
     }
 
-    private void forEveryOne(Model m, Consumer<EventNotifier> caller){
+    private void forEveryOne(Model m, Consumer<ServerToClient> caller){
         gameToPlayers.get(m).forEach(playerName -> {
             caller.accept(nameToNotifier.get(playerName));
         });
@@ -103,7 +103,7 @@ public class Controller implements PlayerControls {
         Result<Integer> result = m.moveTimer(name);
 
         if(result.isOk())
-            forEveryOneExept(m, name, EventNotifier::movedTimer);
+            forEveryOneExept(m, name, ServerToClient::movedTimer);
 
         return result;
     }

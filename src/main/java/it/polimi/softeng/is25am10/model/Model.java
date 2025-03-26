@@ -1,6 +1,5 @@
 package it.polimi.softeng.is25am10.model;
 
-import it.polimi.softeng.is25am10.network.PlayerControls;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
@@ -10,6 +9,7 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
+import it.polimi.softeng.is25am10.network.ClientToServer;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -48,7 +48,7 @@ import java.util.function.BiConsumer;
  * This phase repeats until the cards are finished or if there are no player left.
  * It is possible that at the end of a card, it's required to correct the ship.
  */
-public class Model implements Serializable, PlayerControls {
+public class Model implements Serializable, ClientToServer {
     /**
      * Counter for the removed items.
      */
