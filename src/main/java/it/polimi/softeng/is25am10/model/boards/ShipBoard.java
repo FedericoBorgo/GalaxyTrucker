@@ -55,9 +55,7 @@ public class ShipBoard implements Serializable {
         battery = new BatteryBoard(tiles);
 
         goods = new HashMap<>();
-        Arrays.stream(GoodsBoard.Type.values()).forEach(type -> {
-            goods.put(type, new GoodsBoard(tiles, type));
-        });
+        Arrays.stream(GoodsBoard.Type.values()).forEach(type -> goods.put(type, new GoodsBoard(tiles, type)));
 
         astronaut.setOthers(Arrays.asList(brown, purple));
         purple.setOthers(Arrays.asList(brown, astronaut));
@@ -94,24 +92,24 @@ public class ShipBoard implements Serializable {
         return goods.get(type);
     }
 
-    public double getDrillsPower(Map<Tile.Rotation, Integer> count){
-        double drills = tiles.countDrillsPower(count);
+    public double getCannonsPower(Map<Tile.Rotation, Integer> count){
+        double cannons = tiles.countCannonsPower(count);
 
-        if(drills > 0){
-            drills += purple.getTotal()*2;
+        if(cannons > 0){
+            cannons += purple.getTotal()*2;
         }
 
-        return drills;
+        return cannons;
     }
 
-    public int getRocketPower(int count){
-        int rocket = tiles.countRocketPower(count);
+    public int getEnginePower(int count){
+        int engines = tiles.countEnginePower(count);
 
-        if(rocket > 0){
-            rocket += brown.getTotal()*2;
+        if(engines > 0){
+            engines += brown.getTotal()*2;
         }
 
-        return rocket;
+        return engines;
     }
 
     private boolean thereIsSomeone(Coordinate c){
@@ -154,9 +152,7 @@ public class ShipBoard implements Serializable {
         for(boolean[] b: marked)
             Arrays.fill(b, false);
 
-        Coordinate.forEach(c ->  {
-            toRemove(marked, c);
-        });
+        Coordinate.forEach(c -> toRemove(marked, c));
 
         Coordinate.forEach(c -> {
             if(marked[c.x()][c.y()]) {
@@ -171,9 +167,7 @@ public class ShipBoard implements Serializable {
     public CompressedShipBoard compress(){
         Map<GoodsBoard.Type, Map<Coordinate, Integer>> goodMap = new HashMap<>();
 
-        goods.forEach((type, board) -> {
-            goodMap.put(type, board.positions);
-        });
+        goods.forEach((type, board) -> goodMap.put(type, board.positions));
 
         return new CompressedShipBoard(tiles.getBoard(), tiles.getRotation(),
                 astronaut.getPositions(),
@@ -187,9 +181,7 @@ public class ShipBoard implements Serializable {
         purple.removeIllegals();
         brown.removeIllegals();
         battery.removeIllegals();
-        goods.forEach((type, board) -> {
-            board.removeIllegals();
-        });
+        goods.forEach((type, board) -> board.removeIllegals());
     }
 
     public Optional<Coordinate> hit(Projectile projectile, boolean useBattery) {
@@ -199,13 +191,9 @@ public class ShipBoard implements Serializable {
     }
 
     public void init(Optional<Coordinate> purple, Optional<Coordinate> brown){
-        purple.ifPresent(c -> {
-            this.purple.put(c, 1);
-        });
+        purple.ifPresent(c -> this.purple.put(c, 1));
 
-        brown.ifPresent(c -> {
-            this.brown.put(c, 1);
-        });
+        brown.ifPresent(c -> this.brown.put(c, 1));
 
         Coordinate.forEach(c -> {
             Result<Tile> res = tiles.getTile(c);

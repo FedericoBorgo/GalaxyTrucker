@@ -20,7 +20,7 @@ class AstronautBoardTest {
         board = new TilesBoard();
         board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
         board.setTile(new Coordinate(1, 2), new Tile(Tile.Type.HOUSE, "uuuu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.ROCKET, "uuuu"), Tile.Rotation.NONE);
+        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.ENGINE, "uuuu"), Tile.Rotation.NONE);
 
         ElementsPlaceholder alien = new ElementsPlaceholder(board);
         alien.set(new Coordinate(1, 2), 1);

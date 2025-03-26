@@ -70,7 +70,6 @@ public class Planets extends Card{
         });
 
         JSONObject result = new JSONObject();
-        JSONArray rewarded = new JSONArray();
 
         //move pawns in reverse flight order
         List<FlightBoard.Pawn> reversed = new ArrayList<>(board.getOrder());
@@ -78,12 +77,11 @@ public class Planets extends Card{
         for(FlightBoard.Pawn pawn : reversed){
             Player player = registered.get(pawn);
             if(Planet.NOPLANET != playerChoice.get(player)){
-                rewarded.put(player.getName());
                 board.moveRocket(player.getPawn(), flightDays);
             }
         }
 
-        result.put("rewarded", rewarded);
+        result.put("flight", board.toJSON());
 
         return Result.ok(result);
     }
@@ -97,6 +95,9 @@ public class Planets extends Card{
     public JSONObject getData() {
         JSONObject json = new JSONObject();
         JSONArray jsonArray = new JSONArray();
+
+        json.put("type", type);
+        json.put("id", id);
 
         Arrays.asList(Planet.values()).forEach(planet -> {
             if(planet != Planet.NOPLANET && !playerChoice.containsValue(planet)){

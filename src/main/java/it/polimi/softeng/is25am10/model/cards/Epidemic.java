@@ -67,7 +67,8 @@ public class Epidemic extends Card {
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("epidemic", "");
+        data.put("type", type);
+        data.put("id", id);
         return data;
     }
 

@@ -9,19 +9,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Ship extends Card {
-    private final int cash;
-    private final int days;
-    private final int astronaut;
+public class AbandonedShip extends Card {
+    private final int cashReward;
+    private final int daysLost;
+    private final int astronautCost;
     private boolean someoneAccepted;
     private Player descendingPlayer;
 
-    public Ship(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
-        super(model, true, board, id, Type.SHIP);
-       this.cash = cash;
-       this.days = days;
-       this.astronaut = astronaut;
+    public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
+        super(model, true, board, id, Type.AB_SHIP);
+       this.cashReward = cash;
+       this.daysLost = days;
+       this.astronautCost = astronaut;
     }
 
     @Override
@@ -37,10 +38,12 @@ public class Ship extends Card {
         //end
 
         if(!someoneAccepted && getChoice(json)){
-            if(model.getRemovedItems(player).guys >= astronaut){
+            if(model.getRemovedItems(player).guys >= astronautCost){
                 someoneAccepted = true;
                 descendingPlayer = player;
             }
+            else
+                return Result.err("not enough astronaut");
         }
 
         register(player);
@@ -49,26 +52,22 @@ public class Ship extends Card {
 
     @Override
     public Result<JSONObject> play() {
-        //begin common part
+        // common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject moved = new JSONObject();
 
         if(someoneAccepted){
-            descendingPlayer.giveCash(cash);
-            board.moveRocket(descendingPlayer.getPawn(), -days);
-            moved.put("pawn", descendingPlayer.getPawn());
-            moved.put("days", -days);
-            jsonArray.put(moved);
+            descendingPlayer.giveCash(cashReward);
+            board.moveRocket(descendingPlayer.getPawn(), -daysLost);
+
+            JSONObject rewarded = new JSONObject();
+            rewarded.put(descendingPlayer.getName(), cashReward);
+            result.put("cash", rewarded);
+            result.put("flight", board.toJSON());
         }
-
-        result.put("moved", jsonArray);
-
         return Result.ok(result);
-        //end
     }
 
     @Override
@@ -79,12 +78,13 @@ public class Ship extends Card {
     @Override
     public JSONObject getData() {
         JSONObject data = new JSONObject();
-        data.put("ship", "");
+        data.put("type", type);
+        data.put("id", id);
         return data;
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Ship.class.getResourceAsStream("ship.json"));
+        String out = dump(Objects.requireNonNull(AbandonedShip.class.getResourceAsStream("abandoned_ship.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class Ship extends Card {
             int guys = entry.getInt("guys");
             int cash = entry.getInt("cash");
 
-            cards.add(new Ship(model, board, id, guys, cash, days));
+            cards.add(new AbandonedShip(model, board, id, guys, cash, days));
         });
 
         return cards;

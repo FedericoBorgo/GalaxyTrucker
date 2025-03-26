@@ -59,6 +59,30 @@ public class Player implements Serializable {
     }
 
     /**
+     * Retrieves the goodsReward associated with the player. Needed for some card effects.
+     * @return List of goods
+     */
+    public List<GoodsBoard.Type> getGoodsReward() {
+        return goodsReward;
+    }
+
+    /**
+     * Retrieves the nickname of the player
+     * @return string nickname
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the goodsReward field for the player.
+     * @param goodsReward list
+     */
+    public void setGoodsReward(List<GoodsBoard.Type> goodsReward) {
+        this.goodsReward = goodsReward;
+    }
+
+    /**
      * Adds the specified amount of cash to the player's balance.
      *
      * @param amount the amount of cash to add.
@@ -67,29 +91,22 @@ public class Player implements Serializable {
         cash += amount;
     }
 
-    public List<GoodsBoard.Type> getGoodsReward() {
-        return goodsReward;
-    }
-
-    public void setGoodsReward(List<GoodsBoard.Type> goodsReward) {
-        this.goodsReward = goodsReward;
-    }
-
+    /**
+     * Places a good from the goodsReward list of the player at a specific coordinate.
+     * @param reward good to be placed.
+     * @param c coordinate of the storage.
+     * @return a successful {@code Result} or an error {@code Result} with a message explaining
+     * why the operation failed.
+     */
     public Result<Integer> placeReward(GoodsBoard.Type reward, Coordinate c) {
         if(!this.goodsReward.contains(reward))
-            return Result.err("cant place a goods not in the reward list");
+            return Result.err("can't place goods that aren't in the goodsReward list");
 
         Result<Integer> res = board.getGoods(reward).put(c, 1);
-
         if(res.isErr())
             return res;
-
         goodsReward.remove(reward);
         return res;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override

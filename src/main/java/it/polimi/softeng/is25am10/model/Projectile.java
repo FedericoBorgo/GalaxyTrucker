@@ -35,7 +35,7 @@ public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, 
         public Tile.Type stoppedBy() {
             return switch (this) {
                 case SMALL_ASTEROID, SMALL_FIRE -> Tile.Type.SHIELD;
-                case BIG_ASTEROID -> Tile.Type.DRILLS;
+                case BIG_ASTEROID -> Tile.Type.CANNON;
                 case BIG_FIRE -> null;
             };
         }

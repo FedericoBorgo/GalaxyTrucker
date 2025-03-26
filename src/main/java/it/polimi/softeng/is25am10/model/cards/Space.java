@@ -7,17 +7,14 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Space extends Card {
     private final Map<FlightBoard.Pawn, Integer> enginePower = new HashMap<>();
     private final Map<String, Integer> enginePowerName = new HashMap<>();
 
     public Space(Model model, FlightBoard board, int id) {
-        super(model, true, board, id, Type.SHIP);
+        super(model, true, board, id, Type.OPEN_SPACE);
     }
 
     @Override
@@ -32,7 +29,7 @@ public class Space extends Card {
         }
         //end
 
-        enginePower.put(player.getPawn(), player.getBoard().getRocketPower(model.getRemovedItems(player).battery));
+        enginePower.put(player.getPawn(), player.getBoard().getEnginePower(model.getRemovedItems(player).battery));
         register(player);
         return Result.ok(genAccepted());
     }
@@ -46,18 +43,13 @@ public class Space extends Card {
         //end
 
         JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
 
         for(int i = board.getOrder().size() - 1; i >= 0; i--){
-            JSONObject player = new JSONObject();
             FlightBoard.Pawn p = board.getOrder().get(i);
             board.moveRocket(p, enginePower.get(p));
-
-            player.put("days", enginePower.get(p));
-            player.put("pawn", p);
-            jsonArray.put(player);
         }
-        result.put("moved", jsonArray);
+
+        result.put("flight", board.toJSON());
 
         return Result.ok(result);
     }
@@ -72,10 +64,13 @@ public class Space extends Card {
         JSONArray jsonArray = new JSONArray();
         JSONObject json = new JSONObject();
 
+        json.put("type", type);
+        json.put("id", id);
+
         enginePowerName.forEach((name, power) -> {
             JSONObject entry = new JSONObject();
             entry.put("name", name);
-            entry.put("val", power);
+            entry.put("power", power);
             jsonArray.put(entry);
         });
 
@@ -85,7 +80,7 @@ public class Space extends Card {
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Space.class.getResourceAsStream("space.json"));
+        String out = dump(Objects.requireNonNull(Space.class.getResourceAsStream("open_space.json")));
         JSONObject jsonObject = new JSONObject(out);
         JSONArray jsonArray = jsonObject.getJSONArray("ids");
         List<Card> cards = new ArrayList<>();

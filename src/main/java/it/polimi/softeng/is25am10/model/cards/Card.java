@@ -12,12 +12,11 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Generic class used by all types of space.json.
- * The necessary info about every card is if its
- * need an input by the player (needInput) and
- * some data (getData). We also need to know the
- * type of the card (Type) in some cases.
+ * Generic class used by all types of cards, it contains the necessary info about every card:
+ * if it needs an input by the player (needInput) and some data (getData).
+ * We also need to know the type of the card (Type) in some cases.
  */
+
 public abstract class Card implements Serializable {
     public record CompressedCard(int ID, JSONObject data){
 
@@ -28,30 +27,24 @@ public abstract class Card implements Serializable {
     public final boolean needInput;
 
     protected final FlightBoard board;
-
-    /**
-     * When a player is ready o has declared their input,
-     * we can set the player as "registered" it means that
-     * he has already given the input.
-     */
-    protected final Map<FlightBoard.Pawn, Player> registered;
     protected final Model model;
 
-    /**
-     * ID unique to every card.
-     * Even same card type has different IDs.
-     */
+    // ID unique to every card, even if they share the same type they have different IDs
     public final int id;
 
+    // When a player is ready or has declared their input, we can set the player
+    // as "registered", which means that they have already given the input.
+    protected final Map<FlightBoard.Pawn, Player> registered;
+
     public enum Type{
-        EPIDEMIC, METEOR, PLANETS, SHIP, SPACE, STARDUST, STATION;
+        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION, PIRATES, SMUGGLERS, SLAVERS, WARZONE;
     }
 
     protected final Type type;
 
     /**
-     * Create the card by giving the model to get player data, such as
-     * the number of removed battery, astronaut or goods.
+     * Creates the card by giving the model from which to get player data, such as
+     * the number of removed batteries, astronauts or goods.
      *
      * @param model where to get the player data
      * @param needInput does the player need to give some input?
@@ -69,18 +62,17 @@ public abstract class Card implements Serializable {
     }
 
     /**
-     * Check if the player already set their input.
-     * @param player
-     * @return
+     * Checks if the player has already set their input.
+     * @param player to check
+     * @return true if registered, false otherwise
      */
     public boolean isRegistered(Player player) {
         return registered.containsValue(player);
     }
 
     /**
-     * Check if the given player is the one that should declare the next
-     * input.
-     * @param player
+     * Check if the given player is the one that should declare the next input.
+     * @param player to check
      * @return true if he's him, false if not
      */
     protected boolean isCorrectOrder(Player player) {
@@ -88,34 +80,33 @@ public abstract class Card implements Serializable {
     }
 
     /**
-     * Check if all the player gave their input
-     * @return
+     * Check if all the players gave their input
+     * @return true if all players did, false otherwise
      */
     protected boolean allRegistered(){
         return registered.size() == board.getOrder().size();
     }
 
     /**
-     * Register a player as already given the input.
-     * @param player
+     * Register a player as having already given the input.
+     * @param player to register
      */
     public void register(Player player){
         registered.put(player.getPawn(), player);
     }
 
     /**
-     * Standardisation of a player choice.
-     * @param json
-     * @return
+     * Standardization of a player choice
+     * @param json from player
+     * @return player choice
      */
     protected boolean getChoice(JSONObject json){
         return json.getBoolean("choice");
     }
 
     /**
-     * Give the player input to the card. If the player does not have
-     * to give any input, someone still need to give the card all
-     * the players using this method.
+     * Give the player's input to the card. If the player does not need to give any input,
+     * this method can still be used to give all the players to the card.
      *
      * @param player the player that execute the action
      * @param json this is dependent of every card
@@ -131,13 +122,13 @@ public abstract class Card implements Serializable {
 
     /**
      * Check if a card is ready to be played.
-     * @return
+     * @return true if ready, false otherwise
      */
     public abstract boolean ready();
 
     /**
      * Get some specific data about the card.
-     * @return
+     * @return the data
      */
     public abstract JSONObject getData();
 

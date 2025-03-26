@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
+import java.io.Serializable;
 import java.util.NoSuchElementException;
 
 /**
@@ -8,7 +9,7 @@ import java.util.NoSuchElementException;
  * and containing the reason of the failure.
  * It is inspired by the Class Optional in Java.util and by the Result type of Rust.
  */
-public class Result<T> {
+public class Result<T> implements Serializable {
     private final boolean ok;
     private final T data;
     private final String reason;

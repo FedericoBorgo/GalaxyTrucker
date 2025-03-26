@@ -53,7 +53,7 @@ public abstract class ElementsBoard implements Serializable {
     /**
      * Retrieves the number of units on a certain tile, specified though the coordinates {@code x} and {@code y}.
      * Uses the method getOrDefault of the Map class.
-     * @param c
+     * @param c coordinate
      * @return number of units on a certain tile
      */
     public int get(Coordinate c){
@@ -64,7 +64,7 @@ public abstract class ElementsBoard implements Serializable {
      * Sets the number of units on a certain tile, specified though the coordinates
      * {@code x} and {@code y} to {@code value}. It modifies the total number of units based
      * on the previous number of units on that tile.
-     * @param c
+     * @param c coordinate
      * @param value the new number of units on the tile
      */
     protected void set(Coordinate c, int value) {
@@ -82,7 +82,7 @@ public abstract class ElementsBoard implements Serializable {
      * Removes units from a certain tile, specified though the coordinates {@code x}
      * and {@code y}, by the quantity {@code qty}. Uses the get and set methods from this class.
      * Checks if there are enough units to be removed on the tile
-     * @param c
+     * @param c coordinate
      * @param qty the number of units to be removed from the tile.
      * @return a {@code Result} containing the number of units remaining on the tile,
      * or an error {@code Result} with a message explaining why the operation failed
@@ -102,22 +102,22 @@ public abstract class ElementsBoard implements Serializable {
      * Move units from one position to another. Does not change the total number of units on the board.
      * Uses the remove and put method from this class. Put is implemented in the subclasses.
      * Result.data should not be accessed.
-     * @param fromc
-     * @param toc
+     * @param from_c old coordinate
+     * @param to_c new coordinate
      * @param qty the number of units being moved
      * @return a successful {@code Result} or an error {@code Result} with a message explaining
      * why the operation failed
      */
-    public Result<Integer> move(Coordinate fromc, Coordinate toc, int qty) {
-        Result<Integer> res = remove(fromc, qty);
+    public Result<Integer> move(Coordinate from_c, Coordinate to_c, int qty) {
+        Result<Integer> res = remove(from_c, qty);
 
         if(res.isErr())
             return res;
 
-        res = put(toc, qty);
+        res = put(to_c, qty);
 
         if(res.isErr())
-            put(fromc, qty);
+            put(from_c, qty);
 
         return Result.ok(qty);
     }
@@ -173,7 +173,7 @@ public abstract class ElementsBoard implements Serializable {
      * Adds a number {@code qty} of units to the tile specified though the coordinates {@code x}
      * and {@code y}.
      * Result.data should not be accessed.
-     * @param c
+     * @param c coordinate
      * @param qty the number of units to be added to the tile
      * @return a successful {@code Result} or an error {@code Result} with a message explaining
      * why the operation failed
@@ -218,8 +218,8 @@ public abstract class ElementsBoard implements Serializable {
      * Check if a quantity is placeable in a specified coordinate.
      * This depends on the specified pawn. The check is implemented in
      * subclasses.
-     * @param c
-     * @param qty
+     * @param c coordinate
+     * @param qty quantity
      * @return
      */
     public abstract boolean check(Coordinate c, int qty);

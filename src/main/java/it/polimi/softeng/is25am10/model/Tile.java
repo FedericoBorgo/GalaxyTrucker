@@ -9,7 +9,11 @@ import java.util.*;
  * by {@code ConnectorType}s. The methods in this class reveal the nature of a tile: its type
  * and the connectors that it exposes.
  */
+
 public class Tile implements Serializable {
+    private final Type type;
+    private final Map<Side, ConnectorType> connectors;
+
     public enum Side{
         UP, RIGHT, DOWN, LEFT;
         public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
@@ -33,10 +37,10 @@ public class Tile implements Serializable {
      */
     public enum Type {
         PIPES,
-        DRILLS,
-        D_DRILLS,
-        ROCKET,
-        D_ROCKET,
+        CANNON,
+        D_CANNON,
+        ENGINE,
+        D_ENGINE,
         HOUSE,
         C_HOUSE,
         B_BOX_3,
@@ -52,31 +56,31 @@ public class Tile implements Serializable {
         WALL;
     }
 
+    // "Special tiles": WALL and EMPTY
     public static final Tile WALL_TILE = new Tile(Type.WALL, "ssss");
     public static final Tile EMPTY_TILE = new Tile(Type.EMPTY, "ssss");
 
-    private final Type type;
-    private final Map<Side, ConnectorType> connectors;
-
     /**
      * Constructs a Tile with a specified type and connector configuration.
+     * It uses {@code ConnectorType.fromChar()} for the conversion from {@code String} to {@code ConnectorType}.
      *
      * @param type the type of the tile, represented by a {@code TilesType} enum.
-     * @param connectors a string representing the types of connectors on the tile.
-     * It is assumed to have a length of 4, with each character corresponding
-     * to a specific {@code ConnectorType}.
+     * @param connectors a string of length 4 representing the types of connectors on the tile.
      */
     public Tile(Type type, String connectors) {
         this.type = type;
         HashMap<Side, ConnectorType> map = new HashMap<>();
 
-        Arrays.stream(Side.order).forEach(side -> {
-            map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal())));
-        });
+        Arrays.stream(Side.order).forEach(side -> map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal()))));
 
         this.connectors = Collections.unmodifiableMap(map);
     }
 
+    /**
+     * Constructs a Tile with a specified type and connector configuration.
+     * @param type the type of the tile, represented by a {@code TilesType} enum.
+     * @param connectors a map of sides and connectorTypes
+     */
     public Tile(Type type, Map<Side, ConnectorType> connectors) {
         this.type = type;
         this.connectors = Collections.unmodifiableMap(connectors);
@@ -140,31 +144,48 @@ public class Tile implements Serializable {
      * Check if a tile is not a placeholder.
      *
      * @param t the tile to check
-     * @return  true if its real false if its placeholder
+     * @return  true if it's real false if its placeholder
      */
     static public boolean real(Tile t){
         return t.type != Type.WALL && t.type != Type.EMPTY;
     }
 
-    static public boolean rocket(Tile t){
-        return t.type == Type.ROCKET || t.type == Type.D_ROCKET;
+    /**
+     * Check if a tile is an engine or a double engine
+     * @param t the tile to check
+     * @return true if it's an engine false otherwise
+     */
+    static public boolean engine(Tile t){
+        return t.type == Type.ENGINE || t.type == Type.D_ENGINE;
     }
 
-    static public boolean drills(Tile t){
-        return t.type == Type.DRILLS || t.type == Type.D_DRILLS;
+    /**
+     * Check if a tile is a cannon or a double cannon
+     * @param t the tile to check
+     * @return true if it's a cannon false otherwise
+     */
+    static public boolean cannon(Tile t){
+        return t.type == Type.CANNON || t.type == Type.D_CANNON;
     }
 
+    /**
+     * Check if a tile can contain members of the crew
+     * @param t the tile to check
+     * @return true if it can, false otherwise
+     */
     static public boolean house(Tile t){
         return t.type == Type.HOUSE || t.type == Type.C_HOUSE;
     }
 
+    /**
+     * Check if a tile can contain batteries
+     * @param t the tile to check
+     * @return true if it can, false otherwise
+     */
     static public boolean battery(Tile t){
         return t.type == Type.BATTERY_2 || t.type == Type.BATTERY_3;
     }
 
-    /**
-     * This class provides an interface to deal with the tile's connectors and check their type.
-     */
     public enum ConnectorType {
         ONE_PIPE,
         TWO_PIPE,
@@ -205,8 +226,8 @@ public class Tile implements Serializable {
         /**
          * Check if two connector are compatible.
          *
-         * @param other
-         * @return
+         * @param other the other tile to be checked
+         * @return true if they are connectable, false otherwise
          */
         public boolean connectable(ConnectorType other){
             if(this == SMOOTH){
@@ -229,6 +250,11 @@ public class Tile implements Serializable {
         }
     }
 
+    /**
+     * Sides covered by the shield. Does not check if the tile is a shield tile.
+     * @param rotation of the tile
+     * @return the 2 sides that are covered by this rotation of the shield
+     */
     static public List<Side> shieldCoverage(Rotation rotation){
         return switch (rotation){
             case NONE -> Arrays.asList(Side.UP, Side.RIGHT);

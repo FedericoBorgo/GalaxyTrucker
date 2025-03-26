@@ -26,7 +26,7 @@ public class TilesCollection implements Serializable {
         tiles = new ArrayList<>();
         seen = new ArrayList<>();
 
-        String out = Card.dump(TilesCollection.class.getResourceAsStream("tiles.json"));
+        String out = Card.dump(Objects.requireNonNull(TilesCollection.class.getResourceAsStream("tiles.json")));
         JSONObject object = new JSONObject(out);
 
         for (Tile.Type type : Tile.Type.values()) {
@@ -35,9 +35,7 @@ public class TilesCollection implements Serializable {
 
             JSONArray array = object.getJSONArray(type.name());
 
-            array.forEach(e -> {
-                tiles.add(new Tile(type, e.toString()));
-            });
+            array.forEach(e -> tiles.add(new Tile(type, e.toString())));
         }
 
         Collections.shuffle(tiles);

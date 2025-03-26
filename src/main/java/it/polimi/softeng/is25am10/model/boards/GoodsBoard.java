@@ -19,7 +19,7 @@ public class GoodsBoard extends ElementsBoard{
     private static final Map<Tile.Type, Integer> MAX_VALUE;
 
     public enum Type{
-        BLUE, RED, YELLOW, GREEN;
+        BLUE, RED, YELLOW, GREEN
     }
 
     private final List<Tile.Type> box;

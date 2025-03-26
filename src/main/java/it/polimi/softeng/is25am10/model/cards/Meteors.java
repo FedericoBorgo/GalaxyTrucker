@@ -23,7 +23,7 @@ public class Meteors extends Card {
     }
 
     public Meteors(FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
-        super(null, true, board, id, Card.Type.METEOR);
+        super(null, true, board, id, Card.Type.METEORS);
         projectiles = new ArrayList<>();
         useBattery = new HashMap<>();
         AtomicInteger counter = new AtomicInteger();
@@ -44,7 +44,6 @@ public class Meteors extends Card {
 
         if (!isCorrectOrder(player)) {
             return Result.err("player choice is not in order");
-
         }
 
         JSONArray array = json.getJSONArray("use");
@@ -78,7 +77,7 @@ public class Meteors extends Card {
                 destroyed.ifPresent(c -> {
                     JSONObject obj = new JSONObject();
                     obj.put("name", p.getName());
-                    obj.put("where", c.toString());
+                    obj.put("coord", c.toString());
                     array.put(obj);
                 });
             });
@@ -96,18 +95,20 @@ public class Meteors extends Card {
 
     @Override
     public JSONObject getData() {
+        JSONObject data = new JSONObject();
+        data.put("type", type);
+        data.put("id", id);
 
-        JSONObject json = new JSONObject();
         JSONArray meteors = new JSONArray();
         projectiles.forEach(projectile -> {
             meteors.put(projectile.toString());
         });
-        json.put("meteors", meteors);
-        return json;
+        data.put("meteors", meteors);
+        return data;
     }
 
     public static List<Card> construct(FlightBoard board){
-        String out = dump(Meteors.class.getResourceAsStream("meteors.json"));
+        String out = dump(Objects.requireNonNull(Meteors.class.getResourceAsStream("meteors.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 

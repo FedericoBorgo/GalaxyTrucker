@@ -22,7 +22,7 @@ class ShipBoardTest {
         tile.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "ouos"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(2, 3), new Tile(Tile.Type.HOUSE, "usst"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(1, 3), new Tile(Tile.Type.P_ADDON, "stus"), Tile.Rotation.NONE);
-        tile.setTile(new Coordinate(4, 2), new Tile(Tile.Type.ROCKET, "stsu"), Tile.Rotation.NONE);
+        tile.setTile(new Coordinate(4, 2), new Tile(Tile.Type.ENGINE, "stsu"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(5, 2), new Tile(Tile.Type.HOUSE, "ottt"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(6, 2), new Tile(Tile.Type.HOUSE, "ssot"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(6, 3), new Tile(Tile.Type.HOUSE, "usoo"), Tile.Rotation.NONE);
@@ -50,7 +50,7 @@ class ShipBoardTest {
         tile.setTile(new Coordinate(2, 2), new Tile(Tile.Type.HOUSE, "ouos"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(2, 3), new Tile(Tile.Type.HOUSE, "usst"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(1, 3), new Tile(Tile.Type.P_ADDON, "stus"), Tile.Rotation.NONE);
-        tile.setTile(new Coordinate(4, 2), new Tile(Tile.Type.ROCKET, "stsu"), Tile.Rotation.NONE);
+        tile.setTile(new Coordinate(4, 2), new Tile(Tile.Type.ENGINE, "stsu"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(5, 2), new Tile(Tile.Type.HOUSE, "ottt"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(6, 2), new Tile(Tile.Type.HOUSE, "ssot"), Tile.Rotation.NONE);
         tile.setTile(new Coordinate(6, 3), new Tile(Tile.Type.HOUSE, "usoo"), Tile.Rotation.NONE);
