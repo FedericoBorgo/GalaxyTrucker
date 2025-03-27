@@ -21,7 +21,7 @@ import java.util.Map;
  */
 
 public abstract class Card implements Serializable {
-    public record CompressedCard(int ID, JSONObject data){
+    public record CompressedCard(boolean needInput, int ID, JSONObject data){
 
     }
     /**
@@ -165,6 +165,6 @@ public abstract class Card implements Serializable {
     }
 
     public CompressedCard compress(){
-        return new CompressedCard(this.id, getData());
+        return new CompressedCard(needInput, this.id, getData());
     }
 }

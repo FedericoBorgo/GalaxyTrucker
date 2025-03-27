@@ -8,8 +8,8 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import it.polimi.softeng.is25am10.network.Callback;
+import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import org.json.JSONObject;
 
 import java.rmi.RemoteException;
@@ -47,6 +47,16 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
 
         if(type == Model.State.Type.ALIEN)
             updatePosition(model);
+
+        if(type == Model.State.Type.DRAW){
+            forEveryOne(model, player ->{
+                try {
+                    player.pushCardChanges(model.getChanges());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
     };
 
     public Controller(int port) throws RemoteException {
@@ -275,6 +285,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
                     throw new RuntimeException(e);
                 }
             });
+
+            if(res.getData().needInput()){
+                try {
+                    nameToCallback.get(get(name).getNextToPlay()).askForInput();
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return res;
     }
@@ -284,14 +302,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         Result<JSONObject> res = get(name).setInput(name, json);
         if(res.isOk()){
             JSONObject obj = res.getData();
-            if(obj.has("played"))
-                forEveryOne(get(name), player ->{
-                    try {
-                        player.pushCardChanges(obj);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+            if(!obj.has("played")){
+                try {
+                    nameToCallback.get(get(name).getNextToPlay()).askForInput();
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return get(name).setInput(name, json);
     }

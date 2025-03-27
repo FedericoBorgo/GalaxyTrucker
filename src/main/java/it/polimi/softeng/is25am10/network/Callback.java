@@ -23,4 +23,6 @@ public interface Callback extends Remote {
     void pushCard(Card.CompressedCard card) throws RemoteException;
 
     void pushCardChanges(JSONObject data) throws RemoteException;
+
+    void askForInput() throws RemoteException;
 }

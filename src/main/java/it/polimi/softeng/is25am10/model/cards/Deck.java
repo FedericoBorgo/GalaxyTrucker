@@ -134,6 +134,11 @@ public class Deck implements Serializable {
         return selectedCard.getRegistered();
     }
 
+    public void debug_setCards(List<Card> cards){
+        deck.clear();
+        deck.addAll(cards);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

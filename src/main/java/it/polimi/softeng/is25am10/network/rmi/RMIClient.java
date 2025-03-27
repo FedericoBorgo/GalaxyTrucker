@@ -6,8 +6,8 @@ import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.Callback;
+import it.polimi.softeng.is25am10.network.ClientInterface;
 import org.json.JSONObject;
 
 import java.rmi.NotBoundException;

@@ -52,4 +52,9 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     public void pushCardChanges(JSONObject data) throws RemoteException {
 
     }
+
+    @Override
+    public void askForInput() throws RemoteException {
+
+    }
 }

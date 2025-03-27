@@ -15,6 +15,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
 /**
@@ -622,9 +623,19 @@ public class Model implements Serializable {
             state.next(State.Type.ENDED);
             return Result.ok(null);
         }
+
         state.next(State.Type.WAITING);
+
+        if(!c.needInput){
+            players.forEach((p, _) -> {
+                setInput(p, null);
+            });
+        }
+
         return Result.ok(c.compress());
     }
+
+    private JSONObject changes = null;
 
     /**
      * Give the player's input to the drawn card.
@@ -643,9 +654,29 @@ public class Model implements Serializable {
             res = playCard();
             res.getData().put("accepted", true);
             res.getData().put("played", true);
+            changes = res.getData();
         }
 
         return res;
+    }
+
+    public synchronized JSONObject getChanges(){
+        return changes;
+    }
+
+    public String getNextToPlay(){
+        List<Pawn> order = new ArrayList<>(flight.getOrder());
+        order.removeAll(deck.getRegistered()
+                .stream()
+                .map(Player::getPawn)
+                .toList());
+        Pawn next = order.getFirst();
+        AtomicReference<String> nextToPlay = new AtomicReference<>("");
+        players.forEach((name, player) -> {
+            if(player.getPawn() == next)
+                nextToPlay.set(name);
+        });
+        return nextToPlay.get();
     }
 
     /**
@@ -717,6 +748,14 @@ public class Model implements Serializable {
 
     public void resume(){
         state.next(state.getPrev());
+    }
+
+    public void debug_setCards(List<Card> cards){
+        deck.debug_setCards(cards);
+    }
+
+    public FlightBoard debug_getFlightBoard(){
+        return flight;
     }
 
     /**

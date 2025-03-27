@@ -1,13 +1,15 @@
 package it.polimi.softeng.is25am10.model;
 
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -106,6 +108,24 @@ class ModelTest {
         });
     }
 
+    void loadCards(Model model){
+        List<Card> cards = new ArrayList<>();
+
+        cards.add(Epidemic.construct(model.debug_getFlightBoard()).getFirst());
+        cards.add(Meteors.construct(model.debug_getFlightBoard()).getFirst());
+        cards.add(Planets.construct(model.debug_getFlightBoard()).getFirst());
+        cards.add(AbandonedShip.construct(model, model.debug_getFlightBoard()).getFirst());
+        cards.add(Space.construct(model, model.debug_getFlightBoard()).getFirst());
+        cards.add(Stardust.construct(model.debug_getFlightBoard()).getFirst());
+        cards.add(Station.construct(model.debug_getFlightBoard()).getFirst());
+        cards.add(Pirates.construct(model,model.debug_getFlightBoard()).getFirst());
+        cards.add(Slavers.construct(model,model.debug_getFlightBoard()).getFirst());
+        cards.add(Smugglers.construct(model,model.debug_getFlightBoard()).getFirst());
+        cards.add(Warzone.construct(model,model.debug_getFlightBoard()).getFirst());
+
+        model.debug_setCards(cards);
+    }
+
     @Test
     void testModel(){
         JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
@@ -135,6 +155,12 @@ class ModelTest {
         assertEquals(Model.State.Type.DRAW, model.getStatus());
         checkInit(model, players);
 
+        loadCards(model);
+
+        Result<Card.CompressedCard> res = model.drawCard("player2");
+        assertTrue(res.isErr());
+        res = model.drawCard("player1");
+        assertTrue(res.isOk());
         //TODO cards
     }
 

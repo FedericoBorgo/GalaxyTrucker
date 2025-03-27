@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,5 +153,10 @@ class EventInvoker implements Callback {
     @Override
     public void pushCardChanges(JSONObject data) {
         call("pushCardChanges", new Class[]{JSONObject.class}, data);
+    }
+
+    @Override
+    public void askForInput() throws RemoteException {
+        call("askForInput", new Class[]{});
     }
 }
