@@ -21,8 +21,17 @@ public class Logger {
     }
 
     public static void modelLog(int id, String message) {
-        print("MODEL", "[" + id + "]" + message, CYAN);
+        print("MODEL", "[" + id + "]" + message, PURPLE);
     }
+
+    public static void socketLog(String message) {
+        print("SOCKET", message, YELLOW);
+    }
+
+    public static void clientLog(String message) {
+        print("CLIENT", message, BLUE);
+    }
+
 
     public static void playerLog(int id, String player, String message){
         String prefix = Controller.isRMI() ? "RMI" : "SOCKET";

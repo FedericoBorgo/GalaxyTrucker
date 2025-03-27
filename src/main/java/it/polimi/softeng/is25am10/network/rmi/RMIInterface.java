@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.network;
+package it.polimi.softeng.is25am10.network.rmi;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
@@ -6,6 +6,7 @@ import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.network.Callback;
 import org.json.JSONObject;
 
 import java.rmi.Remote;
@@ -15,8 +16,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface ClientToServer extends Remote {
-    void join(String name, ServerToClient callback) throws RemoteException;
+public interface RMIInterface extends Remote {
+    void join(String name) throws RemoteException;
+
+    void setCallback(String name, Callback callback) throws RemoteException;
 
     Result<Integer> moveTimer(String name) throws RemoteException;
 

@@ -13,4 +13,8 @@ module it.polimi.softeng.is25am10 {
     exports it.polimi.softeng.is25am10;
     exports it.polimi.softeng.is25am10.network;
     opens it.polimi.softeng.is25am10.network to javafx.fxml;
+    exports it.polimi.softeng.is25am10.network.rmi;
+    opens it.polimi.softeng.is25am10.network.rmi to javafx.fxml;
+    exports it.polimi.softeng.is25am10.client;
+    opens it.polimi.softeng.is25am10.client to javafx.fxml;
 }

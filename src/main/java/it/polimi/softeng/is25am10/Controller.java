@@ -8,8 +8,8 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.network.ClientToServer;
-import it.polimi.softeng.is25am10.network.ServerToClient;
+import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
+import it.polimi.softeng.is25am10.network.Callback;
 import org.json.JSONObject;
 
 import java.rmi.RemoteException;
@@ -22,12 +22,12 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class Controller extends UnicastRemoteObject implements ClientToServer {
+public class Controller extends UnicastRemoteObject implements RMIInterface {
     private final Map<String, Model> nameToGame = new HashMap<>();
     private final Map<Model, List<String>> gameToPlayers = new HashMap<>();
     private final Map<Model, Integer> modelID = new HashMap<>();
 
-    private final Map<String, ServerToClient> nameToCallback = new HashMap<>();
+    private final Map<String, Callback> nameToCallback = new HashMap<>();
     private Model starting = null;
     private int counter = 0;
 
@@ -51,25 +51,22 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
 
     public Controller(int port) throws RemoteException {
         super();
-
         Registry registry = LocateRegistry.createRegistry(port);
-        try {
-            registry.rebind("controller", this);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        registry.rebind("controller", this);
         Logger.serverLog("controller started");
     }
 
-    public synchronized void join(String name, ServerToClient callback){
+    public synchronized void setCallback(String name, Callback callback) {
         nameToCallback.put(name, callback);
+    }
 
+    public synchronized void join(String name){
         if(nameToGame.containsKey(name))
             return;
 
         if(starting == null) {
             try {
-                starting = new Model(callback.askHowManyPlayers(), stateChanged);
+                starting = new Model(nameToCallback.get(name).askHowManyPlayers(), stateChanged);
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
@@ -95,7 +92,7 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
         return nameToGame.get(name);
     }
 
-    private void forEveryOneExept(Model m, String name, Consumer<ServerToClient> caller){
+    private void forEveryOneExept(Model m, String name, Consumer<Callback> caller){
         gameToPlayers.get(m).forEach(playerName -> {
             if(playerName.equals(name))
                 return;
@@ -104,7 +101,7 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
         });
     }
 
-    private void forEveryOne(Model m, Consumer<ServerToClient> caller){
+    private void forEveryOne(Model m, Consumer<Callback> caller){
         gameToPlayers.get(m).forEach(playerName -> {
             caller.accept(nameToCallback.get(playerName));
         });

@@ -36,7 +36,7 @@ public class FlightBoard implements Serializable {
 
     // Constructor method
     public FlightBoard() {
-        this.timer = 0;
+        this.timer = -1;
         this.order = new ArrayList<>();
         this.offset = new ArrayList<>();
         this.quitters = new ArrayList<>();

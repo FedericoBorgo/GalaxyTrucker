@@ -9,7 +9,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface ServerToClient extends Remote {
+public interface Callback extends Remote {
     void joinedPlayer(String player) throws RemoteException;
 
     int askHowManyPlayers() throws RemoteException;
