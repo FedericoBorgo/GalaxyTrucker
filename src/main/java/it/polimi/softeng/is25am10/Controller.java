@@ -49,15 +49,16 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
             updatePosition(model);
     };
 
-    public Controller() throws RemoteException {
+    public Controller(int port) throws RemoteException {
         super();
 
-        Registry registry = LocateRegistry.createRegistry(1234);
+        Registry registry = LocateRegistry.createRegistry(port);
         try {
             registry.rebind("controller", this);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
+        Logger.serverLog("controller started");
     }
 
     public synchronized void join(String name, ServerToClient callback){
@@ -140,9 +141,9 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
     @Override
     public Result<Integer> moveTimer(String name) {
         Model m = get(name);
-        Result<Integer> result = m.moveTimer(name);
+        Result<Integer> result = m.moveTimer();
 
-        if(result.isOk())
+        if(result.isOk()) {
             forEveryOneExept(m, name, p -> {
                 try {
                     p.movedTimer();
@@ -150,6 +151,8 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
                     throw new RuntimeException(e);
                 }
             });
+            Logger.playerLog(getID(m), name,"moved timer");
+        }
 
         return result;
     }
@@ -246,22 +249,22 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
 
     @Override
     public Result<Tile> drawTile(String name) {
-        return get(name).drawTile(name);
+        return get(name).drawTile();
     }
 
     @Override
     public Result<List<Tile>> getSeenTiles(String name) {
-        return get(name).getSeenTiles(name);
+        return get(name).getSeenTiles();
     }
 
     @Override
     public Result<String> giveTile(String name, Tile t) {
-        return get(name).giveTile(name, t);
+        return get(name).giveTile(t);
     }
 
     @Override
     public Result<Tile> getTileFromSeen(String name, Tile t) {
-        return get(name).getTileFromSeen(name, t);
+        return get(name).getTileFromSeen(t);
     }
 
     @Override
@@ -298,11 +301,11 @@ public class Controller extends UnicastRemoteObject implements ClientToServer {
 
     @Override
     public Result<JSONObject> getCardData(String name) {
-        return get(name).getCardData(name);
+        return get(name).getCardData();
     }
 
     @Override
     public Result<Card[][]> getVisible(String name) {
-        return get(name).getVisible(name);
+        return get(name).getVisible();
     }
 }

@@ -9,8 +9,6 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
-import it.polimi.softeng.is25am10.network.ClientToServer;
-import it.polimi.softeng.is25am10.network.ServerToClient;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -49,7 +47,7 @@ import java.util.function.BiConsumer;
  * This phase repeats until the cards are finished or if there are no player left.
  * It is possible that at the end of a card, it's required to correct the ship.
  */
-public class Model implements Serializable, ClientToServer {
+public class Model implements Serializable {
     /**
      * Counter for the removed items.
      */
@@ -72,7 +70,6 @@ public class Model implements Serializable, ClientToServer {
             return battery < 0 || guys < 0 || goods < 0;
         }
 
-        @Override
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) return false;
             RemovedItems that = (RemovedItems) o;
@@ -163,6 +160,8 @@ public class Model implements Serializable, ClientToServer {
     private final AtomicBoolean canMove = new AtomicBoolean(false);
     private transient Timer timer;
     private transient TimerTask task;
+    //TODO delay 90000L
+    private final long TIMER_DELAY = 1;
 
     /**
      * Builds a new Model with the number of required players.
@@ -181,7 +180,7 @@ public class Model implements Serializable, ClientToServer {
             public void run() {
                 canMove.set(true);
                 if(flight.getTimer() == 2){
-                    moveTimer("");
+                    moveTimer();
                 }
         }
         };
@@ -232,7 +231,7 @@ public class Model implements Serializable, ClientToServer {
 
         state.next(State.Type.BUILDING);
         countPlayers = 0;
-        timer.schedule(task, 90000L);
+        timer.schedule(task, TIMER_DELAY);
         return Result.ok("");
     }
 
@@ -253,17 +252,20 @@ public class Model implements Serializable, ClientToServer {
      * It eventually moves the BUILDING state to CHECKING or ALIEN.
      * @return the position of the timer.
      */
-    public synchronized Result<Integer> moveTimer(String name){
+    public synchronized Result<Integer> moveTimer(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
-        if(canMove.get())
+        if(canMove.get()) {
             flight.moveTimer();
 
-        if(flight.getTimer() == 2){
-            players.forEach((p,v)-> setReady(p));
+            if(flight.getTimer() == 2){
+                players.forEach((p,v)-> setReady(p));
+            }
+            else {
+                loadTimer();
+                timer.schedule(task, TIMER_DELAY);
+            }
         }
-        else
-            timer.schedule(task, 90000L);
 
         return Result.ok(flight.getTimer());
     }
@@ -280,7 +282,6 @@ public class Model implements Serializable, ClientToServer {
      * @param name the name of the player that finished.
      * @return err in case of fail
      */
-    @Override
     public synchronized Result<String> setReady(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
@@ -575,26 +576,26 @@ public class Model implements Serializable, ClientToServer {
     }
 
     //tiles section
-    public synchronized Result<Tile> drawTile(String name){
+    public synchronized Result<Tile> drawTile(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getNew());
     }
 
-    public synchronized Result<List<Tile>> getSeenTiles(String name){
+    public synchronized Result<List<Tile>> getSeenTiles(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getSeen());
     }
 
-    public synchronized Result<String> giveTile(String name, Tile t){
+    public synchronized Result<String> giveTile(Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         tiles.give(t);
         return Result.ok("");
     }
 
-    public synchronized Result<Tile> getTileFromSeen(String name, Tile t){
+    public synchronized Result<Tile> getTileFromSeen(Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getFromSeen(t));
@@ -651,7 +652,7 @@ public class Model implements Serializable, ClientToServer {
      * Get the temporary data about the drawn card.
      * @return
      */
-    public synchronized Result<JSONObject> getCardData(String name){
+    public synchronized Result<JSONObject> getCardData(){
         if(state.get() != State.Type.WAITING)
             return Result.err("not WAITING state");
         return Result.ok(deck.getData());
@@ -703,7 +704,7 @@ public class Model implements Serializable, ClientToServer {
         return res;
     }
 
-    public synchronized Result<Card[][]> getVisible(String name){
+    public synchronized Result<Card[][]> getVisible(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(deck.getVisible());
@@ -748,11 +749,5 @@ public class Model implements Serializable, ClientToServer {
         model.state.setNotify(notifer);
         ois.close();
         return model;
-    }
-
-
-    @Override
-    public void join(String name, ServerToClient callback) {
-        throw new IllegalCallerException("cant call join in the controller");
     }
 }

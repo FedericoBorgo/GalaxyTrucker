@@ -1,28 +1,18 @@
 package it.polimi.softeng.is25am10;
 
-import it.polimi.softeng.is25am10.network.ClientToServer;
-import it.polimi.softeng.is25am10.network.RMICLient;
-import it.polimi.softeng.is25am10.network.ServerToClient;
+import it.polimi.softeng.is25am10.network.RMIClient;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 public class ClientMain {
-    public static ClientToServer getRMIConnection(String host, int port) {
-        try {
-            Registry registry = LocateRegistry.getRegistry(host, port);
-            return (ClientToServer) registry.lookup("controller");
-        } catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public static void main(String[] args) throws RemoteException, InterruptedException {
+        RMIClient clientA = new RMIClient("fede", "localhost", 1234);
+        RMIClient clientB = new RMIClient("marco", "localhost", 1234);
 
-
-    public static void main(String[] args) throws RemoteException {
-        ClientToServer server = getRMIConnection("localhost", 1234);
-        ServerToClient client = new RMICLient();
-        server.join("fede", client);
+        clientA.moveTimer();
+        Thread.sleep(100);
+        clientB.moveTimer();
+        Thread.sleep(100);
+        clientA.movedTimer();
     }
 }

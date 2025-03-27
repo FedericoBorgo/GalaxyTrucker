@@ -1,9 +1,5 @@
 package it.polimi.softeng.is25am10;
 
-import java.awt.*;
-import java.rmi.server.RemoteServer;
-import java.rmi.server.ServerNotActiveException;
-
 public class Logger {
     static final String RESET = "\u001B[0m";
     static final String BLACK = "\u001B[30m";
