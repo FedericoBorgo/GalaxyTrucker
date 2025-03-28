@@ -635,7 +635,7 @@ public class Model implements Serializable {
         return Result.ok(c.compress());
     }
 
-    private JSONObject changes = null;
+    private transient JSONObject changes = null;
 
     /**
      * Give the player's input to the drawn card.

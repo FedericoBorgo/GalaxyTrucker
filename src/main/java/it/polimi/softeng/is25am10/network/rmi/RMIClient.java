@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.network.rmi;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
@@ -34,10 +35,10 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public void join(Callback callback) {
+    public Result<FlightBoard.Pawn> join(Callback callback) {
         try {
             server.setCallback(name, callback);
-            server.join(name);
+            return server.join(name);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

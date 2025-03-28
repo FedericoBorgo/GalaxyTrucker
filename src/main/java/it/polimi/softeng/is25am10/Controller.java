@@ -70,9 +70,9 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         nameToCallback.put(name, callback);
     }
 
-    public synchronized void join(String name){
+    public synchronized Result<FlightBoard.Pawn> join(String name){
         if(nameToGame.containsKey(name))
-            return;
+            return Result.err("already joined");
 
         if(starting == null) {
             try {
@@ -95,7 +95,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         gameToPlayers.get(starting).add(name);
         nameToGame.put(name, starting);
         Logger.playerLog(getID(starting), name, "joined");
-        starting.addPlayer(name);
+        return starting.addPlayer(name);
     }
 
     private Model get(String name){

@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.network.socket;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
@@ -71,9 +72,9 @@ public class SocketClient extends Thread implements ClientInterface {
         }
     }
 
-    public void join(Callback callback){
+    public Result<FlightBoard.Pawn> join(Callback callback){
         this.callback = callback;
-        Object o = call("join", new Class[]{String.class}, name);
+        return call("join", new Class[]{String.class}, name);
     }
 
     public Result<Integer> moveTimer() {

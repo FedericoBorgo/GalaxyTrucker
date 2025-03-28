@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.network.rmi;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
@@ -17,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface RMIInterface extends Remote {
-    void join(String name) throws RemoteException;
+    Result<FlightBoard.Pawn> join(String name) throws RemoteException;
 
     void setCallback(String name, Callback callback) throws RemoteException;
 

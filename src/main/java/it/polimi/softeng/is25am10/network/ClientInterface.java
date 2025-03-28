@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.network;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ClientInterface {
-    void join(Callback callback);
+    Result<FlightBoard.Pawn> join(Callback callback);
 
     Result<Integer> moveTimer();
 
