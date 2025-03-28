@@ -6,8 +6,8 @@ module it.polimi.softeng.is25am10 {
     requires org.json;
     requires jdk.jsobject;
     requires jdk.jdi;
-    requires java.desktop;
     requires java.rmi;
+    requires com.googlecode.lanterna;
 
     opens it.polimi.softeng.is25am10 to javafx.fxml;
     exports it.polimi.softeng.is25am10;

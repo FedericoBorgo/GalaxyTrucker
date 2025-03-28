@@ -1,6 +1,8 @@
 package it.polimi.softeng.is25am10;
 
 public class Logger {
+    public static boolean SILENCE = false;
+
     static final String RESET = "\u001B[0m";
     static final String BLACK = "\u001B[30m";
     static final String RED = "\u001B[31m";
@@ -13,6 +15,8 @@ public class Logger {
 
 
     private static void print(String prefix, String message, String color) {
+        if(SILENCE)
+            return;
         System.out.println(RESET + color + "[" + prefix + "]" + message);
     }
 
