@@ -125,11 +125,11 @@ public class Model implements Serializable {
             notify.accept(m, next);
         }
         
-        public Type get(){
+        private Type get(){
             return curr;
         }
         
-        public Type getPrev(){
+        private Type getPrev(){
             return prev;
         }
     }
@@ -583,12 +583,21 @@ public class Model implements Serializable {
         return Result.ok(tiles.getNew());
     }
 
+    /**
+     * Retrieves the list containing all the face-up tiles.
+     * @return The seen list.
+     */
     public synchronized Result<List<Tile>> getSeenTiles(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getSeen());
     }
 
+    /**
+     * Adds a tile to the face-up tiles.
+     * @param t the tile to be added to the seen list.
+     * @return
+     */
     public synchronized Result<String> giveTile(Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
