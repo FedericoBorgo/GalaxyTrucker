@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ClientInterface {
+    String getPlayerName();
+
     Result<FlightBoard.Pawn> join(Callback callback);
 
     Result<Integer> moveTimer();

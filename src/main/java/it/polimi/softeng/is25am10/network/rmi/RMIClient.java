@@ -35,6 +35,11 @@ public class RMIClient implements ClientInterface {
         }
     }
 
+    @Override
+    public String getPlayerName() {
+        return name;
+    }
+
     public Result<FlightBoard.Pawn> join(Callback callback) {
         try {
             server.setCallback(name, callback);

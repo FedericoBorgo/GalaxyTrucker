@@ -62,6 +62,11 @@ public class SocketClient extends Thread implements ClientInterface {
             }
         }
     }
+
+    @Override
+    public String getPlayerName(){
+        return name;
+    }
     
     private <T> T call(String name, Class<?>[] types, Object... args){
         try {
