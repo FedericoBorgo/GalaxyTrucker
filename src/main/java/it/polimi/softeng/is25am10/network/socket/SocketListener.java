@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SocketListener {
     private final ServerSocket methodInvoker;
@@ -121,8 +122,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void joinedPlayer(String player) {
-        call("joinedPlayer", new Class[]{String.class}, player);
+    public void setPlayers(Map<String, FlightBoard.Pawn> players) {
+        call("setPlayers", new Class[]{Map.class}, players);
     }
 
     @Override

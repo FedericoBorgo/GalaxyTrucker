@@ -52,10 +52,10 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
             }
         });
 
-        if(type == Model.State.Type.ALIEN)
+        if(type == Model.State.Type.ALIEN_INPUT)
             updatePosition(model);
 
-        if(type == Model.State.Type.DRAW){
+        if(type == Model.State.Type.DRAW_CARD){
             forEveryOne(model, player ->{
                 try {
                     player.pushCardChanges(model.getChanges());
@@ -97,18 +97,23 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
             gameToPlayers.put(starting, new ArrayList<>());
         }
 
-        forEveryOneExcept(starting, name, caller -> {
-            try {
-                caller.joinedPlayer(name);
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
+        Model temp = starting;
         gameToPlayers.get(starting).add(name);
         nameToGame.put(name, starting);
         Logger.playerLog(getID(starting), name, "joined");
-        return starting.addPlayer(name);
+        Result<FlightBoard.Pawn> pawn = starting.addPlayer(name);
+
+        if(pawn.isOk()){
+            forEveryOne(temp, caller -> {
+                try {
+                    caller.setPlayers(temp.getPlayers());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        return pawn;
     }
 
     // Private methods BEGIN

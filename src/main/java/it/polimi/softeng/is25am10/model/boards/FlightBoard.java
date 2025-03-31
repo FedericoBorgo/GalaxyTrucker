@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import com.googlecode.lanterna.TextColor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -154,7 +155,17 @@ public class FlightBoard implements Serializable {
      */
 
     public enum Pawn {
-        YELLOW, GREEN, BLUE, RED, EMPTY
+        YELLOW, GREEN, BLUE, RED, EMPTY;
+
+        public TextColor.ANSI getColor() {
+            return switch (this){
+                case YELLOW -> TextColor.ANSI.YELLOW_BRIGHT;
+                case GREEN -> TextColor.ANSI.GREEN_BRIGHT;
+                case BLUE -> TextColor.ANSI.BLUE_BRIGHT;
+                case RED -> TextColor.ANSI.RED_BRIGHT;
+                case EMPTY -> null;
+            };
+        }
     }
 
     public CompressedFlightBoard compress() {

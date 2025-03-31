@@ -2,8 +2,13 @@ package it.polimi.softeng.is25am10.client.tui;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -12,23 +17,21 @@ import com.googlecode.lanterna.terminal.Terminal;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.boards.*;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
-import javafx.util.Pair;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.lang.Thread.sleep;
 
 public class RendererTUI extends UnicastRemoteObject implements Callback {
     private final JSONObject textures;
@@ -36,12 +39,17 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
     Screen screen;
     Terminal terminal;
     TextGraphics graphics;
+    Map<String, FlightBoard.Pawn> players = new HashMap<>();
 
     ShipBoard board = new ShipBoard();
+    FlightBoard flight = new FlightBoard();
+
+    Model.State.Type state = Model.State.Type.JOINING;
+
+    boolean pauseRender = false;
 
     public RendererTUI(ClientInterface client) throws IOException {
         super();
-        client.join(this);
         terminal = new DefaultTerminalFactory().createTerminal();
         screen = new TerminalScreen(terminal);
         screen.startScreen();
@@ -53,48 +61,19 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
         boardBorder = Card.dump(RendererTUI.class.getResourceAsStream("board.txt")).split("\n");
         textures = new JSONObject(Card.dump(RendererTUI.class.getResourceAsStream("textures.json")));
 
-        TilesBoard board = this.board.getTiles();
-        board.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "stuo"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(3, 3), new Tile(Tile.Type.PIPES, "tusu"), Tile.Rotation.NONE);
-
-        board.setTile(new Coordinate(2, 2), new Tile(Tile.Type.B_BOX_2, "usos"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(2, 3), new Tile(Tile.Type.ENGINE, "otst"), Tile.Rotation.NONE);
-
-        board.setTile(new Coordinate(4, 1), new Tile(Tile.Type.HOUSE, "uouo"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(4, 2), new Tile(Tile.Type.B_ADDON, "tstt"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(4, 3), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.CLOCK);
-        board.setTile(new Coordinate(1, 2), new Tile(Tile.Type.D_CANNON, "sstu"), Tile.Rotation.CLOCK);
-        board.setTile(new Coordinate(1, 3), new Tile(Tile.Type.D_ENGINE, "sstu"), Tile.Rotation.INV);
-        board.setTile(new Coordinate(5, 1), new Tile(Tile.Type.R_BOX_1, "sstu"), Tile.Rotation.INV);
-        board.setTile(new Coordinate(5, 2), new Tile(Tile.Type.R_BOX_2, "sstu"), Tile.Rotation.INV);
-        board.setTile(new Coordinate(5, 3), new Tile(Tile.Type.B_BOX_2, "sstu"), Tile.Rotation.INV);
-        board.setTile(new Coordinate(5, 4), new Tile(Tile.Type.B_BOX_3, "sstu"), Tile.Rotation.INV);
-        board.setTile(new Coordinate(1, 4), new Tile(Tile.Type.HOUSE, "sstu"), Tile.Rotation.INV);
-
-        board.setTile(new Coordinate(0, 2), new Tile(Tile.Type.SHIELD, "sstu"), Tile.Rotation.NONE);
-        board.setTile(new Coordinate(0, 3), new Tile(Tile.Type.SHIELD, "sstu"), Tile.Rotation.CLOCK);
-        board.setTile(new Coordinate(0, 4), new Tile(Tile.Type.SHIELD, "sstu"), Tile.Rotation.DOUBLE);
-        board.setTile(new Coordinate(6, 2), new Tile(Tile.Type.BATTERY_2, "sstu"), Tile.Rotation.CLOCK);
-        board.setTile(new Coordinate(6, 3), new Tile(Tile.Type.BATTERY_3, "sstu"), Tile.Rotation.DOUBLE);
-
-        board.bookTile(new Tile(Tile.Type.BATTERY_3, "sstu"));
-        board.bookTile(new Tile(Tile.Type.SHIELD, "sstu"));
-
-        this.board.init(Optional.empty(), Optional.of(new Coordinate(4, 1)));
-        this.board.getGoods(GoodsBoard.Type.GREEN).put(new Coordinate(5, 4), 2);
-        this.board.getGoods(GoodsBoard.Type.YELLOW).put(new Coordinate(5, 4), 1);
-
         new Thread(update).start();
+
+        client.join(this).getData();
     }
 
     final Runnable update = () -> {
         try{
             while(true){
-                draw();
-                handleKeyBoard();
-
-
-                sleep(30);
+                if(!pauseRender){
+                    draw();
+                    handleKeyBoard();
+                }
+                Thread.sleep(30);
             }
         }
         catch (Exception _){}
@@ -106,8 +85,14 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
      */
     private void draw(){
         drawBorderBoard();
+        drawFlight();
         drawTiles(board.getTiles());
+        drawBooked(board.getTiles());
         drawElements(board);
+        drawErrors(board.getTiles().isOK());
+        drawClock();
+        drawPlayersName();
+        drawState();
 
         try {
             screen.refresh();
@@ -172,74 +157,83 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
      */
     void drawTiles(TilesBoard board){
         Coordinate.forEach(c -> {
-            TerminalPosition pos = coordToTerminalPosition(c);
-            Tile tile;
-            Tile.Type tileType;
-            Tile.Rotation rotation;
+            Result<Tile> res = board.getTile(c);
 
-            // print the booked tiles
-            if(c.equals(5, 0) && !board.getBooked().isEmpty()){
-                tile = board.getBooked().getFirst();
-                tileType = tile.getType();
-                rotation = Tile.Rotation.NONE;
-                pos = coordToTerminalPosition(new Coordinate(6, 0))
-                        .plus(new TerminalPosition(22, 0));
-            }
-            else if(c.equals(6, 0) && board.getBooked().size() > 1){
-                tile = board.getBooked().getLast();
-                tileType = tile.getType();
-                rotation = Tile.Rotation.NONE;
-                pos = coordToTerminalPosition(new Coordinate(6, 1))
-                        .plus(new TerminalPosition(22, 0));;
-            }
-            else{
-                Result<Tile> res = board.getTile(c);
-
-                if(res.isErr())
-                    return;
-
-                tile = res.getData();
-                tileType = tile.getType();
-                rotation = board.getRotation(c);
-            }
-
-
-            // get the texture of the corresponding tile
-            JSONObject texture = textures.getJSONObject(tileType.name());
-
-            // if a texture does not have rotation, it means that
-            // the tile can not be printed to the screen (es: WALL, EMPTY)
-            if(!texture.has("rotation"))
+            if(res.isErr())
                 return;
 
-            graphics.setForegroundColor(TextColor.ANSI.valueOf(texture.getString("color")));
+            drawTile(coordToTerminalPosition(c), res.getData(), board.getRotation(c));
+        });
+    }
 
-            if(texture.getBoolean("rotation"))
-                texture = texture.getJSONObject(rotation.name());
+    /**
+     * Draw the booked ties in their space
+     * @param board
+     */
+    void drawBooked(TilesBoard board){
+        if(!board.getBooked().isEmpty())
+            drawTile(new TerminalPosition(120, 2),
+                    board.getBooked().getFirst(), Tile.Rotation.NONE);
 
-            int xOffset = texture.getInt("x");
-            int yOffset = texture.getInt("y");
+        if(board.getBooked().size() > 1)
+            drawTile(new TerminalPosition(120, 8),
+                    board.getBooked().getLast(), Tile.Rotation.NONE);
+    }
 
-            // draw the texture
+    private void drawTile(TerminalPosition pos, Tile t, Tile.Rotation rotation){
+        // get the texture of the corresponding tile
+        JSONObject texture = textures.getJSONObject(t.getType().name());
+
+        // if a texture does not have rotation, it means that
+        // the tile can not be printed to the screen (es: WALL, EMPTY)
+        if(!texture.has("rotation"))
+            return;
+
+        graphics.setForegroundColor(TextColor.ANSI.valueOf(texture.getString("color")));
+
+        if(texture.getBoolean("rotation"))
+            texture = texture.getJSONObject(rotation.name());
+
+        int xOffset = texture.getInt("x");
+        int yOffset = texture.getInt("y");
+
+        // draw the texture
+        for(int i = 0; texture.has(String.valueOf(i)); i++)
+            graphics.putString(pos.plus(new TerminalPosition(xOffset, yOffset + i)), texture.getString(String.valueOf(i)));
+
+
+        //draw the connectors of the tile
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        for (Tile.Side side : Tile.Side.values()) {
+            Tile.ConnectorType type = Tile.getSide(t, rotation, side);
+            texture = textures.getJSONObject("connectors");
+            JSONObject offset = texture.getJSONObject(side.name());
+
+            xOffset = offset.getInt("x");
+            yOffset = offset.getInt("y");
+
+            texture = texture.getJSONObject(type.name()).getJSONObject(side.name());
+
             for(int i = 0; texture.has(String.valueOf(i)); i++)
                 graphics.putString(pos.plus(new TerminalPosition(xOffset, yOffset + i)), texture.getString(String.valueOf(i)));
+        }
+    }
 
+    /**
+     * Draw the wrong placed tiles.
+     * @param errors set of coordinates of wrong tiels
+     */
+    void drawErrors(Set<Coordinate> errors){
+        graphics.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
 
-            //draw the connectors of the tile
-            graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-            for (Tile.Side side : Tile.Side.values()) {
-                Tile.ConnectorType type = Tile.getSide(tile, board.getRotation(c), side);
-                texture = textures.getJSONObject("connectors");
-                JSONObject offset = texture.getJSONObject(side.name());
+        if(errors.contains(new Coordinate(0, 0))) {
+            graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "Nave separata in più pezzi.");
+            return;
+        }
 
-                xOffset = offset.getInt("x");
-                yOffset = offset.getInt("y");
-
-                texture = texture.getJSONObject(type.name()).getJSONObject(side.name());
-
-                for(int i = 0; texture.has(String.valueOf(i)); i++)
-                    graphics.putString(pos.plus(new TerminalPosition(xOffset, yOffset + i)), texture.getString(String.valueOf(i)));
-            }
+        errors.forEach(c -> {
+            TerminalPosition pos = coordToTerminalPosition(c);
+            graphics.putString(pos.plus(new TerminalPosition(2, 1)), "FIX");
         });
     }
 
@@ -265,31 +259,99 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
         });
     }
 
+    /**
+     * Draws the flightboard to the screen
+     */
+    void drawFlight(){
+        List<FlightBoard.Pawn> order = flight.getOrder();
+        int leader = flight.getLeaderPosition();
+        List<Integer> offset = flight.getOffset();
 
+        for(int i = 0; i < order.size(); i++){
+            String pos = textures.getJSONObject("FLIGHT")
+                    .getString(String.valueOf(leader + offset.get(i)));
 
+            int x = Integer.parseInt(pos.substring(0, pos.indexOf(' ')));
+            int y = Integer.parseInt(pos.substring(pos.indexOf(' ')+1));
 
+            TerminalPosition screenPos = new TerminalPosition(120 + y, 17 + x);
+
+            graphics.setForegroundColor(order.get(i).getColor());
+            graphics.putString(screenPos, "X");
+        }
+    }
+
+    /**
+     * Draw the clock position
+     */
+    void drawClock(){
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        graphics.drawRectangle(new TerminalPosition(122+ (flight.getTimer()+1)*10, 25),
+                new TerminalSize(8, 4), '#');
+    }
+
+    /**
+     * Draw the players connected to the game
+     */
+    void drawPlayersName(){
+        AtomicInteger pos = new AtomicInteger(34);
+        players.forEach((name, pawn) -> {
+            graphics.setForegroundColor(pawn.getColor());
+            graphics.putString(new TerminalPosition(0, pos.get()), "#"+name);
+            pos.getAndIncrement();
+        });
+    }
+
+    void drawState(){
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        graphics.putString(new TerminalPosition(93, 2), state.name());
+    }
 
 
 
 
     @Override
-    public void joinedPlayer(String player) throws RemoteException {
-
+    public void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException {
+        this.players = players;
     }
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return 0;
+        pauseRender = true;
+
+        WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
+        Window window = new BasicWindow("Numero Giocatori");
+        Panel panel = new Panel(new LinearLayout());
+        IntegerBox box = new IntegerBox(2);
+        Button ok = new Button("Ok", () -> {
+            if(box.getInt() > 4 || box.getInt() < 0)
+                MessageDialog.showMessageDialog(textGUI, "Error", "Numero giocatori non valido (massimo 4)", MessageDialogButton.OK);
+            else
+                window.close();
+        });
+        textGUI.setTheme(new SimpleTheme(TextColor.ANSI.WHITE_BRIGHT, TextColor.ANSI.BLACK));
+
+        panel.addComponent(box);
+        panel.addComponent(ok);
+
+        window.setComponent(panel);
+        window.setHints(Collections.singletonList(Window.Hint.CENTERED));
+
+        textGUI.addWindow(window);
+        textGUI.waitForWindowToClose(window);
+        screen.clear();
+        pauseRender = false;
+        return box.getInt();
     }
 
     @Override
     public void notifyState(Model.State.Type state) throws RemoteException {
-
+        this.state = state;
     }
 
     @Override
     public void movedTimer() throws RemoteException {
-
+        flight.moveTimer();
     }
 
     @Override

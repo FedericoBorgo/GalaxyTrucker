@@ -95,13 +95,13 @@ public class Model implements Serializable {
             //checking the board and fixing
             CHECKING,
             //setting where to put the alien
-            ALIEN,
-            DRAW,
+            ALIEN_INPUT,
+            DRAW_CARD,
             //waiting player input
-            WAITING,
+            WAITING_INPUT,
             ENDED,
             PAUSED,
-            DEBT
+            PAY_DEBT
         }
         private Type prev;
         private Type curr;
@@ -299,7 +299,7 @@ public class Model implements Serializable {
             if(!allShipOk())
                 state.next(State.Type.CHECKING);
             else
-                state.next(State.Type.ALIEN);
+                state.next(State.Type.ALIEN_INPUT);
         }
 
         return Result.ok("");
@@ -322,7 +322,7 @@ public class Model implements Serializable {
      * @return err if it fails
      */
     public synchronized Result<String> quit(String name){
-        if(state.get() != State.Type.DRAW)
+        if(state.get() != State.Type.DRAW_CARD)
             return Result.err("can't quit, not in the DRAW phase");
         quitIgnore(name);
         return Result.ok("");
@@ -375,9 +375,9 @@ public class Model implements Serializable {
         //if every board is ok, move the state
         if(allShipOk()){
             if(state.getPrev() == State.Type.BUILDING)
-                state.next(State.Type.ALIEN);
-            else if(state.getPrev() == State.Type.WAITING)
-                state.next(State.Type.DRAW);
+                state.next(State.Type.ALIEN_INPUT);
+            else if(state.getPrev() == State.Type.WAITING_INPUT)
+                state.next(State.Type.DRAW_CARD);
         }
 
         return Result.ok("");
@@ -417,7 +417,7 @@ public class Model implements Serializable {
      * @return result
      */
     public synchronized Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown) {
-        if (state.get() != State.Type.ALIEN)
+        if (state.get() != State.Type.ALIEN_INPUT)
             return Result.err("not ALIEN state");
 
         if (ship(name).getAstronaut().get(new Coordinate(3, 2)) == 2)
@@ -426,7 +426,7 @@ public class Model implements Serializable {
         countPlayers++;
 
         if (countPlayers == nPlayers)
-            state.next(State.Type.DRAW);
+            state.next(State.Type.DRAW_CARD);
         return Result.ok("");
     }
 
@@ -454,7 +454,7 @@ public class Model implements Serializable {
      * @return ok if its accepted, err if not
      */
     public synchronized Result<Integer> drop(String name, Coordinate c){
-        if(state.get() != State.Type.WAITING && state.get() != State.Type.DEBT)
+        if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -496,7 +496,7 @@ public class Model implements Serializable {
      * @return
      */
     public synchronized Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
-        if(state.get() != State.Type.WAITING && state.get() != State.Type.DEBT)
+        if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -512,15 +512,15 @@ public class Model implements Serializable {
     }
 
     private void updateDebt() {
-        if(state.get() == State.Type.DEBT && !someoneDebt()){
-            state.next(State.Type.WAITING);
+        if(state.get() == State.Type.PAY_DEBT && !someoneDebt()){
+            state.next(State.Type.WAITING_INPUT);
 
             removedItems.forEach((_, item) -> {
                 item.reset();
             });
 
             if(allShipOk())
-                state.next(State.Type.DRAW);
+                state.next(State.Type.DRAW_CARD);
             else
                 state.next(State.Type.CHECKING);
         }
@@ -545,7 +545,7 @@ public class Model implements Serializable {
      * @return
      */
     public synchronized Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
@@ -621,7 +621,7 @@ public class Model implements Serializable {
      * @return the card
      */
     public synchronized Result<Card.CompressedCard> drawCard(String name){
-        if(state.get() != State.Type.DRAW)
+        if(state.get() != State.Type.DRAW_CARD)
             return Result.err("not DRAW state");
         if(flight.getOrder().getFirst() != get(name).getPawn())
             return Result.err("only the leader can draw");
@@ -633,7 +633,7 @@ public class Model implements Serializable {
             return Result.ok(null);
         }
 
-        state.next(State.Type.WAITING);
+        state.next(State.Type.WAITING_INPUT);
 
         if(!c.needInput){
             players.forEach((p, _) -> {
@@ -655,7 +655,7 @@ public class Model implements Serializable {
      * @return
      */
     public synchronized Result<JSONObject> setInput(String name, JSONObject json){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
         Result<JSONObject> res = deck.set(get(name), json);
 
@@ -693,7 +693,7 @@ public class Model implements Serializable {
      * @return
      */
     public synchronized Result<JSONObject> getCardData(){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
         return Result.ok(deck.getData());
     }
@@ -710,7 +710,7 @@ public class Model implements Serializable {
     }
 
     private Result<JSONObject> playCard(){
-        if(state.get() != State.Type.WAITING)
+        if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
 
         Result<JSONObject> res = deck.play();
@@ -727,7 +727,7 @@ public class Model implements Serializable {
             });
 
             if(someoneDebt()){
-                state.next(State.Type.DEBT);
+                state.next(State.Type.PAY_DEBT);
             }
             else{
                 removedItems.forEach((name, item) -> {
@@ -735,7 +735,7 @@ public class Model implements Serializable {
                 });
 
                 if(allShipOk())
-                    state.next(State.Type.DRAW);
+                    state.next(State.Type.DRAW_CARD);
                 else
                     state.next(State.Type.CHECKING);
             }
@@ -775,7 +775,7 @@ public class Model implements Serializable {
      * @throws IOException
      */
     public Result<String> store(String filename) throws IOException {
-        if(state.get() != State.Type.DRAW)
+        if(state.get() != State.Type.DRAW_CARD)
             return Result.err("not DRAW state");
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
         oos.writeObject(this);
@@ -797,5 +797,14 @@ public class Model implements Serializable {
         model.state.setNotify(notifer);
         ois.close();
         return model;
+    }
+
+    public Map<String, Pawn> getPlayers(){
+        Map<String, Pawn> p = new HashMap<>();
+        players.forEach((name, player) -> {
+            p.put(name, player.getPawn());
+        });
+
+        return p;
     }
 }

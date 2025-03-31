@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 
 public class PlaceholderCallback extends UnicastRemoteObject implements Callback {
     private final String name;
@@ -19,8 +20,8 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     }
 
     @Override
-    public void joinedPlayer(String player) throws RemoteException {
-        Logger.clientLog("per : " + name + " evento: giocatore unito " + player);
+    public void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException {
+        Logger.clientLog("per : " + name + " evento: giocatore unito " + players);
     }
 
     @Override

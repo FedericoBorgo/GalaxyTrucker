@@ -8,9 +8,10 @@ import org.json.JSONObject;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 public interface Callback extends Remote {
-    void joinedPlayer(String player) throws RemoteException;
+    void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException;
 
     int askHowManyPlayers() throws RemoteException;
 

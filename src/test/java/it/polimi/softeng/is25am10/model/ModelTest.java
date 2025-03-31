@@ -150,9 +150,9 @@ class ModelTest {
         checkTiles(model, players);
         assertEquals(Model.State.Type.CHECKING, model.getStatus());
         removeWrong(model, players);
-        assertEquals(Model.State.Type.ALIEN, model.getStatus());
+        assertEquals(Model.State.Type.ALIEN_INPUT, model.getStatus());
         initShip(model, players);
-        assertEquals(Model.State.Type.DRAW, model.getStatus());
+        assertEquals(Model.State.Type.DRAW_CARD, model.getStatus());
         checkInit(model, players);
 
         loadCards(model);
