@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import com.googlecode.lanterna.TextColor;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import javafx.util.Pair;
@@ -21,6 +22,8 @@ public abstract class ElementsBoard implements Serializable {
     // List of other boards containing units which interact with the units we are working on
     protected List<ElementsBoard> other;
 
+    private final boolean removeChecks;
+
     /**
      * Constructor method that can be used in the subclasses.
      * @param board The TilesBoard of a certain player
@@ -30,6 +33,19 @@ public abstract class ElementsBoard implements Serializable {
         total = 0;
         positions = new HashMap<>();
         other = new ArrayList<>();
+        removeChecks = false;
+    }
+
+    /**
+     * Constructor method that can be used in the subclasses.
+     * @param board The TilesBoard of a certain player
+     */
+    public ElementsBoard(TilesBoard board, boolean removeCheck) {
+        this.board = board;
+        total = 0;
+        positions = new HashMap<>();
+        other = new ArrayList<>();
+        this.removeChecks = removeCheck;
     }
     // Get methods
 
@@ -185,9 +201,10 @@ public abstract class ElementsBoard implements Serializable {
         if(resBoard.isErr())
             return Result.err(resBoard.getReason());
 
-        for(ElementsBoard b: other)
-            if(b.get(c) > 0)
-                return Result.err("occupied by others");
+        if(!removeChecks)
+            for(ElementsBoard b: other)
+                if(b.get(c) > 0)
+                    return Result.err("occupied by others");
 
         if(!check(c, qty))
             return Result.err("cant place here");
@@ -223,6 +240,8 @@ public abstract class ElementsBoard implements Serializable {
      * @return
      */
     public abstract boolean check(Coordinate c, int qty);
+
+    public abstract TextColor.ANSI getColor();
 
     @Override
     public boolean equals(Object o) {

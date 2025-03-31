@@ -100,4 +100,8 @@ public record Coordinate(int x, int y) implements Serializable {
         Coordinate that = (Coordinate) o;
         return x == that.x && y == that.y;
     }
+
+    public boolean equals(int x, int y) {
+        return this.x == x && this.y == y;
+    }
 }

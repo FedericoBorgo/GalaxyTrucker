@@ -46,6 +46,7 @@ public class ShipBoard implements Serializable {
     private final ElementsBoard brown;
     private final ElementsBoard battery;
     private final Map<GoodsBoard.Type, ElementsBoard> goods;
+    private final List<ElementsBoard> boards;
 
     public ShipBoard(){
         tiles = new TilesBoard();
@@ -66,6 +67,9 @@ public class ShipBoard implements Serializable {
             other.remove(goods.get(type));
             goods.get(type).setOthers(other);
         });
+
+        boards = new ArrayList<>(List.of(astronaut, purple, brown, battery));
+        boards.addAll(goods.values());
     }
 
     public TilesBoard getTiles() {
@@ -216,5 +220,9 @@ public class ShipBoard implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         ShipBoard shipBoard = (ShipBoard) o;
         return Objects.equals(tiles, shipBoard.tiles) && Objects.equals(astronaut, shipBoard.astronaut) && Objects.equals(purple, shipBoard.purple) && Objects.equals(brown, shipBoard.brown) && Objects.equals(battery, shipBoard.battery) && Objects.equals(goods, shipBoard.goods);
+    }
+
+    public List<ElementsBoard> boards(){
+        return boards;
     }
 }

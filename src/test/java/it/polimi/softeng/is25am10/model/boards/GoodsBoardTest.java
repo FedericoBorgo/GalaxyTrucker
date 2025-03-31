@@ -35,10 +35,6 @@ class GoodsBoardTest {
     void testPut(){
         Result<Integer> res;
 
-        res = blockRed.put(new Coordinate(2, 2), 1);
-        assertTrue(res.isErr());
-        assertEquals("occupied by others", res.getReason());
-        assertEquals(0, blockRed.get(new Coordinate(2, 2)));
 
         res = blockRed.put(new Coordinate(1, 2), 1);
         assertTrue(res.isOk());

@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import com.googlecode.lanterna.TextColor;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 
@@ -51,5 +52,9 @@ public class AlienBoard extends ElementsBoard{
     public boolean check(Coordinate c, int qty) {
         return board.getTile(c).getData().getType() == Tile.Type.HOUSE
                 && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1) && total+ qty <= 1;
+    }
+
+    public TextColor.ANSI getColor(){
+        return type == Tile.Type.B_ADDON ? TextColor.ANSI.YELLOW : TextColor.ANSI.MAGENTA;
     }
 }

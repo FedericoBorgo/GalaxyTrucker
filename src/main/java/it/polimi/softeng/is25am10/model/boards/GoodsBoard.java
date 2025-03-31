@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import com.googlecode.lanterna.TextColor;
 import it.polimi.softeng.is25am10.model.Tile;
 
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class GoodsBoard extends ElementsBoard{
     public enum Type{
         BLUE, RED, YELLOW, GREEN
     }
+
+    private final TextColor.ANSI color;
 
     private final List<Tile.Type> box;
 
@@ -51,12 +54,19 @@ public class GoodsBoard extends ElementsBoard{
         MAX_VALUE.put(Tile.Type.R_BOX_2, 2);
     }
 
-    public GoodsBoard(TilesBoard board, Type color) { super(board);
+    public GoodsBoard(TilesBoard board, Type color) {
+        super(board, true);
         this.box = switch (color){
             case RED -> RED_BOX;
             case YELLOW -> YELLOW_BOX;
             case BLUE -> BLUE_BOX;
             case GREEN -> GREEN_BOX;
+        };
+        this.color = switch(color){
+            case BLUE -> TextColor.ANSI.BLUE;
+            case RED -> TextColor.ANSI.RED;
+            case YELLOW -> TextColor.ANSI.YELLOW;
+            case GREEN -> TextColor.ANSI.GREEN;
         };
     }
 
@@ -74,4 +84,11 @@ public class GoodsBoard extends ElementsBoard{
         Tile.Type tile = board.getTile(c).getData().getType();
         return box.contains(tile) && (getNBox(c) + get(c) + qty) <= MAX_VALUE.get(tile);
     }
+
+    @Override
+    public TextColor.ANSI getColor() {
+        return color;
+    }
+
+
 }
