@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * @param y
  */
 public record Coordinate(int x, int y) implements Serializable {
-    private boolean check(int x, int y) {
+    static public boolean check(int x, int y) {
         return x < 0 || x >= TilesBoard.BOARD_WIDTH || y < 0 || y >= TilesBoard.BOARD_HEIGHT;
     }
 

@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.client.tui;
+package it.polimi.softeng.is25am10.client.asciiui;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
@@ -10,6 +10,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -22,34 +23,29 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
-public class RendererTUI extends UnicastRemoteObject implements Callback {
+public class FrameGenerator {
     private final JSONObject textures;
     private final String[] boardBorder;
-    Screen screen;
-    Terminal terminal;
-    TextGraphics graphics;
-    Map<String, FlightBoard.Pawn> players = new HashMap<>();
+    private final Game game;
+    private final Screen screen;
+    private final Terminal terminal;
+    private final TextGraphics graphics;
+    private boolean pauseRender = false;
+    private boolean isOkCommand = false;
 
-    ShipBoard board = new ShipBoard();
-    FlightBoard flight = new FlightBoard();
+    ArrayList<Character> command = new ArrayList<>();
+    int cursor = 0;
 
-    Model.State.Type state = Model.State.Type.JOINING;
+    String response = "";
 
-    boolean pauseRender = false;
-
-    public RendererTUI(ClientInterface client) throws IOException {
-        super();
+    public FrameGenerator(Game game) throws IOException {
         terminal = new DefaultTerminalFactory().createTerminal();
         screen = new TerminalScreen(terminal);
         screen.startScreen();
@@ -58,64 +54,23 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
         screen.setCursorPosition(null);
 
         //get the textures
-        boardBorder = Card.dump(RendererTUI.class.getResourceAsStream("board.txt")).split("\n");
-        textures = new JSONObject(Card.dump(RendererTUI.class.getResourceAsStream("textures.json")));
+        boardBorder = Card.dump(Game.class.getResourceAsStream("board.txt")).split("\n");
+        textures = new JSONObject(Card.dump(Game.class.getResourceAsStream("textures.json")));
 
-        new Thread(update).start();
+        this.game = game;
 
-        client.join(this).getData();
-    }
-
-    final Runnable update = () -> {
-        try{
-            while(true){
-                if(!pauseRender){
-                    draw();
-                    handleKeyBoard();
-                }
-                Thread.sleep(30);
-            }
-        }
-        catch (Exception _){}
-    };
-
-
-    /**
-     * Draw everything to the screen.
-     */
-    private void draw(){
-        drawBorderBoard();
-        drawFlight();
-        drawTiles(board.getTiles());
-        drawBooked(board.getTiles());
-        drawElements(board);
-        drawErrors(board.getTiles().isOK());
-        drawClock();
-        drawPlayersName();
-        drawState();
-
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Handles the user keyboard input.
-     */
-    private void handleKeyBoard(){
-        try {
-            KeyStroke key = screen.pollInput();
-
-            if(key != null){
-                if(key.getCharacter() == 'c' && key.isCtrlDown()){
-                    System.exit(0);
+        new Thread(() -> {
+            try{
+                while(true){
+                    if(!pauseRender){
+                        draw();
+                        handleKeyBoard();
+                    }
+                    Thread.sleep(30);
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            catch (Exception _){}}
+        ).start();
     }
 
     /**
@@ -263,9 +218,9 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
      * Draws the flightboard to the screen
      */
     void drawFlight(){
-        List<FlightBoard.Pawn> order = flight.getOrder();
-        int leader = flight.getLeaderPosition();
-        List<Integer> offset = flight.getOffset();
+        List<FlightBoard.Pawn> order = game.flight.getOrder();
+        int leader = game.flight.getLeaderPosition();
+        List<Integer> offset = game.flight.getOffset();
 
         for(int i = 0; i < order.size(); i++){
             String pos = textures.getJSONObject("FLIGHT")
@@ -286,8 +241,15 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
      */
     void drawClock(){
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-        graphics.drawRectangle(new TerminalPosition(122+ (flight.getTimer()+1)*10, 25),
+        graphics.drawRectangle(new TerminalPosition(122+ game.flight.getTimer()*10, 25),
                 new TerminalSize(8, 4), '#');
+
+        if(game.state == Model.State.Type.BUILDING) {
+            long time = Model.TIMER_DELAY/1000-((System.currentTimeMillis()-game.startTime)/1000);
+            if(time < 0)
+                time = 0;
+            graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(time));
+        }
     }
 
     /**
@@ -295,7 +257,7 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
      */
     void drawPlayersName(){
         AtomicInteger pos = new AtomicInteger(34);
-        players.forEach((name, pawn) -> {
+        game.players.forEach((name, pawn) -> {
             graphics.setForegroundColor(pawn.getColor());
             graphics.putString(new TerminalPosition(0, pos.get()), "#"+name);
             pos.getAndIncrement();
@@ -304,21 +266,97 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
 
     void drawState(){
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-        graphics.putString(new TerminalPosition(93, 2), state.name());
+        graphics.putString(new TerminalPosition(93, 2), game.state.name());
     }
 
+    void drawInput(){
+        graphics.setForegroundColor(isOkCommand? TextColor.ANSI.WHITE_BRIGHT : TextColor.ANSI.RED_BRIGHT);
 
+        for(int i = 0; i < command.size(); i++){
+            graphics.putString(new TerminalPosition(29+i, 34), ""+command.get(i));
+        }
 
+        screen.setCursorPosition(new TerminalPosition(29+ cursor, 34));
 
-    @Override
-    public void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException {
-        this.players = players;
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        graphics.putString(new TerminalPosition(29, 36), response);
     }
 
-    @Override
-    public int askHowManyPlayers() throws RemoteException {
+    void drawCurrentTile(){
+        if(game.currentTile == null)
+            return;
+
+        drawTile(new TerminalPosition(140, 2),
+                game.currentTile, Tile.Rotation.NONE);
+    }
+
+    /**
+     * Draw everything to the screen.
+     */
+    public void draw(){
+        screen.clear();
+        drawBorderBoard();
+        drawFlight();
+        drawTiles(game.board.getTiles());
+        drawBooked(game.board.getTiles());
+        drawElements(game.board);
+        drawErrors(game.board.getTiles().isOK());
+        drawClock();
+        drawPlayersName();
+        drawState();
+        drawInput();
+        drawCurrentTile();
+
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String toStringCommand(){
+        StringBuilder builder = new StringBuilder();
+        for (Character character : command) builder.append(character);
+        return builder.toString();
+    }
+
+    /**
+     * Handles the user keyboard input.
+     */
+    private void handleKeyBoard(){
+        try {
+            KeyStroke key = screen.pollInput();
+
+            if(key != null){
+                if(key.getKeyType() == KeyType.Delete && cursor < command.size())
+                    command.remove(cursor);
+                else if(key.getKeyType() == KeyType.Backspace && cursor > 0){
+                    command.remove(cursor-1);
+                    cursor--;
+                }
+                else if(key.getKeyType() == KeyType.ArrowLeft && cursor > 0)
+                    cursor--;
+                else if(key.getKeyType() == KeyType.ArrowRight && cursor < command.size())
+                    cursor++;
+                else if(key.getKeyType() == KeyType.Character) {
+                    command.add(cursor++, key.getCharacter());
+                    isOkCommand = game.checkCommand(toStringCommand());
+                }
+                else if(key.getKeyType() == KeyType.Enter) {
+                    String cmd = toStringCommand();
+
+                    if(isOkCommand) {
+                        response = game.handleInsert(cmd);
+                        command.clear();
+                        cursor = 0;
+                    }
+                }
+            }
+        } catch (IOException _) {}
+    }
+
+    int askHowManyPlayer(){
         pauseRender = true;
-
         WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
         Window window = new BasicWindow("Numero Giocatori");
         Panel panel = new Panel(new LinearLayout());
@@ -342,35 +380,5 @@ public class RendererTUI extends UnicastRemoteObject implements Callback {
         screen.clear();
         pauseRender = false;
         return box.getInt();
-    }
-
-    @Override
-    public void notifyState(Model.State.Type state) throws RemoteException {
-        this.state = state;
-    }
-
-    @Override
-    public void movedTimer() throws RemoteException {
-        flight.moveTimer();
-    }
-
-    @Override
-    public void pushPositions(List<FlightBoard.Pawn> order, List<Integer> offset) throws RemoteException {
-
-    }
-
-    @Override
-    public void pushCard(Card.CompressedCard card) throws RemoteException {
-
-    }
-
-    @Override
-    public void pushCardChanges(JSONObject data) throws RemoteException {
-
-    }
-
-    @Override
-    public void askForInput() throws RemoteException {
-
     }
 }

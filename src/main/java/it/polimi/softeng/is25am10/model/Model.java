@@ -161,8 +161,7 @@ public class Model implements Serializable {
     private final AtomicBoolean canMove = new AtomicBoolean(false);
     private transient Timer timer;
     private transient TimerTask task;
-    //TODO delay 90000L
-    private final long TIMER_DELAY = 1;
+    public static final long TIMER_DELAY = 10000L;
 
     /**
      * Builds a new Model with the number of required players.
@@ -257,16 +256,20 @@ public class Model implements Serializable {
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         if(canMove.get()) {
-            flight.moveTimer();
-
             if(flight.getTimer() == 2){
                 players.forEach((p,v)-> setReady(p));
             }
             else {
+                flight.moveTimer();
                 loadTimer();
                 timer.schedule(task, TIMER_DELAY);
             }
+
+            canMove.set(false);
         }
+        else
+            return Result.err("clessidra non ancora esaurita");
+
 
         return Result.ok(flight.getTimer());
     }
@@ -332,6 +335,8 @@ public class Model implements Serializable {
     public synchronized Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
+        if(flight.getOrder().contains(get(name).getPawn()))
+            return Result.err("player già pronto");
         return ship(name).getTiles().setTile(c, t, rotation);
     }
 

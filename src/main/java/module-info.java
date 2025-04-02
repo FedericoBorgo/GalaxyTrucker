@@ -8,6 +8,7 @@ module it.polimi.softeng.is25am10 {
     requires jdk.jdi;
     requires java.rmi;
     requires com.googlecode.lanterna;
+    requires java.desktop;
 
     opens it.polimi.softeng.is25am10 to javafx.fxml;
     exports it.polimi.softeng.is25am10;
@@ -17,6 +18,6 @@ module it.polimi.softeng.is25am10 {
     opens it.polimi.softeng.is25am10.network.rmi to javafx.fxml;
     exports it.polimi.softeng.is25am10.client;
     opens it.polimi.softeng.is25am10.client to javafx.fxml;
-    exports it.polimi.softeng.is25am10.client.tui;
-    opens it.polimi.softeng.is25am10.client.tui to javafx.fxml;
+    exports it.polimi.softeng.is25am10.client.asciiui;
+    opens it.polimi.softeng.is25am10.client.asciiui to javafx.fxml;
 }

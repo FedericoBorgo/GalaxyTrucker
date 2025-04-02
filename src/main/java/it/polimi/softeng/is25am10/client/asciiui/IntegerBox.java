@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.client.tui;
+package it.polimi.softeng.is25am10.client.asciiui;
 
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.input.KeyStroke;

@@ -1,16 +1,26 @@
-package it.polimi.softeng.is25am10.client.tui;
+package it.polimi.softeng.is25am10.client.asciiui;
 
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.Component;
+import com.googlecode.lanterna.gui2.GridLayout;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.swing.SwingTerminal;
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * When the player gave the input, a connection to the server
  * is established.
  */
-public class ConfigTUI {
+public class Config {
     // boxes for the ports
     private static final IntegerBox rmiPort = new IntegerBox(1234);
     private static final IntegerBox socketPort1 = new IntegerBox(1235);
@@ -47,7 +57,7 @@ public class ConfigTUI {
         //create a terminal, associate a screen and create a window
         //inside the screen
         Terminal terminal = new DefaultTerminalFactory().createTerminal();
-        Screen screen = new TerminalScreen(terminal);
+        Screen  screen= new TerminalScreen(terminal);
         screen.startScreen();
         WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
 

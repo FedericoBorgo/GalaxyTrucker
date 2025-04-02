@@ -30,14 +30,14 @@ public class FlightBoard implements Serializable {
 
     private int timer;
 
-    private final List<Pawn> order;
-    private final List<Integer> offset;
+    private List<Pawn> order;
+    private List<Integer> offset;
     private int leaderPosition;
     private final List<Pawn> quitters;
 
     // Constructor method
     public FlightBoard() {
-        this.timer = -1;
+        this.timer = 0;
         this.order = new ArrayList<>();
         this.offset = new ArrayList<>();
         this.quitters = new ArrayList<>();
@@ -214,5 +214,10 @@ public class FlightBoard implements Serializable {
         }
 
         return array;
+    }
+
+    public void set(List<Pawn> order, List<Integer> offset){
+        this.order = order;
+        this.offset = offset;
     }
 }
