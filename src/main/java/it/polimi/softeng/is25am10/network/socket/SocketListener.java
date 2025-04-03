@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.network.socket;
 import it.polimi.softeng.is25am10.Controller;
 import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
@@ -159,5 +160,15 @@ class EventInvoker implements Callback {
     @Override
     public void askForInput() throws RemoteException {
         call("askForInput", new Class[]{});
+    }
+
+    @Override
+    public void gaveTile(Tile t) throws RemoteException {
+        call("gaveTile", new Class[]{Tile.class}, t);
+    }
+
+    @Override
+    public void gotTile(Tile t) throws RemoteException {
+        call("gotTile", new Class[]{Tile.class}, t);
     }
 }

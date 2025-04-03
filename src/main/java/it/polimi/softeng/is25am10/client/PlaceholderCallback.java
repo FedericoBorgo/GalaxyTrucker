@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.client;
 
 import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
@@ -56,6 +57,16 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
 
     @Override
     public void askForInput() throws RemoteException {
+
+    }
+
+    @Override
+    public void gaveTile(Tile t) throws RemoteException {
+
+    }
+
+    @Override
+    public void gotTile(Tile t) throws RemoteException {
 
     }
 }

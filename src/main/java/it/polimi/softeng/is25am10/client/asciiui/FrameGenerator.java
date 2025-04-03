@@ -306,6 +306,7 @@ public class FrameGenerator {
         drawState();
         drawInput();
         drawCurrentTile();
+        drawOpenTiles();
 
         try {
             screen.refresh();
@@ -380,5 +381,16 @@ public class FrameGenerator {
         screen.clear();
         pauseRender = false;
         return box.getInt();
+    }
+
+    void drawOpenTiles(){
+        TerminalPosition start = new TerminalPosition(162, 2);
+
+        for (int i = 0; i < game.openTiles.size(); i++) {
+            drawTile(start.plus(new TerminalPosition(
+                    (i/7)*16,
+                    (i%7)*6
+            )), game.openTiles.get(i), Tile.Rotation.NONE);
+        }
     }
 }

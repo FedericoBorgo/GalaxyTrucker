@@ -23,6 +23,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     final ClientInterface server;
     final ShipBoard board = new ShipBoard();
     final FlightBoard flight = new FlightBoard();
+    final ArrayList<Tile> openTiles = new ArrayList<>();
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
     Tile currentTile = null;
@@ -59,17 +60,15 @@ public class Game extends UnicastRemoteObject implements Callback {
                 if(args.length < 3)
                     return false;
 
-                if(!(args[0].equals("0") || args[0].equals("1") || args[0].equals("2")))
+                if(Integer.parseInt(args[0]) > 30)
                     return false;
 
-                if(args[1].charAt(0) != 'x' ||
-                        args[1].charAt(2) != 'y' ||
-                        !Character.isDigit(args[1].charAt(1)) ||
-                        !Character.isDigit(args[1].charAt(3)))
+                if(!Character.isDigit(args[1].charAt(0)) ||
+                    !Character.isDigit(args[1].charAt(1)))
                     return false;
 
-                int x = args[1].charAt(1) - '0' - 4;
-                int y = args[1].charAt(3) - '0' - 5;
+                int x = args[1].charAt(0) - '0';
+                int y = args[1].charAt(1) - '0';
 
                 if(Coordinate.check(x, y))
                     return false;
@@ -143,7 +142,8 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     String handlePlace(String cmd){
         TilesBoard board = this.board.getTiles();
-        int from = cmd.charAt(0) - '0';
+        String[] args = cmd.split(" ");
+        int from = Integer.parseInt(args[0]);
 
         switch(from){
             case 0:
@@ -158,11 +158,14 @@ public class Game extends UnicastRemoteObject implements Callback {
                 if(currentTile == null)
                     return "impossibile prendere all'indice " + from;
                 break;
+            default:
+                if(from-3+1 > openTiles.size())
+                    return "impossibile prendere all'indice " + from;
         }
 
         //0 x1y2 4
-        Coordinate coord = new Coordinate(cmd.charAt(3) - '0' - 4, cmd.charAt(5) - '0' - 5);
-        Tile.Rotation pos = switch(cmd.charAt(7) - '0'){
+        Coordinate coord = new Coordinate(args[1].charAt(0) - '0', args[1].charAt(1) - '0');
+        Tile.Rotation pos = switch(args[2].charAt(0) - '0'){
             case 0 -> Tile.Rotation.NONE;
             case 1 -> Tile.Rotation.CLOCK;
             case 2 -> Tile.Rotation.DOUBLE;
@@ -180,7 +183,7 @@ public class Game extends UnicastRemoteObject implements Callback {
             }
             return res.getReason();
         }
-        else{
+        else if (from < 2){
             Tile t = board.getBooked().get(from);
 
             Result<Tile> res = server.useBookedTile(t, pos, coord);
@@ -190,6 +193,25 @@ public class Game extends UnicastRemoteObject implements Callback {
                 return "piazzata";
             }
             return res.getReason();
+        }
+        else {
+            from = from-3;
+            Tile t = openTiles.get(from);
+            Result<Tile> res = server.getTileFromSeen(t);
+
+            if(res.isErr())
+                return res.getReason();
+
+            res = server.setTile(coord, t, pos);
+
+            if(res.isOk()){
+                board.setTile(coord, t, pos);
+                return "piazzata";
+            }
+            else {
+                server.giveTile(t);
+                return res.getReason();
+            }
         }
     }
 
@@ -236,6 +258,16 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void askForInput() throws RemoteException {
 
+    }
+
+    @Override
+    public void gaveTile(Tile t) throws RemoteException {
+        openTiles.add(t);
+    }
+
+    @Override
+    public void gotTile(Tile t) throws RemoteException {
+        openTiles.remove(t);
     }
 
 }

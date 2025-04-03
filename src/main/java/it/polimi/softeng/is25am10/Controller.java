@@ -309,7 +309,18 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
      */
     @Override
     public Result<String> giveTile(String name, Tile t) {
-        return getModel(name).giveTile(t);
+        Result<String> res = getModel(name).giveTile(t);
+        if(res.isErr())
+            return Result.err("errore");
+
+        forEveryOne(getModel(name), caller -> {
+            try {
+                caller.gaveTile(t);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return res;
     }
 
     /**
@@ -320,7 +331,18 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
      */
     @Override
     public Result<Tile> getTileFromSeen(String name, Tile t) {
-        return getModel(name).getTileFromSeen(t);
+        Result<Tile> res = getModel(name).getTileFromSeen(t);
+        if(res.isErr())
+            return Result.err("errore");
+
+        forEveryOne(getModel(name), caller -> {
+            try {
+                caller.gotTile(t);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return res;
     }
 
     /**

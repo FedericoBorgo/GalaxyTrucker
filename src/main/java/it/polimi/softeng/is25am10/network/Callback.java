@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.network;
 
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;
@@ -26,4 +27,8 @@ public interface Callback extends Remote {
     void pushCardChanges(JSONObject data) throws RemoteException;
 
     void askForInput() throws RemoteException;
+
+    void gaveTile(Tile t) throws RemoteException;
+
+    void gotTile(Tile t) throws RemoteException;
 }
