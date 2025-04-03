@@ -77,6 +77,37 @@ public class Game extends UnicastRemoteObject implements Callback {
 
                 return rot < 4;
             }
+            else if(command.substring(0, command.indexOf(' ')).equals("alieni") && state == Model.State.Type.ALIEN_INPUT){
+                String[] args = command.substring(command.indexOf(' ') + 1).split(" ");
+
+                if(args.length > 2)
+                    return false;
+
+                for (String arg : args) {
+                    if (arg.charAt(0) != 'v' && arg.charAt(0) != 'm')
+                        return false;
+
+                    if (!Character.isDigit(arg.charAt(1)) ||
+                            !Character.isDigit(arg.charAt(2)))
+                        return false;
+
+                    int x = arg.charAt(1) - '0';
+                    int y = arg.charAt(2) - '0';
+
+                    if (Coordinate.check(x, y))
+                        return false;
+                }
+
+                return true;
+            }
+            else if(command.substring(0, command.indexOf(' ')).equals("rimuovi") && state == Model.State.Type.CHECKING){
+                String where = command.substring(command.indexOf(' ') + 1);
+
+                int x = where.charAt(0) - '0';
+                int y = where.charAt(1) - '0';
+
+                return !Coordinate.check(x, y);
+            }
         }
         catch (Exception _) {}
         return false;
@@ -135,8 +166,55 @@ public class Game extends UnicastRemoteObject implements Callback {
         else if(cmd.contains("piazza")){
             return handlePlace(cmd.substring(cmd.indexOf(' ') + 1));
         }
+        else if(cmd.contains("alieni")){
+            return handleAlien(cmd.substring(cmd.indexOf(' ') + 1));
+        }
+        else if(cmd.contains("rimuovi")){
+            String where = cmd.substring(cmd.indexOf(' ') + 1);
+            Coordinate c = new Coordinate(where.charAt(0) - '0', where.charAt(1) - '0');
+
+            Result<String> res = server.remove(c);
+
+            if(res.isErr())
+                return res.getReason();
+
+            board.getTiles().remove(c);
+            return "rimosso";
+        }
 
         return "comando non trovato";
+    }
+
+    String handleAlien(String cmd){
+        String[] args = cmd.split(" ");
+        Result<Coordinate> brown, purple;
+        int x, y;
+
+        brown = Result.err("");
+        purple = Result.err("");
+
+        for (String arg : args) {
+            x = arg.charAt(1) - '0';
+            y = arg.charAt(2) - '0';
+
+            switch (arg.charAt(0)) {
+                case 'v':
+                    purple = Result.ok(new Coordinate(x, y));
+                    break;
+                case 'm':
+                    brown = Result.ok(new Coordinate(x, y));
+                    break;
+            }
+        }
+
+        Result<String> res = server.init(purple, brown);
+
+        if(res.isErr())
+            return res.getReason();
+
+        board.init(purple.isOk()? Optional.of(purple.getData()) : Optional.empty(),
+                brown.isOk()? Optional.of(brown.getData()) : Optional.empty());
+        return "nave riempita";
     }
 
 

@@ -142,9 +142,9 @@ public class SocketClient extends Thread implements ClientInterface {
         return call("getShip", new Class[]{String.class}, name);
     }
 
-    public Result<String> init(Optional<Coordinate> purple, Optional<Coordinate> brown) {
+    public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
         return call("init", new Class[]{
-                String.class, Optional.class, Optional.class}, 
+                String.class, Result.class, Result.class},
                 name, purple, brown);
     }
 

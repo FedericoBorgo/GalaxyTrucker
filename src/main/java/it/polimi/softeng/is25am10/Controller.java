@@ -252,8 +252,9 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     @Override
-    public Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown) {
-        return getModel(name).init(name, purple, brown);
+    public Result<String> init(String name, Result<Coordinate> purple, Result<Coordinate> brown) {
+        return getModel(name).init(name, purple.isOk()? Optional.of(purple.getData()) : Optional.empty(),
+                brown.isOk()? Optional.of(brown.getData()) : Optional.empty());
     }
 
     @Override

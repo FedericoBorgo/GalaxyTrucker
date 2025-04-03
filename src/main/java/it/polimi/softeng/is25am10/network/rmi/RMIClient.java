@@ -145,7 +145,7 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<String> init(Optional<Coordinate> purple, Optional<Coordinate> brown) {
+    public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
         try {
             return server.init(name, purple, brown);
         } catch (RemoteException e) {

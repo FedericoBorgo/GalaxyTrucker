@@ -91,6 +91,11 @@ public class FrameGenerator {
         graphics.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
         for(int i = 0; i < boardBorder.length; i++)
             graphics.putString(new TerminalPosition(1, i+1), boardBorder[i]);
+
+        if(game.state != Model.State.Type.BUILDING){
+            graphics.fillRectangle(new TerminalPosition(119, 1), new TerminalSize(107, 15), ' ');
+            graphics.fillRectangle(new TerminalPosition(161, 16), new TerminalSize(65, 28), ' ');
+        }
     }
 
     /**
@@ -126,6 +131,9 @@ public class FrameGenerator {
      * @param board
      */
     void drawBooked(TilesBoard board){
+        if(game.state != Model.State.Type.BUILDING)
+            return;
+
         if(!board.getBooked().isEmpty())
             drawTile(new TerminalPosition(120, 2),
                     board.getBooked().getFirst(), Tile.Rotation.NONE);
@@ -283,6 +291,9 @@ public class FrameGenerator {
     }
 
     void drawCurrentTile(){
+        if(game.state != Model.State.Type.BUILDING)
+            return;
+
         if(game.currentTile == null)
             return;
 
@@ -384,6 +395,9 @@ public class FrameGenerator {
     }
 
     void drawOpenTiles(){
+        if(game.state != Model.State.Type.BUILDING)
+            return;
+
         TerminalPosition start = new TerminalPosition(162, 2);
 
         for (int i = 0; i < game.openTiles.size(); i++) {

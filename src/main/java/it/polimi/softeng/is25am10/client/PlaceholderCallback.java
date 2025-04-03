@@ -22,17 +22,17 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
 
     @Override
     public void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException {
-        Logger.clientLog("per : " + name + " evento: giocatore unito " + players);
+
     }
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return 3;
+        return 2;
     }
 
     @Override
     public void notifyState(Model.State.Type state) throws RemoteException {
-        Logger.clientLog("per : " + name + " evento: cambio stato " + state);
+
     }
 
     @Override

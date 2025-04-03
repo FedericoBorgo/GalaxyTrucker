@@ -46,7 +46,7 @@ public interface RMIInterface extends Remote {
 
     ShipBoard.CompressedShipBoard getShip(String name) throws RemoteException;
 
-    Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown) throws RemoteException;
+    Result<String> init(String name, Result<Coordinate> purple, Result<Coordinate> brown) throws RemoteException;
 
     List<GoodsBoard.Type> getReward(String name) throws RemoteException;
 

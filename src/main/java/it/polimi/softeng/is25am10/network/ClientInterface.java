@@ -43,7 +43,7 @@ public interface ClientInterface {
 
     ShipBoard.CompressedShipBoard getShip();
 
-    Result<String> init(Optional<Coordinate> purple, Optional<Coordinate> brown);
+    Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown);
 
     List<GoodsBoard.Type> getReward();
 
