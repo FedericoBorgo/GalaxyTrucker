@@ -41,7 +41,7 @@ public interface ClientInterface {
 
     Set<Coordinate> checkShip();
 
-    ShipBoard.CompressedShipBoard getShip();
+    ShipBoard getShip();
 
     Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown);
 
@@ -67,9 +67,9 @@ public interface ClientInterface {
 
     Result<Card.CompressedCard> drawCard();
 
-    Result<JSONObject> setInput(JSONObject json);
+    Result<String> setInput(String json);
 
-    Result<JSONObject> getCardData();
+    Result<String> getCardData();
 
     Result<Card[][]> getVisible();
 }

@@ -137,7 +137,7 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public ShipBoard.CompressedShipBoard getShip() {
+    public ShipBoard getShip() {
         try {
             return server.getShip(name);
         } catch (RemoteException e) {
@@ -241,7 +241,7 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<JSONObject> setInput(JSONObject json) {
+    public Result<String> setInput(String json) {
         try {
             return server.setInput(name, json);
         } catch (RemoteException e) {
@@ -249,7 +249,7 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<JSONObject> getCardData() {
+    public Result<String> getCardData() {
         try {
             return server.getCardData(name);
         } catch (RemoteException e) {

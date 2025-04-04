@@ -44,7 +44,7 @@ public interface RMIInterface extends Remote {
 
     Set<Coordinate> checkShip(String name) throws RemoteException;
 
-    ShipBoard.CompressedShipBoard getShip(String name) throws RemoteException;
+    ShipBoard getShip(String name) throws RemoteException;
 
     Result<String> init(String name, Result<Coordinate> purple, Result<Coordinate> brown) throws RemoteException;
 
@@ -70,9 +70,9 @@ public interface RMIInterface extends Remote {
 
     Result<Card.CompressedCard> drawCard(String name) throws RemoteException;
 
-    Result<JSONObject> setInput(String name, JSONObject json) throws RemoteException;
+    Result<String> setInput(String name, String json) throws RemoteException;
 
-    Result<JSONObject> getCardData(String name) throws RemoteException;
+    Result<String> getCardData(String name) throws RemoteException;
 
     Result<Card[][]> getVisible(String name) throws RemoteException;
 }

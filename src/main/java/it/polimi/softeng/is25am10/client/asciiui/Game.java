@@ -21,8 +21,8 @@ import java.util.*;
 public class Game extends UnicastRemoteObject implements Callback {
     final FrameGenerator frame;
     final ClientInterface server;
-    final ShipBoard board = new ShipBoard();
-    final FlightBoard flight = new FlightBoard();
+    ShipBoard board = new ShipBoard();
+    FlightBoard flight = new FlightBoard();
     final ArrayList<Tile> openTiles = new ArrayList<>();
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
@@ -36,8 +36,15 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     public Game(ClientInterface server) throws IOException {
         super();
+        //frame = null;
         frame = new FrameGenerator(this);
-        server.join(this).getData();
+        try{
+            server.join(this).getData();
+        }catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            System.exit(1);
+        }
+
         this.server = server;
     }
 
@@ -80,6 +87,9 @@ public class Game extends UnicastRemoteObject implements Callback {
             else if(command.substring(0, command.indexOf(' ')).equals("alieni") && state == Model.State.Type.ALIEN_INPUT){
                 String[] args = command.substring(command.indexOf(' ') + 1).split(" ");
 
+                if(args[0].equals("no"))
+                    return true;
+
                 if(args.length > 2)
                     return false;
 
@@ -121,7 +131,6 @@ public class Game extends UnicastRemoteObject implements Callback {
             if(res.isErr())
                 return res.getReason();
             else {
-                flight.moveTimer();
                 startTime = System.currentTimeMillis();
                 return "spostata";
             }
@@ -193,17 +202,19 @@ public class Game extends UnicastRemoteObject implements Callback {
         brown = Result.err("");
         purple = Result.err("");
 
-        for (String arg : args) {
-            x = arg.charAt(1) - '0';
-            y = arg.charAt(2) - '0';
+        if(!cmd.equals("no")){
+            for (String arg : args) {
+                x = arg.charAt(1) - '0';
+                y = arg.charAt(2) - '0';
 
-            switch (arg.charAt(0)) {
-                case 'v':
-                    purple = Result.ok(new Coordinate(x, y));
-                    break;
-                case 'm':
-                    brown = Result.ok(new Coordinate(x, y));
-                    break;
+                switch (arg.charAt(0)) {
+                    case 'v':
+                        purple = Result.ok(new Coordinate(x, y));
+                        break;
+                    case 'm':
+                        brown = Result.ok(new Coordinate(x, y));
+                        break;
+                }
             }
         }
 
@@ -305,22 +316,11 @@ public class Game extends UnicastRemoteObject implements Callback {
     }
 
     @Override
-    public void notifyState(Model.State.Type state) throws RemoteException {
+    public void pushState(Model.State.Type state) throws RemoteException {
         this.state = state;
 
         if(state == Model.State.Type.BUILDING)
             startTime = System.currentTimeMillis();
-    }
-
-    @Override
-    public void movedTimer() throws RemoteException {
-        flight.moveTimer();
-        startTime = System.currentTimeMillis();
-    }
-
-    @Override
-    public void pushPositions(List<FlightBoard.Pawn> order, List<Integer> offset) throws RemoteException {
-        flight.set(order, offset);
     }
 
     @Override
@@ -329,7 +329,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     }
 
     @Override
-    public void pushCardChanges(JSONObject data) throws RemoteException {
+    public void pushCardChanges(String data) throws RemoteException {
 
     }
 
@@ -348,4 +348,18 @@ public class Game extends UnicastRemoteObject implements Callback {
         openTiles.remove(t);
     }
 
+    @Override
+    public void pushBoard(ShipBoard board) throws RemoteException {
+        this.board = board;
+    }
+
+    @Override
+    public void pushFlight(FlightBoard board) throws RemoteException {
+        this.flight = board;
+    }
+
+    @Override
+    public int ping(){
+        return 0;
+    }
 }

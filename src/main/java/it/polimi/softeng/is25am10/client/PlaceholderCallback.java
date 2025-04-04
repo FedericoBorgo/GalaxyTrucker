@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
 import org.json.JSONObject;
@@ -31,19 +32,10 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     }
 
     @Override
-    public void notifyState(Model.State.Type state) throws RemoteException {
+    public void pushState(Model.State.Type state) throws RemoteException {
 
     }
 
-    @Override
-    public void movedTimer() throws RemoteException {
-        Logger.clientLog("per : " + name + " evento: timer spostato");
-    }
-
-    @Override
-    public void pushPositions(List<FlightBoard.Pawn> order, List<Integer> offset) throws RemoteException {
-
-    }
 
     @Override
     public void pushCard(Card.CompressedCard card) throws RemoteException {
@@ -51,7 +43,7 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     }
 
     @Override
-    public void pushCardChanges(JSONObject data) throws RemoteException {
+    public void pushCardChanges(String data) throws RemoteException {
 
     }
 
@@ -68,5 +60,20 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     @Override
     public void gotTile(Tile t) throws RemoteException {
 
+    }
+
+    @Override
+    public void pushBoard(ShipBoard board) throws RemoteException {
+
+    }
+
+    @Override
+    public void pushFlight(FlightBoard board) throws RemoteException {
+
+    }
+
+    @Override
+    public int ping() throws RemoteException {
+        return 0;
     }
 }

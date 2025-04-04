@@ -5,6 +5,7 @@ import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
 import org.json.JSONObject;
@@ -24,8 +25,6 @@ import java.util.Map;
 public class SocketListener {
     private final ServerSocket methodInvoker;
     private final ServerSocket eventInvoker;
-    private final List<MethodInvoker> methods = new ArrayList<>();
-    private final List<EventInvoker> events = new ArrayList<>();
     private final Thread methodThread;
     private final Thread eventThread;
 
@@ -38,7 +37,7 @@ public class SocketListener {
             while(true) {
                 try {
                     Socket client = methodInvoker.accept();
-                    methods.add(new MethodInvoker(controller, client));
+                    new MethodInvoker(controller, client);
                 } catch (IOException e) {
                     throw new RuntimeException("unable to start the tcp server", e);
                 }
@@ -49,7 +48,7 @@ public class SocketListener {
             while(true) {
                 try {
                     Socket client = eventInvoker.accept();
-                    events.add(new EventInvoker(controller, client));
+                    new EventInvoker(controller, client);
                 } catch (IOException e) {
                     throw new RuntimeException("unable to start the tcp server", e);
                 }
@@ -70,6 +69,7 @@ class MethodInvoker extends Thread {
     private final ObjectOutputStream output;
     private final ObjectInputStream input;
     private final Controller controller;
+    private final String address;
 
     public MethodInvoker(Controller controller, Socket socket) throws IOException {
         super();
@@ -77,6 +77,7 @@ class MethodInvoker extends Thread {
         input = new ObjectInputStream(socket.getInputStream());
         output.flush();
         this.controller = controller;
+        address = socket.getRemoteSocketAddress().toString();
         start();
     }
 
@@ -89,7 +90,8 @@ class MethodInvoker extends Thread {
                 output.writeObject(method.invoke(controller, request.getArgs()));
             } catch (IOException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
                      IllegalAccessException e) {
-                throw new RuntimeException("unable to invoke the method", e);
+                Logger.serverLog("[" +  address + "]disconnected");
+                return;
             }
         }
     }
@@ -133,18 +135,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void notifyState(Model.State.Type state) {
-        call("notifyState", new Class[]{Model.State.Type.class}, state);
-    }
-
-    @Override
-    public void movedTimer() {
-        call("movedTimer", new Class[]{});
-    }
-
-    @Override
-    public void pushPositions(List<FlightBoard.Pawn> order, List<Integer> offset) {
-        call("pushPositions", new Class[]{List.class, List.class}, order, offset);
+    public void pushState(Model.State.Type state) {
+        call("pushState", new Class[]{Model.State.Type.class}, state);
     }
 
     @Override
@@ -153,8 +145,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushCardChanges(JSONObject data) {
-        call("pushCardChanges", new Class[]{JSONObject.class}, data);
+    public void pushCardChanges(String data) {
+        call("pushCardChanges", new Class[]{String.class}, data);
     }
 
     @Override
@@ -170,5 +162,20 @@ class EventInvoker implements Callback {
     @Override
     public void gotTile(Tile t) throws RemoteException {
         call("gotTile", new Class[]{Tile.class}, t);
+    }
+
+    @Override
+    public void pushBoard(ShipBoard board) throws RemoteException {
+        call("pushBoard", new Class[]{ShipBoard.class}, board);
+    }
+
+    @Override
+    public void pushFlight(FlightBoard board) throws RemoteException {
+        call("pushFlight", new Class[]{FlightBoard.class}, board);
+    }
+
+    @Override
+    public int ping() throws RemoteException{
+        return call("ping", new Class[]{});
     }
 }

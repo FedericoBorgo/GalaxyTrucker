@@ -41,12 +41,11 @@ public class SocketClient extends Thread implements ClientInterface {
             eventInput = new ObjectInputStream(event.getInputStream());
             methodOutput = new ObjectOutputStream(method.getOutputStream());
             methodInput = new ObjectInputStream(method.getInputStream());
+            start();
             eventOutput.writeObject(name);
         } catch (IOException e) {
             throw new RuntimeException("unable to connect to the server", e);
         }
-
-        start();
     }
 
     @Override
@@ -138,7 +137,7 @@ public class SocketClient extends Thread implements ClientInterface {
         return call("checkShip", new Class[]{String.class}, name);
     }
 
-    public ShipBoard.CompressedShipBoard getShip() {
+    public ShipBoard getShip() {
         return call("getShip", new Class[]{String.class}, name);
     }
 
@@ -204,13 +203,13 @@ public class SocketClient extends Thread implements ClientInterface {
         return call("drawCard", new Class[]{String.class}, name);
     }
 
-    public Result<JSONObject> setInput(JSONObject json) {
+    public Result<String> setInput(String json) {
         return call("setInput", new Class[]{
-                String.class, JSONObject.class}, 
+                String.class, String.class},
                 name, json);
     }
 
-    public Result<JSONObject> getCardData() {
+    public Result<String> getCardData() {
         return call("getCardData", new Class[]{String.class}, name);
     }
 

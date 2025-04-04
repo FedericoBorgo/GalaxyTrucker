@@ -236,11 +236,11 @@ public class Model implements Serializable {
     }
 
     /// name -> player
-    private Player get(String name){
+    public Player get(String name){
         return players.get(name);
     }
     /// name -> player -> ship
-    private ShipBoard ship(String name){
+    public ShipBoard ship(String name){
         return get(name).getBoard();
     }
 
@@ -275,8 +275,8 @@ public class Model implements Serializable {
     }
 
     /// get the flight board
-    public CompressedFlightBoard getFlight() {
-        return flight.compress();
+    public FlightBoard getFlight() {
+        return flight;
     }
 
     /**
@@ -407,12 +407,6 @@ public class Model implements Serializable {
 
         return ok.get();
     }
-
-    /// compress ship
-    public CompressedShipBoard getShip(String name){
-        return ship(name).compress();
-    }
-
     /**
      * The player declare where to put the aliens.
      * Can be called only in the ALIEN state.
@@ -649,7 +643,7 @@ public class Model implements Serializable {
         return Result.ok(c.compress());
     }
 
-    private transient JSONObject changes = null;
+    private String changes = null;
 
     /**
      * Give the player's input to the drawn card.
@@ -668,13 +662,13 @@ public class Model implements Serializable {
             res = playCard();
             res.getData().put("accepted", true);
             res.getData().put("played", true);
-            changes = res.getData();
+            changes = res.getData().toString();
         }
 
         return res;
     }
 
-    public synchronized JSONObject getChanges(){
+    public synchronized String getChanges(){
         return changes;
     }
 

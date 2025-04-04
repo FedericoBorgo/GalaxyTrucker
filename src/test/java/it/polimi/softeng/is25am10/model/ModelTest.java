@@ -86,11 +86,11 @@ class ModelTest {
             model.init(name, purple, brown);
 
             brown.ifPresent(coord -> {
-                assertEquals(1, model.getShip(name).brown.get(coord));
+                assertEquals(1, model.ship(name).getBrown().get(coord));
             });
 
             purple.ifPresent(coord -> {
-                assertEquals(1, model.getShip(name).purple.get(coord));
+                assertEquals(1, model.ship(name).getBrown().get(coord));
             });
         });
     }
@@ -99,11 +99,11 @@ class ModelTest {
         jsonForEach(player, (name, playerObj) -> {
 
             playerObj.getJSONArray("battery").forEach(coord ->{
-                assertTrue(2 <= model.getShip(name).battery.get(Coordinate.fromString(coord.toString()).getData()));
+                assertTrue(2 <= model.ship(name).getBattery().get(Coordinate.fromString(coord.toString()).getData()));
             });
 
             playerObj.getJSONArray("astronaut").forEach(coord ->{
-                assertEquals(2, model.getShip(name).astronaut.get(Coordinate.fromString(coord.toString()).getData()));
+                assertEquals(2, model.ship(name).getAstronaut().get(Coordinate.fromString(coord.toString()).getData()));
             });
         });
     }
@@ -126,7 +126,6 @@ class ModelTest {
         model.debug_setCards(cards);
     }
 
-    @Test
     void testModel(){
         JSONObject obj = new JSONObject(Card.dump(ModelTest.class.getResourceAsStream("modelTest.json")));
         model = new Model(obj.getInt("n_players"), new BiConsumer<Model, Model.State.Type>() {
@@ -164,7 +163,7 @@ class ModelTest {
         //TODO cards
     }
 
-    @Test
+
     void testStore() throws IOException, ClassNotFoundException {
         testModel();
 

@@ -12,12 +12,13 @@ import java.io.IOException;
 public class Asciiui {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        ServerMain.main(new String[]{"true"});
-        //ClientInterface clientInterface = Config.getControls();
-        ClientInterface clientInterface = new SocketClient("fede", "localhost", 1235, 1236);
-        ClientInterface player2 = new RMIClient("npc", "localhost", 1234);
-        Game renderer = new Game(clientInterface);
-        Thread.sleep(5000);
-        player2.join(new PlaceholderCallback("chia"));
+        try{
+            ClientInterface clientInterface = Config.getControls();
+
+            Game renderer = new Game(clientInterface);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
