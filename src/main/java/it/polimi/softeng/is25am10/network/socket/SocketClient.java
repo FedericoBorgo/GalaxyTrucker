@@ -17,10 +17,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class SocketClient extends Thread implements ClientInterface {
     private final String name;
@@ -67,8 +64,9 @@ public class SocketClient extends Thread implements ClientInterface {
         return name;
     }
     
-    private <T> T call(String name, Class<?>[] types, Object... args){
+    private <T> T call(String name, Object... args){
         try {
+            Class<?>[] types = Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
             methodOutput.writeObject(new Request(name, types, args));
             return (T) methodInput.readObject();
         } catch (IOException | ClassNotFoundException e) {
@@ -78,142 +76,114 @@ public class SocketClient extends Thread implements ClientInterface {
 
     public Result<FlightBoard.Pawn> join(Callback callback){
         this.callback = callback;
-        return call("join", new Class[]{String.class}, name);
+        return call("join", name);
     }
 
     public Result<Integer> moveTimer() {
-        return call("moveTimer", new Class[]{String.class}, name);
+        return call("moveTimer", name);
     }
 
     public Result<String> setReady() {
-        return call("setReady", new Class[]{String.class}, name);
+        return call("setReady", name);
     }
 
     public Result<String> quit() {
-        return call("quit", new Class[]{String.class}, name);
+        return call("quit", name);
     }
 
     public Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation) {
-        return call("setTile", new Class[]{
-                String.class, Coordinate.class, Tile.class, Tile.Rotation.class}, 
-                name, c, t, rotation);
+        return call("setTile", name, c, t, rotation);
     }
 
     public Result<Tile> getTile(Coordinate c) {
-        return call("getTile", new Class[]{
-                String.class, Coordinate.class}, 
-                name, c);
+        return call("getTile", name, c);
     }
 
     public Tile.Rotation getRotation(Coordinate c) {
-        return call("getRotation", new Class[]{
-                String.class, Coordinate.class}, 
-                name, c);
+        return call("getRotation", name, c);
     }
 
     public Result<Tile> bookTile(Tile t) {
-        return call("bookTile", new Class[]{
-                String.class, Tile.class}, 
-                name, t);
+        return call("bookTile", name, t);
     }
 
     public Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c) {
-        return call("useBookedTile", new Class[]{
-                String.class, Tile.class, Tile.Rotation.class, Coordinate.class}, 
-                name, t, rotation, c);
+        return call("useBookedTile", name, t, rotation, c);
     }
 
     public List<Tile> getBooked() {
-        return call("getBooked", new Class[]{String.class}, name);
+        return call("getBooked", name);
     }
 
     public Result<String> remove(Coordinate c) {
-        return call("remove", new Class[]{
-                String.class, Coordinate.class}, 
-                name, c);
+        return call("remove", name, c);
     }
 
     public Set<Coordinate> checkShip() {
-        return call("checkShip", new Class[]{String.class}, name);
+        return call("checkShip", name);
     }
 
     public ShipBoard getShip() {
-        return call("getShip", new Class[]{String.class}, name);
+        return call("getShip", name);
     }
 
     public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
-        return call("init", new Class[]{
-                String.class, Result.class, Result.class},
-                name, purple, brown);
+        return call("init", name, purple, brown);
     }
 
     public List<GoodsBoard.Type> getReward() {
-        return call("getReward", new Class[]{String.class}, name);
+        return call("getReward", name);
     }
 
     public Result<Integer> placeReward(GoodsBoard.Type t, Coordinate c) {
-        return call("placeReward", new Class[]{
-                String.class, GoodsBoard.Type.class, Coordinate.class},
-                name, t, c);
+        return call("placeReward", name, t, c);
     }
 
     public int getCash() {
-        return call("getCash", new Class[]{String.class}, name);
+        return call("getCash", name);
     }
 
     public Result<Integer> drop(Coordinate c) {
-        return call("drop", new Class[]{
-                String.class, Coordinate.class}, 
-                name, c);
+        return call("drop", name, c);
     }
 
     public Result<Integer> drop(Coordinate c, GoodsBoard.Type t) {
-        return call("drop", new Class[]{
-                String.class, Coordinate.class, GoodsBoard.Type.class}, 
-                name, c, t);
+        return call("drop", name, c, t);
     }
 
     public Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map) {
-        return call("setCannonsToUse", new Class[]{
-                String.class, Map.class}, 
-                name, map);
+        return call("setCannonsToUse", name, map);
     }
 
     public Result<Tile> drawTile() {
-        return call("drawTile", new Class[]{String.class}, name);
+        return call("drawTile", name);
     }
 
     public Result<List<Tile>> getSeenTiles() {
-        return call("getSeenTiles", new Class[]{String.class}, name);
+        return call("getSeenTiles", name);
     }
 
     public Result<String> giveTile(Tile t) {
-        return call("giveTile", new Class[]{
-                String.class, Tile.class}, 
-                name, t);
+        return call("giveTile", name, t);
     }
 
     public Result<Tile> getTileFromSeen(Tile t) {
-        return call("getTileFromSeen", new Class[]{
-                String.class, Tile.class}, 
-                name, t);
+        return call("getTileFromSeen", name, t);
     }
 
     public Result<Card.CompressedCard> drawCard() {
-        return call("drawCard", new Class[]{String.class}, name);
+        return call("drawCard", name);
     }
 
     public Result<String> setInput(String json) {
-        return call("setInput", new Class[]{
-                String.class, String.class},
-                name, json);
+        return call("setInput", name, json);
     }
 
     public Result<String> getCardData() {
-        return call("getCardData", new Class[]{String.class}, name);
+        return call("getCardData", name);
     }
 
     public Result<Card[][]> getVisible() {
-        return call("getVisible", new Class[]{String.class}, name);
+        return call("getVisible", name);
     }
 }

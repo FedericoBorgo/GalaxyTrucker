@@ -19,6 +19,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -115,9 +116,14 @@ class EventInvoker implements Callback {
         }
     }
 
-    private <T> T call(String name, Class<?>[] types, Object... args){
+    private <T> T call(String name, Object... args){
         try {
+            Class<?>[] types = Arrays.stream(args)
+                    .map(Object::getClass)
+                    .toArray(Class<?>[]::new);
+
             output.writeObject(new Request(name, types, args));
+
             return (T) input.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("unable to call: " + name, e);
@@ -126,56 +132,56 @@ class EventInvoker implements Callback {
 
     @Override
     public void setPlayers(Map<String, FlightBoard.Pawn> players) {
-        call("setPlayers", new Class[]{Map.class}, players);
+        call("setPlayers", players);
     }
 
     @Override
     public int askHowManyPlayers() {
-        return call("askHowManyPlayers", new Class[]{});
+        return call("askHowManyPlayers");
     }
 
     @Override
     public void pushState(Model.State.Type state) {
-        call("pushState", new Class[]{Model.State.Type.class}, state);
+        call("pushState", state);
     }
 
     @Override
     public void pushCard(Card.CompressedCard card) {
-        call("pushCard", new Class[]{Card.CompressedCard.class}, card);
+        call("pushCard", card);
     }
 
     @Override
     public void pushCardChanges(String data) {
-        call("pushCardChanges", new Class[]{String.class}, data);
+        call("pushCardChanges", data);
     }
 
     @Override
     public void askForInput() throws RemoteException {
-        call("askForInput", new Class[]{});
+        call("askForInput");
     }
 
     @Override
     public void gaveTile(Tile t) throws RemoteException {
-        call("gaveTile", new Class[]{Tile.class}, t);
+        call("gaveTile", t);
     }
 
     @Override
     public void gotTile(Tile t) throws RemoteException {
-        call("gotTile", new Class[]{Tile.class}, t);
+        call("gotTile", t);
     }
 
     @Override
     public void pushBoard(ShipBoard board) throws RemoteException {
-        call("pushBoard", new Class[]{ShipBoard.class}, board);
+        call("pushBoard", board);
     }
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
-        call("pushFlight", new Class[]{FlightBoard.class}, board);
+        call("pushFlight", board);
     }
 
     @Override
     public int ping() throws RemoteException{
-        return call("ping", new Class[]{});
+        return call("ping");
     }
 }
