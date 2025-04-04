@@ -23,6 +23,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * This class gives an interface between the model and the view. It shows available methods to the clients
@@ -41,12 +42,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     private final BiConsumer<Model, Model.State.Type> stateEvent = (m, state) -> {
         Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
         pushState(m);
+        pushFlight(m);
 
         if(state == Model.State.Type.BUILDING)
             starting = null;
 
-        if(state == Model.State.Type.ALIEN_INPUT)
-            pushFlight(m);
     };
 
     // Constructor method
@@ -56,7 +56,17 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         registry.rebind("controller", this);
         Logger.serverLog("controller started");
 
-        new Thread(ping).start();
+        new Thread(() -> {
+            while(true){
+                ping();
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
     public synchronized void setCallback(String name, Callback callback) {
@@ -125,10 +135,32 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         return players.get(name);
     }
 
+    private void notifyPlayers(Model m, Consumer<String> error , Object... args){
+        String methodName = Thread.currentThread()
+                .getStackTrace()[2]
+                .getMethodName();
 
-    private void notifyPlayers(Model m, BiConsumer<String, Callback> caller){
-        games.get(m).forEach(name -> {
-            caller.accept(name, callbacks.get(name));
+        Class<?>[] types = Arrays.stream(args)
+                .map(Object::getClass)
+                .toArray(Class<?>[]::new);
+
+        Method method;
+
+        try {
+            method = Callback.class.getMethod(methodName, types);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        m.getPlayers().forEach((name, pawn) -> {
+            try {
+                method.invoke(callbacks.get(name), args);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }catch(InvocationTargetException e){
+                if(error != null)
+                    error.accept(name);
+            }
         });
     }
 
@@ -357,11 +389,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     public void setPlayers(Model m) {
-        notifyPlayers(m, (name, call) -> {
-            try {
-                call.setPlayers(m.getPlayers());
-            } catch (Exception _) {}
-        });
+        notifyPlayers(m, null, m.getPlayers());
     }
 
     public int askHowManyPlayers(String name){
@@ -373,16 +401,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     public void pushState(Model m) {
-        notifyPlayers(m, (name, call) -> {
-            try {
-                call.pushState(m.getStatus());
-            } catch (Exception _) {
-                if(m.getStatus() == Model.State.Type.ALIEN_INPUT) {
-                    Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
-                    m.init(name, Optional.empty(), Optional.empty());
-                }
-            }
-        });
+        notifyPlayers(m, null, m.getStatus());
     }
 
     public void pushCard(Model card) {
@@ -402,19 +421,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     public void gaveTile(Model m, Tile t) {
-        notifyPlayers(m, (name, call) -> {
-            try {
-                call.gaveTile(t);
-            } catch (Exception _) {}
-        });
+        notifyPlayers(m, null, t);
     }
 
     public void gotTile(Model m, Tile t) {
-        notifyPlayers(m, (name, call) -> {
-            try {
-                call.gotTile(t);
-            } catch (Exception _) {}
-        });
+        notifyPlayers(m, null, t);
     }
 
     public void pushBoard(ShipBoard board) {
@@ -422,39 +433,22 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     public void pushFlight(Model m) {
-        notifyPlayers(m, (name, call) -> {
-            try {
-                call.pushFlight(m.getFlight());
-            } catch (Exception _) {}
-        });
+        notifyPlayers(m, null, m.getFlight());
     }
 
-    public Runnable ping = () -> {
-        while(true){
-            games.keySet().forEach(m -> {
-                notifyPlayers(m, (name, call) -> {
-                    try {
-                        call.ping();
-                    } catch (Exception _) {
-                        if(m.getStatus() == Model.State.Type.ALIEN_INPUT) {
-                            if(m.init(name, Optional.empty(), Optional.empty()).isOk())
-                                Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
-                        }
+    public void ping(){
+        for(Model m: games.keySet())
+            notifyPlayers(m, (name) ->{
+                if(m.getStatus() == Model.State.Type.ALIEN_INPUT) {
+                    if(m.init(name, Optional.empty(), Optional.empty()).isOk())
+                        Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
+                }
 
-                        else if(m.getStatus() == Model.State.Type.WAITING_INPUT &&
-                                name.equals(m.getNextToPlay())) {
-                            Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
-                            m.setInput(name, new JSONObject());
-                        }
-                    }
-                });
+                else if(m.getStatus() == Model.State.Type.WAITING_INPUT &&
+                        name.equals(m.getNextToPlay())) {
+                    Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
+                    m.setInput(name, new JSONObject());
+                }
             });
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    };
+    }
 }

@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     }
 
     @Override
-    public void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException {
+    public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
 
     }
 
@@ -69,7 +70,7 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
-
+        System.out.println();
     }
 
     @Override

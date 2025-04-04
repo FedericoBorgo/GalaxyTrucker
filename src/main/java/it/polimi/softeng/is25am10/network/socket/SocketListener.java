@@ -18,10 +18,7 @@ import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SocketListener {
     private final ServerSocket methodInvoker;
@@ -116,72 +113,78 @@ class EventInvoker implements Callback {
         }
     }
 
-    private <T> T call(String name, Object... args){
+    private synchronized <T> T call(Object... args){
         try {
             Class<?>[] types = Arrays.stream(args)
                     .map(Object::getClass)
                     .toArray(Class<?>[]::new);
 
-            output.writeObject(new Request(name, types, args));
+            String methodName = Thread.currentThread()
+                                .getStackTrace()[2]
+                                .getMethodName();
+
+            output.reset();
+            output.writeObject(new Request(methodName, types, args));
+            output.flush();
 
             return (T) input.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("unable to call: " + name, e);
+            throw new RuntimeException("unable to call", e);
         }
     }
 
     @Override
-    public void setPlayers(Map<String, FlightBoard.Pawn> players) {
-        call("setPlayers", players);
+    public void setPlayers(HashMap<String, FlightBoard.Pawn> players) {
+        call(players);
     }
 
     @Override
     public int askHowManyPlayers() {
-        return call("askHowManyPlayers");
+        return call();
     }
 
     @Override
     public void pushState(Model.State.Type state) {
-        call("pushState", state);
+        call(state);
     }
 
     @Override
     public void pushCard(Card.CompressedCard card) {
-        call("pushCard", card);
+        call(card);
     }
 
     @Override
     public void pushCardChanges(String data) {
-        call("pushCardChanges", data);
+        call(data);
     }
 
     @Override
     public void askForInput() throws RemoteException {
-        call("askForInput");
+        call();
     }
 
     @Override
     public void gaveTile(Tile t) throws RemoteException {
-        call("gaveTile", t);
+        call(t);
     }
 
     @Override
     public void gotTile(Tile t) throws RemoteException {
-        call("gotTile", t);
+        call(t);
     }
 
     @Override
     public void pushBoard(ShipBoard board) throws RemoteException {
-        call("pushBoard", board);
+        call(board);
     }
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
-        call("pushFlight", board);
+        call(board);
     }
 
     @Override
     public int ping() throws RemoteException{
-        return call("ping");
+        return call();
     }
 }

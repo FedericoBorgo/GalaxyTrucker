@@ -306,13 +306,13 @@ public class Game extends UnicastRemoteObject implements Callback {
 
 
     @Override
-    public void setPlayers(Map<String, FlightBoard.Pawn> players) throws RemoteException {
+    public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
         this.players = players;
     }
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return frame.askHowManyPlayer();
+        return 2;//frame.askHowManyPlayer();
     }
 
     @Override
@@ -356,6 +356,8 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
         this.flight = board;
+        startTime = System.currentTimeMillis();
+        System.out.println();
     }
 
     @Override

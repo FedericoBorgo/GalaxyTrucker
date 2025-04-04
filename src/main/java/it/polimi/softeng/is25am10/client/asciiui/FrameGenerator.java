@@ -407,4 +407,18 @@ public class FrameGenerator {
             )), game.openTiles.get(i), Tile.Rotation.NONE);
         }
     }
+
+    void dialog(String message){
+        pauseRender = true;
+        WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
+        Window window = new BasicWindow("Dialog");
+        textGUI.addWindow(window);
+
+        MessageDialog.showMessageDialog(textGUI, "Message", message, MessageDialogButton.OK);
+        window.close();
+
+        textGUI.waitForWindowToClose(window);
+        screen.clear();
+        pauseRender = false;
+    }
 }

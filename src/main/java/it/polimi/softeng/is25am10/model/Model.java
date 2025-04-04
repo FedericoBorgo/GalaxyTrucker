@@ -161,7 +161,7 @@ public class Model implements Serializable {
     private final AtomicBoolean canMove = new AtomicBoolean(false);
     private transient Timer timer;
     private transient TimerTask task;
-    public static final long TIMER_DELAY = 10000L;
+    public static final long TIMER_DELAY = 1000L;
 
     /**
      * Builds a new Model with the number of required players.
@@ -798,8 +798,8 @@ public class Model implements Serializable {
         return model;
     }
 
-    public Map<String, Pawn> getPlayers(){
-        Map<String, Pawn> p = new HashMap<>();
+    public HashMap<String, Pawn> getPlayers(){
+        HashMap<String, Pawn> p = new HashMap<>();
         players.forEach((name, player) -> {
             p.put(name, player.getPawn());
         });

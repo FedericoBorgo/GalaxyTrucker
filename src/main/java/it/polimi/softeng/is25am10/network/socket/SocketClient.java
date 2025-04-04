@@ -49,9 +49,11 @@ public class SocketClient extends Thread implements ClientInterface {
     public void run() {
         while (true) {
             try {
-                Request request = (Request) eventInput.readObject();
+                Object obj = eventInput.readObject();
+                Request request = (Request) obj;
                 Method method = Callback.class.getMethod(request.getMethod(), request.getType());
                 eventOutput.writeObject(method.invoke(callback, request.getArgs()));
+                eventOutput.flush();
             } catch (IOException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
                      IllegalAccessException e) {
                 throw new RuntimeException("unable to handle the event", e);
@@ -63,127 +65,137 @@ public class SocketClient extends Thread implements ClientInterface {
     public String getPlayerName(){
         return name;
     }
-    
-    private <T> T call(String name, Object... args){
+
+    private synchronized <T> T call(Object... args){
         try {
-            Class<?>[] types = Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
-            methodOutput.writeObject(new Request(name, types, args));
+            Class<?>[] types = Arrays.stream(args)
+                    .map(Object::getClass)
+                    .toArray(Class<?>[]::new);
+
+            String methodName = Thread.currentThread()
+                    .getStackTrace()[2]
+                    .getMethodName();
+
+            methodOutput.reset();
+            methodOutput.writeObject(new Request(methodName, types, args));
+            methodOutput.flush();
+
             return (T) methodInput.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("unable to call: " + name, e);
+            throw new RuntimeException("unable to call", e);
         }
     }
 
     public Result<FlightBoard.Pawn> join(Callback callback){
         this.callback = callback;
-        return call("join", name);
+        return call(name);
     }
 
     public Result<Integer> moveTimer() {
-        return call("moveTimer", name);
+        return call(name);
     }
 
     public Result<String> setReady() {
-        return call("setReady", name);
+        return call(name);
     }
 
     public Result<String> quit() {
-        return call("quit", name);
+        return call(name);
     }
 
     public Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation) {
-        return call("setTile", name, c, t, rotation);
+        return call(name, c, t, rotation);
     }
 
     public Result<Tile> getTile(Coordinate c) {
-        return call("getTile", name, c);
+        return call(name, c);
     }
 
     public Tile.Rotation getRotation(Coordinate c) {
-        return call("getRotation", name, c);
+        return call(name, c);
     }
 
     public Result<Tile> bookTile(Tile t) {
-        return call("bookTile", name, t);
+        return call(name, t);
     }
 
     public Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c) {
-        return call("useBookedTile", name, t, rotation, c);
+        return call(name, t, rotation, c);
     }
 
     public List<Tile> getBooked() {
-        return call("getBooked", name);
+        return call(name);
     }
 
     public Result<String> remove(Coordinate c) {
-        return call("remove", name, c);
+        return call(name, c);
     }
 
     public Set<Coordinate> checkShip() {
-        return call("checkShip", name);
+        return call(name);
     }
 
     public ShipBoard getShip() {
-        return call("getShip", name);
+        return call(name);
     }
 
     public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
-        return call("init", name, purple, brown);
+        return call(name, purple, brown);
     }
 
     public List<GoodsBoard.Type> getReward() {
-        return call("getReward", name);
+        return call(name);
     }
 
     public Result<Integer> placeReward(GoodsBoard.Type t, Coordinate c) {
-        return call("placeReward", name, t, c);
+        return call(name, t, c);
     }
 
     public int getCash() {
-        return call("getCash", name);
+        return call(name);
     }
 
     public Result<Integer> drop(Coordinate c) {
-        return call("drop", name, c);
+        return call(name, c);
     }
 
     public Result<Integer> drop(Coordinate c, GoodsBoard.Type t) {
-        return call("drop", name, c, t);
+        return call(name, c, t);
     }
 
     public Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map) {
-        return call("setCannonsToUse", name, map);
+        return call(name, map);
     }
 
     public Result<Tile> drawTile() {
-        return call("drawTile", name);
+        return call(name);
     }
 
     public Result<List<Tile>> getSeenTiles() {
-        return call("getSeenTiles", name);
+        return call(name);
     }
 
     public Result<String> giveTile(Tile t) {
-        return call("giveTile", name, t);
+        return call(name, t);
     }
 
     public Result<Tile> getTileFromSeen(Tile t) {
-        return call("getTileFromSeen", name, t);
+        return call(name, t);
     }
 
     public Result<Card.CompressedCard> drawCard() {
-        return call("drawCard", name);
+        return call(name);
     }
 
     public Result<String> setInput(String json) {
-        return call("setInput", name, json);
+        return call(name, json);
     }
 
     public Result<String> getCardData() {
-        return call("getCardData", name);
+        return call(name);
     }
 
     public Result<Card[][]> getVisible() {
-        return call("getVisible", name);
+        return call(name);
     }
 }
