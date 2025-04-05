@@ -149,7 +149,7 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushCard(Card.CompressedCard card) {
+    public void pushCard(Card card) {
         call(card);
     }
 

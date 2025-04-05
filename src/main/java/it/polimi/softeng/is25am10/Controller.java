@@ -338,12 +338,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
      * @return the drawn card
      */
     @Override
-    public Result<Card.CompressedCard> drawCard(String name) {
-        Result<Card.CompressedCard> res = getModel(name).drawCard(name);
+    public Result<Card> drawCard(String name) {
+        Result<Card> res = getModel(name).drawCard(name);
         if(res.isOk()){
             pushCard(getModel(name));
 
-            if(res.getData().needInput()){
+            if(res.getData().needInput){
                 askForInput(getModel(name).getNextToPlay());
             }
         }

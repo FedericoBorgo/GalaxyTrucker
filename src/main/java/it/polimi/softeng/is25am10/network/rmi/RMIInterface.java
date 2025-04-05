@@ -68,7 +68,7 @@ public interface RMIInterface extends Remote {
 
     Result<Tile> getTileFromSeen(String name, Tile t) throws RemoteException;
 
-    Result<Card.CompressedCard> drawCard(String name) throws RemoteException;
+    Result<Card> drawCard(String name) throws RemoteException;
 
     Result<String> setInput(String name, String json) throws RemoteException;
 

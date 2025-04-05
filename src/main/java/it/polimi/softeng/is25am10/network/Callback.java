@@ -19,7 +19,7 @@ public interface Callback extends Remote {
 
     void pushState(Model.State.Type state) throws RemoteException;
 
-    void pushCard(Card.CompressedCard card) throws RemoteException;
+    void pushCard(Card card) throws RemoteException;
 
     void pushCardChanges(String data) throws RemoteException;
 

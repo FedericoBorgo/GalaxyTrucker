@@ -2,11 +2,9 @@ package it.polimi.softeng.is25am10.model;
 
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard.CompressedFlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.Pawn;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard.CompressedShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
 import org.json.JSONObject;
@@ -619,7 +617,7 @@ public class Model implements Serializable {
      * @param name name of the leader
      * @return the card
      */
-    public synchronized Result<Card.CompressedCard> drawCard(String name){
+    public synchronized Result<Card> drawCard(String name){
         if(state.get() != State.Type.DRAW_CARD)
             return Result.err("not DRAW state");
         if(flight.getOrder().getFirst() != get(name).getPawn())
@@ -640,7 +638,7 @@ public class Model implements Serializable {
             });
         }
 
-        return Result.ok(c.compress());
+        return Result.ok(c);
     }
 
     private String changes = null;

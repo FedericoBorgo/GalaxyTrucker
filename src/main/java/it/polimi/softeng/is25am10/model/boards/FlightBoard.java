@@ -15,19 +15,6 @@ import java.util.Objects;
  * Includes methods for moving pawns
  */
 public class FlightBoard implements Serializable {
-    public static class CompressedFlightBoard{
-        public final List<Pawn> order;
-        public final List<Integer> offset;
-        public final int leaderPosition;
-
-
-        CompressedFlightBoard(List<Pawn> order, List<Integer> offset, int leaderPosition){
-            this.order = Collections.unmodifiableList(order);
-            this.offset = Collections.unmodifiableList(offset);
-            this.leaderPosition = leaderPosition;
-        }
-    }
-
     private int timer;
 
     private List<Pawn> order;
@@ -166,10 +153,6 @@ public class FlightBoard implements Serializable {
                 case EMPTY -> null;
             };
         }
-    }
-
-    public CompressedFlightBoard compress() {
-        return new CompressedFlightBoard(order, offset, leaderPosition);
     }
 
     /**

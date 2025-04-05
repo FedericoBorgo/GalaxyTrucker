@@ -233,7 +233,7 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<Card.CompressedCard> drawCard() {
+    public Result<Card> drawCard() {
         try {
             return server.drawCard(name);
         } catch (RemoteException e) {

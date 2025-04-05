@@ -183,7 +183,7 @@ public class SocketClient extends Thread implements ClientInterface {
         return call(name, t);
     }
 
-    public Result<Card.CompressedCard> drawCard() {
+    public Result<Card> drawCard() {
         return call(name);
     }
 

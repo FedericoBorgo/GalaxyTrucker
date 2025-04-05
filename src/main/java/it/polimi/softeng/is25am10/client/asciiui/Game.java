@@ -324,7 +324,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     }
 
     @Override
-    public void pushCard(Card.CompressedCard card) throws RemoteException {
+    public void pushCard(Card card) throws RemoteException {
 
     }
 

@@ -65,7 +65,7 @@ public interface ClientInterface {
 
     Result<Tile> getTileFromSeen(Tile t);
 
-    Result<Card.CompressedCard> drawCard();
+    Result<Card> drawCard();
 
     Result<String> setInput(String json);
 

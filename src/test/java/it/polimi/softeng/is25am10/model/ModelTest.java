@@ -156,7 +156,7 @@ class ModelTest {
 
         loadCards(model);
 
-        Result<Card.CompressedCard> res = model.drawCard("player2");
+        Result<Card> res = model.drawCard("player2");
         assertTrue(res.isErr());
         res = model.drawCard("player1");
         assertTrue(res.isOk());
