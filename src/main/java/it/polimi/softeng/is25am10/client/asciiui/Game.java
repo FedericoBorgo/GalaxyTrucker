@@ -10,20 +10,22 @@ import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
-import org.json.JSONObject;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 
 public class Game extends UnicastRemoteObject implements Callback {
-    final FrameGenerator frame;
-    final ClientInterface server;
+    FrameGenerator frame;
+    ClientInterface server;
     ShipBoard board = new ShipBoard();
     FlightBoard flight = new FlightBoard();
-    final ArrayList<Tile> openTiles = new ArrayList<>();
+    ArrayList<Tile> openTiles = new ArrayList<>();
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
     Tile currentTile = null;
@@ -32,11 +34,12 @@ public class Game extends UnicastRemoteObject implements Callback {
     boolean notReady = true;
 
     Model.State.Type state = Model.State.Type.JOINING;
+    Map<String, Function<String, String>> executors = new HashMap<>();
+    Map<String, Predicate<String>> checkers = new HashMap<>();
 
 
     public Game(ClientInterface server) throws IOException {
         super();
-        //frame = null;
         frame = new FrameGenerator(this);
         try{
             server.join(this).getData();
@@ -45,156 +48,26 @@ public class Game extends UnicastRemoteObject implements Callback {
             System.exit(1);
         }
 
+        executors.put("alieni", alien);
+        executors.put("piazza", place);
+        executors.put("rimuovi", remove);
+        executors.put("prenota", book);
+        executors.put("pesca", draw);
+        executors.put("pronto", ready);
+        executors.put("clessidra", clock);
+
+        checkers.put("alieni", checkAlien);
+        checkers.put("piazza", checkPlace);
+        checkers.put("rimuovi", checkRemove);
+        checkers.put("prenota", checkBook);
+        checkers.put("pesca", checkDraw);
+        checkers.put("pronto", checkReady);
+        checkers.put("clessidra", checkClock);
+
         this.server = server;
     }
 
-    boolean checkCommand(String command) {
-        try{
-            if (command.equals("clessidra") && state == Model.State.Type.BUILDING) {
-                return true;
-            }
-            else if(command.equals("pronto") && state == Model.State.Type.BUILDING) {
-                return true;
-            }
-            else if(command.equals("pesca") && state == Model.State.Type.BUILDING && notReady) {
-                return true;
-            }
-            else if(command.equals("prenota") && state == Model.State.Type.BUILDING && notReady) {
-                return true;
-            }
-            else if(notReady && command.substring(0, command.indexOf(' ')).equals("piazza") && state == Model.State.Type.BUILDING) {
-                String[] args = command.substring(command.indexOf(' ') + 1).split(" ");
-                if(args.length < 3)
-                    return false;
-
-                if(Integer.parseInt(args[0]) > 30)
-                    return false;
-
-                if(!Character.isDigit(args[1].charAt(0)) ||
-                    !Character.isDigit(args[1].charAt(1)))
-                    return false;
-
-                int x = args[1].charAt(0) - '0';
-                int y = args[1].charAt(1) - '0';
-
-                if(Coordinate.check(x, y))
-                    return false;
-
-                int rot = args[2].charAt(0) - '0';
-
-                return rot < 4;
-            }
-            else if(command.substring(0, command.indexOf(' ')).equals("alieni") && state == Model.State.Type.ALIEN_INPUT){
-                String[] args = command.substring(command.indexOf(' ') + 1).split(" ");
-
-                if(args[0].equals("no"))
-                    return true;
-
-                if(args.length > 2)
-                    return false;
-
-                for (String arg : args) {
-                    if (arg.charAt(0) != 'v' && arg.charAt(0) != 'm')
-                        return false;
-
-                    if (!Character.isDigit(arg.charAt(1)) ||
-                            !Character.isDigit(arg.charAt(2)))
-                        return false;
-
-                    int x = arg.charAt(1) - '0';
-                    int y = arg.charAt(2) - '0';
-
-                    if (Coordinate.check(x, y))
-                        return false;
-                }
-
-                return true;
-            }
-            else if(command.substring(0, command.indexOf(' ')).equals("rimuovi") && state == Model.State.Type.CHECKING){
-                String where = command.substring(command.indexOf(' ') + 1);
-
-                int x = where.charAt(0) - '0';
-                int y = where.charAt(1) - '0';
-
-                return !Coordinate.check(x, y);
-            }
-        }
-        catch (Exception _) {}
-        return false;
-    }
-
-
-    String handleInsert(String cmd){;
-        if(cmd.equals("clessidra")){
-            Result<Integer> res = server.moveTimer();
-
-            if(res.isErr())
-                return res.getReason();
-            else {
-                startTime = System.currentTimeMillis();
-                return "spostata";
-            }
-        }
-        else if(cmd.equals("pronto")){
-            Result<String> res = server.setReady();
-
-            if(res.isErr())
-                return res.getReason();
-            else {
-                notReady = false;
-                return "ok";
-            }
-        }
-        else if(cmd.equals("pesca")){
-            Result<Tile> res = server.drawTile();
-
-            if(res.isErr())
-                return res.getReason();
-            else {
-                if(currentTile != null)
-                    server.giveTile(currentTile);
-                currentTile = res.getData();
-                return "pescata";
-            }
-        }
-        else if(cmd.equals("prenota")){
-            if(currentTile != null){
-                Result<Tile> res = server.bookTile(currentTile);
-
-                if(res.isErr())
-                    return res.getReason();
-                else {
-                    board.getTiles().bookTile(currentTile);
-                    currentTile = null;
-                    return "fatto";
-                }
-            }
-            else
-                return "nessun elemento pescato";
-        }
-        else if(cmd.contains("piazza")){
-            return handlePlace(cmd.substring(cmd.indexOf(' ') + 1));
-        }
-        else if(cmd.contains("alieni")){
-            return handleAlien(cmd.substring(cmd.indexOf(' ') + 1));
-        }
-        else if(cmd.contains("rimuovi")){
-            String where = cmd.substring(cmd.indexOf(' ') + 1);
-            Coordinate c = new Coordinate(where.charAt(0) - '0', where.charAt(1) - '0');
-
-            Result<String> res = server.remove(c);
-
-            if(res.isErr())
-                return res.getReason();
-
-            board.getTiles().remove(c);
-            return "rimosso";
-        }
-
-        return "comando non trovato";
-    }
-
-    String handleAlien(String cmd){
+    Function<String, String> alien = (cmd) -> {
         String[] args = cmd.split(" ");
         Result<Coordinate> brown, purple;
         int x, y;
@@ -226,10 +99,39 @@ public class Game extends UnicastRemoteObject implements Callback {
         board.init(purple.isOk()? Optional.of(purple.getData()) : Optional.empty(),
                 brown.isOk()? Optional.of(brown.getData()) : Optional.empty());
         return "nave riempita";
-    }
+    };
 
+    Predicate<String> checkAlien = (cmd) -> {
+        if(state != Model.State.Type.ALIEN_INPUT)
+            return false;
 
-    String handlePlace(String cmd){
+        String[] args = cmd.split(" ");
+
+        if(args[0].equals("no"))
+            return true;
+
+        if(args.length > 2)
+            return false;
+
+        for (String arg : args) {
+            if (arg.charAt(0) != 'v' && arg.charAt(0) != 'm')
+                return false;
+
+            if (!Character.isDigit(arg.charAt(1)) ||
+                    !Character.isDigit(arg.charAt(2)))
+                return false;
+
+            int x = arg.charAt(1) - '0';
+            int y = arg.charAt(2) - '0';
+
+            if (Coordinate.check(x, y))
+                return false;
+        }
+
+        return true;
+    };
+
+    Function<String, String> place = (cmd) -> {
         TilesBoard board = this.board.getTiles();
         String[] args = cmd.split(" ");
         int from = Integer.parseInt(args[0]);
@@ -302,8 +204,145 @@ public class Game extends UnicastRemoteObject implements Callback {
                 return res.getReason();
             }
         }
+    };
+
+    Predicate<String> checkPlace = (cmd) -> {
+        if(!notReady || state != Model.State.Type.BUILDING)
+            return false;
+
+        String[] args = cmd.split(" ");
+        if(args.length < 3)
+            return false;
+
+        if(Integer.parseInt(args[0]) > 30)
+            return false;
+
+        if(!Character.isDigit(args[1].charAt(0)) ||
+                !Character.isDigit(args[1].charAt(1)))
+            return false;
+
+        int x = args[1].charAt(0) - '0';
+        int y = args[1].charAt(1) - '0';
+
+        if(Coordinate.check(x, y))
+            return false;
+
+        int rot = args[2].charAt(0) - '0';
+
+        return rot < 4;
+    };
+
+    Function<String, String> remove = (cmd) -> {
+        Coordinate c = new Coordinate(cmd.charAt(0) - '0', cmd.charAt(1) - '0');
+
+        Result<String> res = server.remove(c);
+
+        if(res.isErr())
+            return res.getReason();
+
+        board.getTiles().remove(c);
+        return "rimosso";
+    };
+
+    Predicate<String> checkRemove = (where) -> {
+        if(state != Model.State.Type.CHECKING)
+            return false;
+
+        int x = where.charAt(0) - '0';
+        int y = where.charAt(1) - '0';
+
+        return !Coordinate.check(x, y);
+    };
+
+    Function<String, String> book = (cmd) -> {
+        if(currentTile != null){
+            Result<Tile> res = server.bookTile(currentTile);
+
+            if(res.isErr())
+                return res.getReason();
+            else {
+                board.getTiles().bookTile(currentTile);
+                currentTile = null;
+                return "fatto";
+            }
+        }
+        else
+            return "nessun elemento pescato";
+    };
+
+    Predicate<String> checkBook = (cmd) -> state == Model.State.Type.BUILDING;
+
+    Function<String, String> draw = (cmd) -> {
+        Result<Tile> res = server.drawTile();
+
+        if(res.isErr())
+            return res.getReason();
+        else {
+            if(currentTile != null)
+                server.giveTile(currentTile);
+            currentTile = res.getData();
+            return "pescata";
+        }
+    };
+
+    Predicate<String> checkDraw = (cmd) -> state == Model.State.Type.BUILDING && notReady;
+
+    Function<String, String> ready = (cmd) -> {
+        Result<String> res = server.setReady();
+
+        if(res.isErr())
+            return res.getReason();
+        else {
+            notReady = false;
+            return "ok";
+        }
+    };
+
+    Predicate<String> checkReady = (cmd) -> state == Model.State.Type.BUILDING;
+
+    Function<String, String> clock = (cmd) -> {
+        Result<Integer> res = server.moveTimer();
+
+        if(res.isErr())
+            return res.getReason();
+        else {
+            startTime = System.currentTimeMillis();
+            return "spostata";
+        }
+    };
+
+    Predicate<String> checkClock = (cmd) -> state == Model.State.Type.BUILDING;
+
+    Pair<String, String> convert(String cmd){
+        int divider = cmd.indexOf(' ');
+        String request = cmd;
+        String args = "";
+
+        if (divider != -1){
+            request = request.substring(0, divider);
+
+            try{
+                args = cmd.substring(divider + 1);
+            }
+            catch(Exception _) {};
+        }
+
+        return new Pair<>(request, args);
     }
 
+    public String execute(String cmd) {
+        Pair<String, String> request = convert(cmd);
+        return executors.get(request.getKey()).apply(request.getValue());
+    };
+
+    public boolean checkCommand(String cmd) {
+        try{
+            Pair<String, String> request = convert(cmd);
+            return checkers.get(request.getKey()).test(request.getValue());
+        }
+        catch (Exception _) {}
+        return false;
+    }
 
     @Override
     public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
@@ -312,7 +351,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return 2;//frame.askHowManyPlayer();
+        return frame.askHowManyPlayer();
     }
 
     @Override

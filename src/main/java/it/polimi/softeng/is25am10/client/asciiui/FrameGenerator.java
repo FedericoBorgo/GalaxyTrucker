@@ -358,7 +358,7 @@ public class FrameGenerator {
                     String cmd = toStringCommand();
 
                     if(isOkCommand) {
-                        response = game.handleInsert(cmd);
+                        response = game.execute(cmd);
                         command.clear();
                         cursor = 0;
                     }

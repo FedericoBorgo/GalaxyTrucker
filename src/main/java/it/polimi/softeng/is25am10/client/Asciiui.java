@@ -13,6 +13,8 @@ public class Asciiui {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         try{
+            //ServerMain.main(new String[]{"true"});
+            //ClientInterface clientInterface = new SocketClient("chia", "localhost", 1235, 1236);
             ClientInterface clientInterface = Config.getControls();
 
             Game renderer = new Game(clientInterface);
