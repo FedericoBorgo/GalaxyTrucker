@@ -1,26 +1,16 @@
 package it.polimi.softeng.is25am10.client.asciiui;
 
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.Button;
-import com.googlecode.lanterna.gui2.Component;
-import com.googlecode.lanterna.gui2.GridLayout;
-import com.googlecode.lanterna.gui2.Label;
-import com.googlecode.lanterna.gui2.Panel;
-import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.swing.SwingTerminal;
-import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;

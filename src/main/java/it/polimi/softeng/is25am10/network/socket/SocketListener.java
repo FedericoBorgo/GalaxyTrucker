@@ -8,7 +8,6 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,7 +17,8 @@ import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class SocketListener {
     private final ServerSocket methodInvoker;

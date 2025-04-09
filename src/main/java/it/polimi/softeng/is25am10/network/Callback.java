@@ -9,8 +9,6 @@ import it.polimi.softeng.is25am10.model.cards.Card;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public interface Callback extends Remote {
     void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException;

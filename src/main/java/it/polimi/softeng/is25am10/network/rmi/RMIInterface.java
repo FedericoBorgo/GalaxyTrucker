@@ -8,13 +8,11 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
-import org.json.JSONObject;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public interface RMIInterface extends Remote {

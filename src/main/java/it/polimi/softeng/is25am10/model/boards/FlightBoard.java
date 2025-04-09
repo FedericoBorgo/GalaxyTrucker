@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,21 +14,12 @@ import java.util.Objects;
  * Includes methods for moving pawns
  */
 public class FlightBoard implements Serializable {
-    private int timer;
+    private int timer = 0;
 
-    private List<Pawn> order;
-    private List<Integer> offset;
-    private int leaderPosition;
-    private final List<Pawn> quitters;
-
-    // Constructor method
-    public FlightBoard() {
-        this.timer = 0;
-        this.order = new ArrayList<>();
-        this.offset = new ArrayList<>();
-        this.quitters = new ArrayList<>();
-        this.leaderPosition = 6;
-    }
+    private List<Pawn> order = new ArrayList<>();
+    private List<Integer> offset = new ArrayList<>();
+    private int leaderPosition = 6;
+    private final List<Pawn> quitters = new ArrayList<>();
 
     // The Rocket pawn is positioned on the flight board
 
@@ -38,7 +28,6 @@ public class FlightBoard implements Serializable {
      * @param pawn The pawn to be added
      */
     public void setRocketReady(Pawn pawn) {
-        //TODO the player can chose which position
         int[] OFFSET = {0, -3, -5, -6};
         order.addLast(pawn);
         offset.addLast(OFFSET[offset.size()]);
@@ -140,17 +129,20 @@ public class FlightBoard implements Serializable {
      * Enumerates the different rocket pawns which can be used by the player.
      * Includes an {@code EMPTY} value.
      */
-
     public enum Pawn {
-        YELLOW, GREEN, BLUE, RED, EMPTY;
+        YELLOW, GREEN, BLUE, RED;
 
+        /**
+         * Convert the Pawn to the corresponding ANSI color.
+         *
+         * @return corresponding color.
+         */
         public TextColor.ANSI getColor() {
             return switch (this){
                 case YELLOW -> TextColor.ANSI.YELLOW_BRIGHT;
                 case GREEN -> TextColor.ANSI.GREEN_BRIGHT;
                 case BLUE -> TextColor.ANSI.BLUE_BRIGHT;
                 case RED -> TextColor.ANSI.RED_BRIGHT;
-                case EMPTY -> null;
             };
         }
     }
@@ -186,6 +178,7 @@ public class FlightBoard implements Serializable {
         return timer == that.timer && leaderPosition == that.leaderPosition && Objects.equals(order, that.order) && Objects.equals(offset, that.offset) && Objects.equals(quitters, that.quitters);
     }
 
+    @Deprecated
     public JSONArray toJSON(){
         JSONArray array = new JSONArray();
 

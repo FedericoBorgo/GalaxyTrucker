@@ -3,7 +3,6 @@ package it.polimi.softeng.is25am10.model.boards;
 import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,7 +17,7 @@ import java.util.function.Predicate;
  * to manage the booking process of tiles (and to manage trashed tiles). To be added.
  */
 public class TilesBoard implements Serializable {
-    // coordinates of unplaceable tiles
+    // coordinates of untraceable tiles
     private static final Coordinate[] WALL_POSITION = new Coordinate[]{
             new Coordinate(0, 0),
             new Coordinate(1, 0),
@@ -229,7 +228,7 @@ public class TilesBoard implements Serializable {
     /**
      * Remove a tile
      *
-     * @param c
+     * @param c coordinate to remove the tile
      */
     public void remove(Coordinate c) {
         trashed.add(board[c.x()][c.y()]);
@@ -253,14 +252,6 @@ public class TilesBoard implements Serializable {
         return result;
     }
 
-    /**
-     * From a specified coordinate, if the corresponding tiles is already
-     * seen do nothing. Otherwise, it marks and seen and call itself around
-     * the tile.
-     *
-     * @param marked
-     * @param c
-     */
     private void mark(boolean[][] marked, Coordinate c) {
         if (marked[c.x()][c.y()] || !Tile.real(board[c.x()][c.y()]))
             return;
@@ -369,7 +360,6 @@ public class TilesBoard implements Serializable {
 
     public int countExposedConnectors() {
         AtomicInteger count = new AtomicInteger();
-        List<Pair<Coordinate, Tile.Side>> debug = new ArrayList<>();
 
         Coordinate.forEach(c -> {
             if (!Tile.real(get(c)))
@@ -409,13 +399,10 @@ public class TilesBoard implements Serializable {
             }
 
 
-            for (Tile.Side s : check) {
+            for (Tile.Side s : check)
                 if (Tile.ConnectorType.SMOOTH !=
-                        Tile.getSide(get(c), getRotation(c), s)) {
+                        Tile.getSide(get(c), getRotation(c), s))
                     count.incrementAndGet();
-                    debug.add(new Pair<>(c, s));
-                }
-            }
         });
 
         return count.get();
@@ -554,6 +541,13 @@ public class TilesBoard implements Serializable {
         return c == null? Optional.empty() : Optional.of(c);
     }
 
+    /**
+     * Hit the board with the projectile.
+     *
+     * @param p projectile to hit
+     * @param useBattery ?
+     * @return the broken tile
+     */
     public Optional<Coordinate> hit(Projectile p, boolean useBattery){
         boolean saved = false;
         Optional<Coordinate> pos = whatWillHit(p);

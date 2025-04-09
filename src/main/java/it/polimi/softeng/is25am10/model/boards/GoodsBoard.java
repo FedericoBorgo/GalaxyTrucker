@@ -19,10 +19,16 @@ public class GoodsBoard extends ElementsBoard{
     private static final List<Tile.Type> GREEN_BOX;
     private static final Map<Tile.Type, Integer> MAX_VALUE;
 
+    /**
+     * Type of the box container layout.
+     */
     public enum Type{
         BLUE, RED, YELLOW, GREEN
     }
 
+    /**
+     * Corresponding color to this box container layout-
+     */
     private final TextColor.ANSI color;
 
     private final List<Tile.Type> box;
@@ -79,9 +85,18 @@ public class GoodsBoard extends ElementsBoard{
         return total;
     }
 
+    /**
+     * Check if a good is placeable in this box.
+     * It checks if the color is correct and if there are enough
+     * spaces inside this tile.
+     *
+     * @param c coordinate to place the box
+     * @param qty how many box to place
+     * @return true if the box is placeable here, false if not
+     */
     @Override
     public boolean check(Coordinate c, int qty) {
-        Tile.Type tile = board.getTile(c).getData().getType();
+        Tile.Type tile = tiles.getTile(c).getData().getType();
         return box.contains(tile) && (getNBox(c) + get(c) + qty) <= MAX_VALUE.get(tile);
     }
 
@@ -89,6 +104,4 @@ public class GoodsBoard extends ElementsBoard{
     public TextColor.ANSI getColor() {
         return color;
     }
-
-
 }

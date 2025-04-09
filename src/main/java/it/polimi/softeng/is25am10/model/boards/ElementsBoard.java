@@ -3,7 +3,6 @@ package it.polimi.softeng.is25am10.model.boards;
 import com.googlecode.lanterna.TextColor;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import javafx.util.Pair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -15,36 +14,30 @@ import java.util.*;
  * removing units or moving units between tiles.
  */
 public abstract class ElementsBoard implements Serializable {
-    protected final Map<Coordinate, Integer> positions;
-    protected int total;
+    // the coordinate-(how many entries) pair
+    protected final Map<Coordinate, Integer> positions = new HashMap<>();
+    protected int total = 0;
     // The matrix containing all the tiles (including empty spaces); board is associated with a specific player
-    protected final TilesBoard board;
+    protected final TilesBoard tiles;
     // List of other boards containing units which interact with the units we are working on
-    protected List<ElementsBoard> other;
+    protected List<ElementsBoard> other = new ArrayList<>();
 
     private final boolean removeChecks;
 
     /**
      * Constructor method that can be used in the subclasses.
-     * @param board The TilesBoard of a certain player
+     * @param tiles The TilesBoard of a certain player
      */
-    public ElementsBoard(TilesBoard board) {
-        this.board = board;
-        total = 0;
-        positions = new HashMap<>();
-        other = new ArrayList<>();
-        removeChecks = false;
+    public ElementsBoard(TilesBoard tiles) {
+        this(tiles, false);
     }
 
     /**
      * Constructor method that can be used in the subclasses.
-     * @param board The TilesBoard of a certain player
+     * @param tiles The TilesBoard of a certain player
      */
-    public ElementsBoard(TilesBoard board, boolean removeCheck) {
-        this.board = board;
-        total = 0;
-        positions = new HashMap<>();
-        other = new ArrayList<>();
+    public ElementsBoard(TilesBoard tiles, boolean removeCheck) {
+        this.tiles = tiles;
         this.removeChecks = removeCheck;
     }
     // Get methods
@@ -115,74 +108,12 @@ public abstract class ElementsBoard implements Serializable {
     }
 
     /**
-     * Move units from one position to another. Does not change the total number of units on the board.
-     * Uses the remove and put method from this class. Put is implemented in the subclasses.
-     * Result.data should not be accessed.
-     * @param from_c old coordinate
-     * @param to_c new coordinate
-     * @param qty the number of units being moved
-     * @return a successful {@code Result} or an error {@code Result} with a message explaining
-     * why the operation failed
-     */
-    public Result<Integer> move(Coordinate from_c, Coordinate to_c, int qty) {
-        Result<Integer> res = remove(from_c, qty);
-
-        if(res.isErr())
-            return res;
-
-        res = put(to_c, qty);
-
-        if(res.isErr())
-            put(from_c, qty);
-
-        return Result.ok(qty);
-    }
-
-    /**
      * Sets the list of other boards needed for the operation of this board.
      * Not all subclasses use or even need this method, but some do.
      * @param other List of other boards that interact with this instance of board.
      */
     public void setOthers(List<ElementsBoard> other){
         this.other = other;
-    }
-
-    /**
-     * Remove all the qty in a list of positions. If some remove fails, undo
-     * all the changes and return err.
-     *
-     * @param positions the list of the coordinates and qty
-     * @return
-     */
-    public Result<Integer> remove(List<Pair<Coordinate, Integer>> positions) {
-        Result<Integer> res;
-        int total = 0;
-
-        if(!checkPresence(positions))
-            return Result.err("not enough items in the specified positions");
-
-        for(Pair<Coordinate, Integer> p : positions){
-            res = remove(p.getKey(), p.getValue());
-            total += p.getValue();
-
-            if(res.isErr())
-                throw new IllegalStateException("remove and checkPresence do not return the same value");
-        }
-
-        return Result.ok(total);
-    }
-
-    /**
-     * Check if there are enough items in the specified position.
-     * @param positions the list of positions and values
-     * @return true if there are enough, false if not.
-     */
-    public boolean checkPresence(List<Pair<Coordinate, Integer>> positions){
-        for(Pair<Coordinate, Integer> p : positions){
-            if(get(p.getKey()) > p.getValue())
-                return false;
-        }
-        return true;
     }
 
     /**
@@ -195,7 +126,7 @@ public abstract class ElementsBoard implements Serializable {
      * why the operation failed
      */
     public Result<Integer> put(Coordinate c, int qty){
-        Result<Tile> resBoard = board.getTile(c);
+        Result<Tile> resBoard = tiles.getTile(c);
 
         // out of bound
         if(resBoard.isErr())
@@ -213,7 +144,6 @@ public abstract class ElementsBoard implements Serializable {
         return Result.ok(get(c));
     }
 
-
     /**
      * Remove all the illegals elements in a board.
      *
@@ -221,7 +151,7 @@ public abstract class ElementsBoard implements Serializable {
      */
     public List<Coordinate> removeIllegals() {
         List<Coordinate> toRemove = new ArrayList<>();
-        positions.forEach((c, qty) -> {
+        positions.forEach((c, _) -> {
 
             if(!check(c, 0))
                 toRemove.add(c);
@@ -237,7 +167,7 @@ public abstract class ElementsBoard implements Serializable {
      * subclasses.
      * @param c coordinate
      * @param qty quantity
-     * @return
+     * @return true if the element is placeable here, false if not
      */
     public abstract boolean check(Coordinate c, int qty);
 

@@ -15,7 +15,10 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -124,7 +127,7 @@ public class Game extends UnicastRemoteObject implements Callback {
             int x = arg.charAt(1) - '0';
             int y = arg.charAt(2) - '0';
 
-            if (Coordinate.check(x, y))
+            if (Coordinate.isInvalid(x, y))
                 return false;
         }
 
@@ -224,7 +227,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         int x = args[1].charAt(0) - '0';
         int y = args[1].charAt(1) - '0';
 
-        if(Coordinate.check(x, y))
+        if(Coordinate.isInvalid(x, y))
             return false;
 
         int rot = args[2].charAt(0) - '0';
@@ -251,7 +254,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         int x = where.charAt(0) - '0';
         int y = where.charAt(1) - '0';
 
-        return !Coordinate.check(x, y);
+        return !Coordinate.isInvalid(x, y);
     };
 
     Function<String, String> book = (cmd) -> {

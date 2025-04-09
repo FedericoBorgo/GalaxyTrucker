@@ -9,17 +9,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class offers the capacity to change the number of aliens held on a tile
+ * This class offers the capacity to change the number of aliens held on a tile.
+ * The maximum number of aliens in a board is only 1.
  */
 public class AlienBoard extends ElementsBoard{
     private final Tile.Type type;
 
+    /**
+     * The type of alien stored inside this layer.
+     * The aliens can be Purple or brown.
+     */
     public enum Type{
         PURPLE, BROWN
     }
 
-    public AlienBoard(TilesBoard board, Type type) {
-        super(board);
+    /**
+     * Create the Alien Layer for a single type of alien.
+     *
+     * @param tiles tiles placement to check if the alien will be placed in
+     *              their corresponding tile-coordinate.
+     * @param type  of this alien layer.
+     */
+    public AlienBoard(TilesBoard tiles, Type type) {
+        super(tiles);
         this.type = switch (type){
             case PURPLE -> Tile.Type.P_ADDON;
             case BROWN -> Tile.Type.B_ADDON;
@@ -33,27 +45,44 @@ public class AlienBoard extends ElementsBoard{
      * @return true if an adjacent tile contains an addon of the specified type, false otherwise
      */
     private boolean thereIsAddon(Coordinate c){
-        List<Result<Tile>> tiles = new ArrayList<>();
+        List<Result<Tile>> adjacent = new ArrayList<>();
 
-        try{tiles.add(board.getTile(c.left()));}catch(IOException _){}
-        try{tiles.add(board.getTile(c.right()));}catch(IOException _){}
-        try{tiles.add(board.getTile(c.up()));}catch(IOException _){}
-        try{tiles.add(board.getTile(c.down()));}catch(IOException _){}
+        // get the adjacent tile (if possible).
+        // If an adjacent coordinate does not exist, IOException is thrown
+        // and the tile is not added to the list of adjacent tiles
+        try{adjacent.add(tiles.getTile(c.left()));}catch(IOException _){}
+        try{adjacent.add(tiles.getTile(c.right()));}catch(IOException _){}
+        try{adjacent.add(tiles.getTile(c.up()));}catch(IOException _){}
+        try{adjacent.add(tiles.getTile(c.down()));}catch(IOException _){}
 
 
-        for(Result<Tile> result: tiles)
+        // check if there is an addon near
+        for(Result<Tile> result: adjacent)
             if(result.isOk() && result.getData().getType() == type)
                 return true;
 
         return false;
     }
 
+    /**
+     * Check if the Alien can be placed at the corresponding coordinate.
+     * It checks if there is an addon of the corresponding color near
+     * and if there is only 1 alien of this color in the entire board.
+     *
+     * @param c the coordinate to check if the alien can be placed here.
+     * @param qty how many aliens, only 1 can be placed per alien.
+     * @return true if the alien is playable, false if not.
+     */
     @Override
     public boolean check(Coordinate c, int qty) {
-        return board.getTile(c).getData().getType() == Tile.Type.HOUSE
+        return tiles.getTile(c).getData().getType() == Tile.Type.HOUSE
                 && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1) && total+ qty <= 1;
     }
 
+    /**
+     * Get the ansi color of the corresponding alien, used for terminal drawing.
+     * @return the ansi color in base of the alien type.
+     */
     public TextColor.ANSI getColor(){
         return type == Tile.Type.B_ADDON ? TextColor.ANSI.YELLOW : TextColor.ANSI.MAGENTA;
     }

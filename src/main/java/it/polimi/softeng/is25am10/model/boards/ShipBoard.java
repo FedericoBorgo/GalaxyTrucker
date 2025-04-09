@@ -9,17 +9,18 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * This class contains all the layouts of every type
+ * of container in the board.
+ * It contains batters, astronauts, aliens, boxes and tiles.
+ */
 public class ShipBoard implements Serializable {
-    public enum CrewType{
-        ASTRONAUT, B_ALIEN, P_ALIEN
-    }
-
     private final TilesBoard tiles;
     private final ElementsBoard astronaut;
     private final ElementsBoard purple;
     private final ElementsBoard brown;
     private final ElementsBoard battery;
-    private final Map<GoodsBoard.Type, ElementsBoard> goods;
+    private final Map<GoodsBoard.Type, ElementsBoard> goods = new HashMap<>();
     private final List<ElementsBoard> boards;
 
     public ShipBoard(){
@@ -29,8 +30,10 @@ public class ShipBoard implements Serializable {
         brown = new AlienBoard(tiles, AlienBoard.Type.BROWN);
         battery = new BatteryBoard(tiles);
 
-        goods = new HashMap<>();
-        Arrays.stream(GoodsBoard.Type.values()).forEach(type -> goods.put(type, new GoodsBoard(tiles, type)));
+        Arrays.stream(GoodsBoard.Type.values())
+                .forEach(type ->
+                        goods.put(type, new GoodsBoard(tiles, type))
+                );
 
         astronaut.setOthers(Arrays.asList(brown, purple));
         purple.setOthers(Arrays.asList(brown, astronaut));
@@ -70,16 +73,29 @@ public class ShipBoard implements Serializable {
         return goods.get(type);
     }
 
+    /**
+     * Get the total power of the cannons in base of how many
+     * the players want to activate.
+     *
+     * @param count how many cannons the player want to activate
+     * @return the power of the cannons
+     */
     public double getCannonsPower(Map<Tile.Rotation, Integer> count){
-        double cannons = tiles.countCannonsPower(count);
+        double power = tiles.countCannonsPower(count);
 
-        if(cannons > 0){
-            cannons += purple.getTotal()*2;
-        }
+        if(power > 0)
+            power += purple.getTotal()*2;
 
-        return cannons;
+        return power;
     }
 
+    /**
+     * Get the total power of the engines in base of how many
+     * the players want to activate.
+     *
+     * @param count how many engines the player want to activate
+     * @return the power of the engines
+     */
     public int getEnginePower(int count){
         int engines = tiles.countEnginePower(count);
 
@@ -90,10 +106,13 @@ public class ShipBoard implements Serializable {
         return engines;
     }
 
+    // there is someone at the specified coordinate?
     private boolean thereIsSomeone(Coordinate c){
         return purple.get(c) + astronaut.get(c) + brown.get(c) > 0;
     }
 
+    // remove at least one member at the specified location
+    // if there is one
     public void removeSomeone(Coordinate c){
         if(astronaut.get(c) > 0) {
             astronaut.remove(c, 1);
@@ -105,10 +124,8 @@ public class ShipBoard implements Serializable {
             return;
         }
 
-        if(brown.get(c) > 0) {
+        if(brown.get(c) > 0)
             brown.remove(c, 1);
-        }
-
     }
 
     private void toRemove(boolean[][] marked, Coordinate c){
@@ -123,6 +140,11 @@ public class ShipBoard implements Serializable {
         try {toRemove(marked, c.down());} catch (IOException _) {}
     }
 
+    /**
+     * Cause an epidemic in the board. Used only for the epidemic card.
+     *
+     * @return the list of the positions of killed members
+     */
     public List<Coordinate> epidemic(){
         boolean[][] marked = new boolean[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
         List<Coordinate> removed = new ArrayList<>();
@@ -142,20 +164,37 @@ public class ShipBoard implements Serializable {
         return removed;
     }
 
+    /**
+     * Remove illegals elements inside the boards.
+     */
     public void removeIllegals(){
         astronaut.removeIllegals();
         purple.removeIllegals();
         brown.removeIllegals();
         battery.removeIllegals();
-        goods.forEach((type, board) -> board.removeIllegals());
+        goods.forEach((_, board) -> board.removeIllegals());
     }
 
+    /**
+     * Hit the board with the Projectile.
+     *
+     * @param projectile that is going to hit the board.
+     * @param useBattery the players want to use the battery?
+     * @return the optional coordinate of the destroyed tile
+     */
     public Optional<Coordinate> hit(Projectile projectile, boolean useBattery) {
         Optional<Coordinate> res = tiles.hit(projectile, useBattery);
         removeIllegals();
         return res;
     }
 
+    /**
+     * Initialize the board by filling the batteries and astronauts.
+     * It also places the aliens.
+     *
+     * @param purple
+     * @param brown
+     */
     public void init(Optional<Coordinate> purple, Optional<Coordinate> brown){
         purple.ifPresent(c -> this.purple.put(c, 1));
 

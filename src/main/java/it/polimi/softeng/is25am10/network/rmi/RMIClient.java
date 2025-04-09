@@ -9,7 +9,6 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
-import org.json.JSONObject;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -17,7 +16,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class RMIClient implements ClientInterface {

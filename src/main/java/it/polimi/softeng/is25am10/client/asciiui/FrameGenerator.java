@@ -23,7 +23,6 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.network.ClientInterface;
 import org.json.JSONObject;
 
 import java.io.IOException;

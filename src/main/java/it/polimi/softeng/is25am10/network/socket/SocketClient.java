@@ -9,7 +9,6 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,7 +16,10 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SocketClient extends Thread implements ClientInterface {
     private final String name;

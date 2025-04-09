@@ -1,11 +1,8 @@
 package it.polimi.softeng.is25am10.client;
 
-import it.polimi.softeng.is25am10.ServerMain;
 import it.polimi.softeng.is25am10.client.asciiui.Config;
 import it.polimi.softeng.is25am10.client.asciiui.Game;
 import it.polimi.softeng.is25am10.network.ClientInterface;
-import it.polimi.softeng.is25am10.network.rmi.RMIClient;
-import it.polimi.softeng.is25am10.network.socket.SocketClient;
 
 import java.io.IOException;
 

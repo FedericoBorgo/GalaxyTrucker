@@ -1,19 +1,15 @@
 package it.polimi.softeng.is25am10.client;
 
-import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.Callback;
-import org.json.JSONObject;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class PlaceholderCallback extends UnicastRemoteObject implements Callback {
     private final String name;
