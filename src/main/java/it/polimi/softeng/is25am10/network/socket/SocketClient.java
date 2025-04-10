@@ -21,7 +21,6 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SocketClient extends Thread implements ClientInterface {
     private final String name;

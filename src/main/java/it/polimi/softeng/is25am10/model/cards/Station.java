@@ -10,11 +10,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Station extends Card {
     private final List<GoodsBoard.Type> goods;
-    private Optional<Player> winner = Optional.empty();
+    private Result<Player> winner = Result.err();
     private final int crew;
     private final int days;
 
@@ -40,7 +39,7 @@ public class Station extends Card {
             if (crew < this.crew)
                 return Result.err("not enough crew");
 
-            winner = Optional.of(player);
+            winner = Result.ok(player);
         }
 
         register(player);
@@ -66,7 +65,7 @@ public class Station extends Card {
 
     @Override
     public boolean ready() {
-        return winner.isPresent() || allRegistered();
+        return winner.isOk() || allRegistered();
     }
 
     @Override

@@ -14,14 +14,12 @@ import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import it.polimi.softeng.is25am10.network.socket.SocketListener;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.RemoteServer;
-import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,10 +33,11 @@ import java.util.function.Consumer;
  * this is why each of them has the param {@code name} to identify the specific model through the
  * name of the player calling the method.
  */
-public class Controller extends UnicastRemoteObject implements RMIInterface {
+public class Controller extends UnicastRemoteObject implements RMIInterface, Serializable {
     private final Map<String, Model> players = new ConcurrentHashMap<>();
     private final Map<Model, List<String>> games = new ConcurrentHashMap<>();
-    private final Map<String, Callback> callbacks = new ConcurrentHashMap<>();
+    private transient Map<String, Callback> callbacks;
+    private transient BiConsumer<Model, Model.State.Type> stateEvent;
 
     private Model starting = null;
     private Model.State.Type prev = null;
@@ -47,31 +46,56 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         if(args.length > 0)
             Logger.SILENCE = Boolean.parseBoolean(args[0]);
 
-        new Controller(1234, 1235, 1236);
+        // read from file or create a new Controller
+        load(1234, 1235, 1236);
+        Logger.serverLog("controller started");
+
+        // wait for the stop signal
+        Scanner scanner = new Scanner(System.in);
+        while(!scanner.nextLine().equals("stop"));
+
+        // delete che tmp files
+        File file = new File("controller.bin");
+        file.delete();
+
+        // terminate all the threads and quit
+        System.exit(0);
     }
 
-    private final BiConsumer<Model, Model.State.Type> stateEvent = (m, state) -> {
-        Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
-        pushState(m);
-        pushFlight(m);
+    /**
+     * Loads the current controller and open RMI and SOCKET server
+     * at the corresponding port.
+     *
+     * @param rmiPort port
+     * @param socketPort1 port
+     * @param socketPort2 port
+     * @throws IOException if an error occurs
+     */
+    void loadController(int rmiPort, int socketPort1, int socketPort2) throws IOException {
+        callbacks = new ConcurrentHashMap<>();
 
-        if(prev == Model.State.Type.WAITING_INPUT)
-            pushCardChanges(m);
+        // create the event notifier
+        stateEvent = (m, state) -> {
+            Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
+            pushState(m);
+            pushFlight(m);
 
-        if(state == Model.State.Type.BUILDING)
-            starting = null;
+            if(prev == Model.State.Type.WAITING_INPUT)
+                pushCardChanges(m);
 
-        prev = state;
-    };
+            if(state == Model.State.Type.BUILDING)
+                starting = null;
 
-    // Constructor method
-    public Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
-        super();
+            prev = state;
+        };
+
+        // open RMI server
         Registry registry = LocateRegistry.createRegistry(rmiPort);
         registry.rebind("controller", this);
-        Logger.serverLog("controller started");
+        // open SOCKET server
         new SocketListener(this, socketPort1, socketPort2);
 
+        // responsible to ping every player every 1 second
         new Thread(() -> {
             while(true){
                 ping();
@@ -82,19 +106,55 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
                 }
             }
         }).start();
+
+        // responsible to save the current game to the file
+        new Thread(() -> {
+            while(true){
+                backup();
+
+                try {
+                    Thread.sleep(20000);
+                }
+                catch(InterruptedException e){
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
+    private Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
+        super();
+        loadController(rmiPort, socketPort1, socketPort2);
+    }
+
+    /**
+     * Set the callback object to call when an event occur.
+     *
+     * @param name of the player associated to the callback
+     * @param callback to call
+     */
     public synchronized void setCallback(String name, Callback callback) {
         callbacks.put(name, callback);
     }
 
-    private void rejoined(Callback callback, Model m, String name) {
+    /**
+     * A player rejoined in the game.
+     * These methods dump the game to the player.
+     *
+     * @param name of the rejoined player
+     */
+    private void rejoined(String name) {
         try {
+            Model m = getModel(name);
+            Callback callback = callbacks.get(name);
+
+            // push the current state of the game
             callback.pushFlight(m.getFlight());
             callback.pushBoard(m.ship(name));
             callback.pushState(m.getState());
             callback.setPlayers(m.getPlayers());
 
+            //dumps all the booked tiles
             if(m.getState() == Model.State.Type.BUILDING){
                 m.getSeenTiles().getData().forEach(t -> {
                     try {
@@ -117,12 +177,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     public synchronized Result<FlightBoard.Pawn> join(String name){
         //in case of disconnected player
         if(players.containsKey(name)) {
-            Model m = players.get(name);
-            rejoined(callbacks.get(name), m, name);
-            Logger.playerLog(m.hashCode(), name, "reconnected");
-            return Result.ok(m.get(name).getPawn());
+            rejoined(name);
+            Logger.playerLog(getModel(name).hashCode(), name, "reconnected");
+            return Result.ok(getModel(name).get(name).getPawn());
         }
 
+        // no game is starting
         if(starting == null) {
             starting = new Model(askHowManyPlayers(name), stateEvent);
             games.put(starting, Collections.synchronizedList(new ArrayList<>()));
@@ -183,7 +243,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
                 method.invoke(callbacks.get(name), args);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
-            }catch(InvocationTargetException e){
+            }catch(InvocationTargetException | NullPointerException e){
                 // the player is unreachable
                 if(error != null)
                     error.accept(name);
@@ -292,6 +352,47 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
                     setInput(name, CardInput.disconnected());
                 }
             });
+    }
+
+    /**
+     * Store the current controller to the disk.
+     */
+    private void backup() {
+        try{
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("controller.bin"));
+            oos.writeObject(this);
+            oos.close();
+            Logger.serverLog("backup done");
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Load the controller from the disk if its present or create a new one
+     * if there is no running game in the disk.
+     *
+     * @param rmiPort port
+     * @param socketPort1 port
+     * @param socketPort2 port
+     */
+    private static void load(int rmiPort, int socketPort1, int socketPort2) throws IOException {
+        try {
+            // read the file from the disk
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("controller.bin"));
+            Controller controller = (Controller) ois.readObject();
+            ois.close();
+
+            controller.loadController(rmiPort, socketPort1, socketPort2);
+            //init the games
+            controller.games.keySet().forEach(model -> {
+                model.loadTimer();
+                model.setEvent(controller.stateEvent);
+            });
+        } catch (IOException | ClassNotFoundException e) {
+            //no file or some error, create a new controller
+            new Controller(rmiPort, socketPort1, socketPort2);
+        }
     }
 
 

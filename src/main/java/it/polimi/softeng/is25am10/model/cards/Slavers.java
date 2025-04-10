@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Slavers extends Card {
     private final int cash;
@@ -19,7 +18,7 @@ public class Slavers extends Card {
     private final int enemyPower;
 
     private boolean defeated = false;
-    private Optional<Player> winner = Optional.empty();
+    private Result<Player> winner = Result.err();
 
     private Slavers(Model model, FlightBoard board, int id, int cash, int days, int astronauts, int enemyPower) {
         super(model, true, board, id, Type.SLAVERS);
@@ -49,7 +48,7 @@ public class Slavers extends Card {
                 defeated = true;
 
                 if (input.accept)
-                    winner = Optional.of(player);
+                    winner = Result.ok(player);
             }
             else if (power < enemyPower)
                 if (model.getRemoved(player).guys < crew)

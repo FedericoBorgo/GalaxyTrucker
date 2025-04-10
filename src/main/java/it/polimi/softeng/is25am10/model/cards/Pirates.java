@@ -12,7 +12,7 @@ public class Pirates extends Card {
     private final Map<Player, List<Integer>> useBattery = new HashMap<>();
     private final List<Projectile> projectiles = new ArrayList<>();
 
-    private Optional<Player> rewarded = Optional.empty();
+    private Result<Player> rewarded = Result.err();
     private boolean defeated = false;
 
     private final List<Player> shotPlayers = new ArrayList<>();
@@ -69,7 +69,7 @@ public class Pirates extends Card {
                 defeated = true;
 
                 if(input.accept)
-                    rewarded = Optional.of(player);
+                    rewarded = Result.ok(player);
             }
         }
 

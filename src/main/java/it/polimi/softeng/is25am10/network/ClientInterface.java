@@ -12,7 +12,6 @@ import it.polimi.softeng.is25am10.model.cards.CardInput;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface ClientInterface {
     String getPlayerName();

@@ -15,7 +15,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface RMIInterface extends Remote {
     Result<FlightBoard.Pawn> join(String name) throws RemoteException;

@@ -7,7 +7,10 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.*;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -170,7 +173,7 @@ public class Model implements Serializable {
         loadTimer();
     }
 
-    private void loadTimer(){
+    public void loadTimer(){
         timer = new Timer();
         task = new TimerTask() {
             public void run() {
@@ -180,6 +183,10 @@ public class Model implements Serializable {
                 }
         }
         };
+    }
+
+    public void setEvent(BiConsumer<Model, State.Type> notify){
+        this.state.notify = notify;
     }
 
     /**
@@ -731,22 +738,7 @@ public class Model implements Serializable {
         return Result.ok(filename);
     }
 
-    /**
-     * Load the state of a game from a file.
-     *
-     * @param filename name of the file
-     * @param notifier function to call when the state has changed
-     * @return loaded model
-     * @throws IOException if it can load the model from the file
-     */
-    static public Model load(String filename, BiConsumer<Model, State.Type> notifier) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
-        Model model = (Model) ois.readObject();
-        model.loadTimer();
-        model.state.setNotify(notifier);
-        ois.close();
-        return model;
-    }
+
 
     public HashMap<String, Pawn> getPlayers(){
         HashMap<String, Pawn> p = new HashMap<>();

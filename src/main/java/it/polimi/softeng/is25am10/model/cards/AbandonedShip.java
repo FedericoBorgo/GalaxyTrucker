@@ -10,13 +10,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class AbandonedShip extends Card {
     private final int cash;
     private final int days;
     private final int crew;
-    private Optional<Player> winner = Optional.empty();
+    private Result<Player> winner = Result.err();
 
     private AbandonedShip(Model model, FlightBoard board, int id, int crew, int cash, int days) {
         super(model, true, board, id, Type.AB_SHIP);
@@ -36,7 +35,7 @@ public class AbandonedShip extends Card {
         if(input.accept) {
             // the player remove enough crews?
             if (model.getRemoved(player).guys >= crew)
-                winner = Optional.of(player);
+                winner = Result.ok(player);
             else
                 return Result.err("not enough astronaut");
         }
@@ -64,7 +63,7 @@ public class AbandonedShip extends Card {
 
     @Override
     public boolean ready() {
-        return winner.isPresent() || allRegistered();
+        return winner.isOk() || allRegistered();
     }
 
     @Override

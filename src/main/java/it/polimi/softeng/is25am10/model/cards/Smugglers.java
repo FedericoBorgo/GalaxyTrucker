@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Smugglers extends Card {
 
@@ -19,7 +18,7 @@ public class Smugglers extends Card {
     private final int goods;
     private final int enemyPower;
     private boolean defeated = false;
-    private Optional<Player> winner = Optional.empty();
+    private Result<Player> winner = Result.err();
     private final List<GoodsBoard.Type> goodsGained;
 
     private Smugglers(Model model, FlightBoard board, int id, int daysLost, int smugglersDrillPower, int goodsLost, List<GoodsBoard.Type> goodsGained) {
@@ -48,7 +47,7 @@ public class Smugglers extends Card {
             if (power > enemyPower){
                 defeated = true;
                 if(input.accept)
-                    winner = Optional.of(player);
+                    winner = Result.ok(player);
 
             } else if (power < enemyPower && model.getRemoved(player).goods < goods)
                     return Result.err("player did not give enough goods to the smugglers");

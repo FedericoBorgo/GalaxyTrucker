@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.model;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /**
  * Result is a type used to manage the return values in the entire project.
@@ -52,6 +53,11 @@ public class Result<T> implements Serializable {
         return data;
     }
 
+    public void ifPresent(Consumer<T> consumer) {
+        if(isOk())
+            consumer.accept(data);
+    }
+
     /**
      * Get the reason the operation failed. Returns null if the operation was successful.
      *
@@ -70,6 +76,14 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> err(String reason){
         return new Result<>(false, null, reason);
     }
+
+    /**
+     * Creates an unsuccessful {@code Result} instance with no reason.
+     */
+    public static <T> Result<T> err(){
+        return err("");
+    }
+
 
     /**
      * Creates a successful {@code Result} instance containing the provided data.
