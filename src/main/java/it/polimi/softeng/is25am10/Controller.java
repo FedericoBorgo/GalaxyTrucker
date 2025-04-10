@@ -43,6 +43,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     private Model starting = null;
     private Model.State.Type prev = null;
 
+    public static void main(String[] args) throws IOException {
+        if(args.length > 0)
+            Logger.SILENCE = Boolean.parseBoolean(args[0]);
+
+        new Controller(1234, 1235, 1236);
+    }
+
     private final BiConsumer<Model, Model.State.Type> stateEvent = (m, state) -> {
         Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
         pushState(m);

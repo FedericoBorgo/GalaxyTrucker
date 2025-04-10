@@ -12,17 +12,20 @@ import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class RMIClient implements ClientInterface {
-    private RMIInterface server;
-    private String name;
+    private final RMIInterface server;
+    private final String name;
 
     public RMIClient(String name, String host, int port) {
         this.name = name;
@@ -40,6 +43,23 @@ public class RMIClient implements ClientInterface {
         return name;
     }
 
+    private <T> T call(Object... args){
+        Class<?>[] types = Arrays.stream(args)
+                .map(Object::getClass)
+                .toArray(Class<?>[]::new);
+
+        String methodName = Thread.currentThread()
+                .getStackTrace()[2]
+                .getMethodName();
+
+        try {
+            return (T) Callback.class.getMethod(methodName, types)
+                    .invoke(server, args);
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Result<FlightBoard.Pawn> join(Callback callback) {
         try {
             server.setCallback(name, callback);
@@ -50,186 +70,94 @@ public class RMIClient implements ClientInterface {
     }
 
     public Result<Integer> moveTimer() {
-        try {
-            return server.moveTimer(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<String> setReady() {
-        try {
-            return server.setReady(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<String> quit() {
-        try {
-            return server.quit(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation) {
-        try {
-            return server.setTile(name, c, t, rotation);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, c, t, rotation);
     }
 
     public Result<Tile> bookTile(Tile t) {
-        try {
-            return server.bookTile(name, t);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, t);
     }
 
     public Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c) {
-        try {
-            return server.useBookedTile(name, t, rotation, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, t, rotation, c);
     }
 
     public Result<String> remove(Coordinate c) {
-        try {
-            return server.remove(name, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, c);
     }
 
     public ShipBoard getShip() {
-        try {
-            return server.getShip(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
-        try {
-            return server.init(name, purple, brown);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, purple, brown);
     }
 
     public List<GoodsBoard.Type> getReward() {
-        try {
-            return server.getReward(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<Integer> placeReward(GoodsBoard.Type t, Coordinate c) {
-        try {
-            return server.placeReward(name, t, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, t, c);
     }
 
     public int getCash() {
-        try {
-            return server.getCash(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<Integer> drop(Coordinate c) {
-        try {
-            return server.drop(name, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, c);
     }
 
     public Result<Integer> drop(Coordinate c, GoodsBoard.Type t) {
-        try {
-            return server.drop(name, c, t);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, c, t);
     }
 
     public Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map) {
-        try {
-            return server.setCannonsToUse(name, map);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, map);
     }
 
     public Result<Tile> drawTile() {
-        try {
-            return server.drawTile(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<List<Tile>> getSeenTiles() {
-        try {
-            return server.getSeenTiles(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<String> giveTile(Tile t) {
-        try {
-            return server.giveTile(name, t);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, t);
     }
 
     public Result<Tile> getTileFromSeen(Tile t) {
-        try {
-            return server.getTileFromSeen(name, t);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, t);
     }
 
     public Result<Card> drawCard() {
-        try {
-            return server.drawCard(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<CardInput> setInput(CardInput input) {
-        try {
-            return server.setInput(name, input);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name, input);
     }
 
     public Result<CardData> getCardData() {
-        try {
-            return server.getCardData(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 
     public Result<Card[][]> getVisible() {
-        try {
-            return server.getVisible(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        return call(name);
     }
 }
