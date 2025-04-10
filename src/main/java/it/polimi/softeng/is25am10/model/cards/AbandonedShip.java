@@ -16,13 +16,9 @@ public class AbandonedShip extends Card {
     private final int cash;
     private final int days;
     private final int crew;
+    private Optional<Player> winner = Optional.empty();
 
-    /**
-     * The player that enters the abandoned ship.
-     */
-    private Optional<Player> descending = Optional.empty();
-
-    public AbandonedShip(Model model, FlightBoard board, int id, int crew, int cash, int days) {
+    private AbandonedShip(Model model, FlightBoard board, int id, int crew, int cash, int days) {
         super(model, true, board, id, Type.AB_SHIP);
         this.cash = cash;
         this.days = days;
@@ -30,22 +26,17 @@ public class AbandonedShip extends Card {
     }
 
     @Override
-    public Result<Input> set(Player player, Input input) {
-        //begin
-        //this section is the same for almost every card.
+    public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
             return Result.err("player already registered");
-
-        if(!isCorrectOrder(player)){
+        if(unexpected(player))
             return Result.err("player choice is not in order");
-        }
-        //end
 
         // the player want to descend?
         if(input.accept) {
             // the player remove enough crews?
             if (model.getRemovedItems(player).guys >= crew)
-                descending = Optional.of(player);
+                winner = Optional.of(player);
             else
                 return Result.err("not enough astronaut");
         }
@@ -55,19 +46,17 @@ public class AbandonedShip extends Card {
     }
 
     @Override
-    public Result<Output> play() {
-        // common part
+    public Result<CardOutput> play() {
         if(!ready())
             return Result.err("not all players declared their decision");
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
 
         // if someone accepted, give the cash and the removed days
-        descending.ifPresent(player -> {
-            player.giveCash(cash);
-            board.moveRocket(player.getPawn(), -days);
-            output.cash.put(player.getName(), cash);
-
+        winner.ifPresent(p -> {
+            p.giveCash(cash);
+            flight.moveRocket(p.getPawn(), -days);
+            output.cash.put(p.getName(), cash);
         });
 
         return Result.ok(output);
@@ -75,7 +64,7 @@ public class AbandonedShip extends Card {
 
     @Override
     public boolean ready() {
-        return descending.isPresent() || allRegistered();
+        return winner.isPresent() || allRegistered();
     }
 
     @Override

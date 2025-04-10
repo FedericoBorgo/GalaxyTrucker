@@ -7,8 +7,8 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
-import it.polimi.softeng.is25am10.model.cards.Input;
-import it.polimi.softeng.is25am10.model.cards.Output;
+import it.polimi.softeng.is25am10.model.cards.CardInput;
+import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -644,7 +644,7 @@ public class Model implements Serializable {
         return Result.ok(c);
     }
 
-    private Output changes = null;
+    private CardOutput changes = null;
 
     /**
      * Give the player's input to the drawn card.
@@ -654,10 +654,10 @@ public class Model implements Serializable {
      * @param input player input
      * @return
      */
-    public synchronized Result<Input> setInput(String name, Input input){
+    public synchronized Result<CardInput> setInput(String name, CardInput input){
         if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
-        Result<Input> res = deck.set(get(name), input);
+        Result<CardInput> res = deck.set(get(name), input);
 
         if(deck.ready())
             changes = playCard().getData();
@@ -665,7 +665,7 @@ public class Model implements Serializable {
         return res;
     }
 
-    public synchronized Output getChanges(){
+    public synchronized CardOutput getChanges(){
         return changes;
     }
 
@@ -705,11 +705,11 @@ public class Model implements Serializable {
         return debt.get();
     }
 
-    private Result<Output> playCard(){
+    private Result<CardOutput> playCard(){
         if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
 
-        Result<Output> res = deck.play();
+        Result<CardOutput> res = deck.play();
 
         if(res.isOk()){
             List<Pawn> quitted = new ArrayList<>(flight.getQuitters());

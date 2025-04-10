@@ -8,43 +8,37 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Stardust extends Card {
-    public Stardust(FlightBoard board, int id) {
+    private Stardust(FlightBoard board, int id) {
         super(null, false, board, id, Type.STARDUST);
     }
 
-    //not really needed
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
             return Result.err("player already registered");
         register(player);
         return Result.ok(input);
     }
 
-    /**
-     * this moves the rocket pawns in reverse order
-     * after having counted the number of exposed connectors
-     * @return result type tells if it's been successful
-     */
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
-
         FlightBoard.Pawn pawn;
-        for(int i= board.getOrder().size()-1; i >= 0; i--){
-            pawn = board.getOrder().get(i);
+        for(int i = flight.getOrder().size()-1; i >= 0; i--){
+            pawn = flight.getOrder().get(i);
             int days = -registered.get(pawn).getBoard().getTiles().countExposedConnectors();
-            board.moveRocket(pawn, days);
+            flight.moveRocket(pawn, days);
         }
 
-        return Result.ok(new Output());
+        return Result.ok(new CardOutput());
     }
 
     @Override
@@ -61,14 +55,12 @@ public class Stardust extends Card {
     }
 
     public static List<Card> construct(FlightBoard board){
-        String out = dump(Stardust.class.getResourceAsStream("stardust.json"));
+        String out = dump(Objects.requireNonNull(Stardust.class.getResourceAsStream("stardust.json")));
         JSONObject jsonObject = new JSONObject(out);
         JSONArray jsonArray = jsonObject.getJSONArray("ids");
         List<Card> cards = new ArrayList<>();
 
-        jsonArray.forEach(item -> {
-            cards.add(new Stardust(board, Integer.parseInt(item.toString())));
-        });
+        jsonArray.forEach(item -> cards.add(new Stardust(board, Integer.parseInt(item.toString()))));
 
         return cards;
     }

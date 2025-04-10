@@ -1,7 +1,6 @@
 package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.*;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
@@ -12,48 +11,48 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Warzone extends Card {
     private enum MalusTypes {
-        DAYS, GUYS, FIRE, GOODS;
+        DAYS, GUYS, FIRE, GOODS
     }
     private enum LeastTypes {
-        LEAST_GUYS, LEAST_ENGINE, LEAST_CANNON;
+        LEAST_GUYS, LEAST_ENGINE, LEAST_CANNON
     }
 
     private final List<Projectile> fire = new ArrayList<>();
     private final int days, goods, guys;
-    private Map<Player, List<Integer>> useBattery = new HashMap<>();
-    private Map<Player, Map<LeastTypes, Double>> declaredPower = new HashMap<>();
-    private Map<LeastTypes, MalusTypes> malusTypes;
+    private final Map<Player, List<Integer>> useBattery = new HashMap<>();
+    private final Map<Player, Map<LeastTypes, Double>> declaredPower = new HashMap<>();
+    private final Map<LeastTypes, MalusTypes> malusTypes;
 
     public static int rollDice() {
         return new Random().nextInt(6) + 1;
     }
 
-    public Warzone(Model model, FlightBoard board, int id,
+    private Warzone(Model model, FlightBoard board, int id,
                    Map<LeastTypes, MalusTypes> malusTypes,
                    List<Pair<Projectile.Type, Tile.Side>> fire,
                    int days, int goods, int guys) {
-        super(model, true, board, id, Type.WARZONE);
+        super(model, true, board, id, Type.WAR_ZONE);
         this.days = days;
         this.goods = goods;
         this.guys = guys;
         this.malusTypes = malusTypes;
+        
         AtomicInteger counter = new AtomicInteger(0);
 
-        fire.forEach(pair -> {
-            int number = rollDice() + rollDice();
-            Projectile p = new Projectile(pair.getKey(), pair.getValue(), number, counter.getAndIncrement());
-            this.fire.add(p);
-        });
+        fire.forEach(pair -> this.fire.add(new Projectile(
+                pair.getKey(),
+                pair.getValue(),
+                rollDice() + rollDice(),
+                counter.getAndIncrement()
+        )));
     }
 
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
             return Result.err("player already registered");
-
-        if(!isCorrectOrder(player)){
+        if(unexpected(player))
             return Result.err("player choice is not in order");
-        }
 
         if(input.shieldFor.size() > player.getBoard().getBattery().getTotal())
             return Result.err("not enough battery");
@@ -87,55 +86,35 @@ public class Warzone extends Card {
 
         List<Player> result = new ArrayList<>();
 
-        min.ifPresent(value -> {
-            result.addAll(declaredPower.keySet()
-                    .stream()
-                    .filter(p -> declaredPower.get(p).get(type) == value)
-                    .toList());
-        });
+        min.ifPresent(value -> result.addAll(declaredPower.keySet()
+                .stream()
+                .filter(p -> declaredPower.get(p).get(type) == value)
+                .toList()));
 
         return result;
     }
 
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         if(!ready())
             return Result.err("not ready");
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
 
         malusTypes.forEach((malusType, type) -> {
             List<Player> players = findLeast(malusType);
 
             switch(type){
-                case DAYS -> {
-                    players.forEach(p -> {
-                        board.moveRocket(p.getPawn(), -days);
-                    });
-                }
-                case GUYS -> {
-                    players.forEach(p -> {
-                        model.getRemovedItems(p).guys -= guys;
-                    });
-                }
+                case DAYS -> players.forEach(p -> flight.moveRocket(p.getPawn(), -days));
+                case GUYS -> players.forEach(p -> model.getRemovedItems(p).guys -= guys);
                 case FIRE -> {
-                    players.forEach(p -> {
-                        model.getRemovedItems(p).battery -= useBattery.get(p).size();
-                    });
+                    players.forEach(p -> model.getRemovedItems(p).battery -= useBattery.get(p).size());
 
-                    fire.forEach(proj -> {
-                        players.forEach(p -> {
-                            p.getBoard()
-                                    .hit(proj, useBattery.get(p).contains(proj.ID()))
-                                    .ifPresent(c -> {output.removed.put(p.getName(), c);});
-                        });
-                    });
+                    fire.forEach(proj -> players.forEach(p -> p.getBoard()
+                            .hit(proj, useBattery.get(p).contains(proj.ID()))
+                            .ifPresent(c -> output.removed.put(p.getName(), c))));
                 }
-                case GOODS -> {
-                    players.forEach(p -> {
-                        model.getRemovedItems(p).goods -= goods;
-                    });
-                }
+                case GOODS -> players.forEach(p -> model.getRemovedItems(p).goods -= goods);
             }
         });
 
@@ -154,9 +133,7 @@ public class Warzone extends Card {
         data.put("id", id);
 
         JSONArray meteors = new JSONArray();
-        fire.forEach(projectile -> {
-            meteors.put(projectile.toString());
-        });
+        fire.forEach(projectile -> meteors.put(projectile.toString()));
         data.put("fire", meteors);
 
         JSONArray entry = new JSONArray();
@@ -181,7 +158,7 @@ public class Warzone extends Card {
     }
 
     public static List<Card> construct(Model model, FlightBoard board){
-        String out = dump(Warzone.class.getResourceAsStream("warzone.json"));
+        String out = dump(Objects.requireNonNull(Warzone.class.getResourceAsStream("warzone.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 

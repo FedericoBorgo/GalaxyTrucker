@@ -10,32 +10,30 @@ import org.json.JSONObject;
 import java.util.*;
 
 public class Planets extends Card{
-    private Map<Planet, List<GoodsBoard.Type>> planets;
-    private Map<Player, Planet> chosenPlanet;
+    private final Map<Planet, List<GoodsBoard.Type>> planets;
+    private final Map<Player, Planet> chosenPlanet = new HashMap<>();
+    private final int days;
+    
     private boolean ready = false;
-    private int flightDays;
 
     public enum Planet{
         PLANET1, PLANET2, PLANET3, PLANET4, NOPLANET
     }
 
-    public Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
+    private Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int days) {
         super(null, true, board, id, Type.PLANETS);
         this.planets = goodsType;
-        this.flightDays = backmoves;
-
+        this.days = days;
     }
 
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
             return Result.err("player already registered");
-
-        if(!isCorrectOrder(player)){
+        if(unexpected(player))
             return Result.err("player choice is not in order");
-        }
         //end
 
         Planet planet = input.planet;
@@ -58,20 +56,20 @@ public class Planets extends Card{
 
 
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
 
         chosenPlanet.forEach((player, planet) -> {
             if(planet == Planet.NOPLANET)
                 return;
 
             List<GoodsBoard.Type> reward = planets.get(planet);
-            board.moveRocket(player.getPawn(), -flightDays);
+            flight.moveRocket(player.getPawn(), -days);
             player.setGoodsReward(reward);
             output.rewards.put(player.getName(), reward);
         });
@@ -104,7 +102,7 @@ public class Planets extends Card{
     }
 
     public static List<Card> construct(FlightBoard board){
-        String out = dump(Planets.class.getResourceAsStream("planets.json"));
+        String out = dump(Objects.requireNonNull(Planets.class.getResourceAsStream("planets.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
@@ -118,9 +116,7 @@ public class Planets extends Card{
                 if(entry.has(p.name())){
                     List<GoodsBoard.Type> types = new ArrayList<>();
 
-                    entry.getJSONArray(p.name()).forEach(box -> {
-                        types.add(GoodsBoard.Type.valueOf(box.toString()));
-                    });
+                    entry.getJSONArray(p.name()).forEach(box -> types.add(GoodsBoard.Type.valueOf(box.toString())));
 
                     goods.put(p, types);
                 }

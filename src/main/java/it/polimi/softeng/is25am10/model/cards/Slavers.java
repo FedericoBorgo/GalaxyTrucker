@@ -21,7 +21,7 @@ public class Slavers extends Card {
     private boolean defeated = false;
     private Optional<Player> winner = Optional.empty();
 
-    public Slavers(Model model, FlightBoard board, int id, int cash, int days, int astronauts, int enemyPower) {
+    private Slavers(Model model, FlightBoard board, int id, int cash, int days, int astronauts, int enemyPower) {
         super(model, true, board, id, Type.SLAVERS);
         this.cash = cash;
         this.days = days;
@@ -30,16 +30,13 @@ public class Slavers extends Card {
     }
 
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
             return Result.err("player already registered");
-
-        if(!isCorrectOrder(player)){
+        if(unexpected(player))
             return Result.err("player choice is not in order");
-        }
-
         //end
 
         if(!input.disconnected) {
@@ -64,16 +61,16 @@ public class Slavers extends Card {
     }
 
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         // common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
 
         winner.ifPresent(p -> {
             p.giveCash(cash);
-            board.moveRocket(p.getPawn(), -days);
+            flight.moveRocket(p.getPawn(), -days);
             output.cash.put(p.getName(), cash);
         });
 
@@ -105,8 +102,9 @@ public class Slavers extends Card {
             int cash = entry.getInt("cash");
             int days = entry.getInt("days");
             int guys = entry.getInt("guys");
+            int power = entry.getInt("power");
 
-            cards.add(new AbandonedShip(model, board, id, guys, cash, days));
+            cards.add(new Slavers(model, board, id, cash, days, guys, power));
         });
 
         return cards;

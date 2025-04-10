@@ -5,7 +5,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.model.cards.Output;
+import it.polimi.softeng.is25am10.model.cards.CardOutput;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -20,7 +20,7 @@ public interface Callback extends Remote {
 
     void pushCard(Card card) throws RemoteException;
 
-    void pushCardChanges(Output output) throws RemoteException;
+    void pushCardChanges(CardOutput output) throws RemoteException;
 
     void askForInput() throws RemoteException;
 

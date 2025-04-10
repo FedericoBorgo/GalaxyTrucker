@@ -192,8 +192,8 @@ public class ShipBoard implements Serializable {
      * Initialize the board by filling the batteries and astronauts.
      * It also places the aliens.
      *
-     * @param purple
-     * @param brown
+     * @param purple where to put the purple alien
+     * @param brown where to put the brown alien
      */
     public void init(Optional<Coordinate> purple, Optional<Coordinate> brown){
         purple.ifPresent(c -> this.purple.put(c, 1));

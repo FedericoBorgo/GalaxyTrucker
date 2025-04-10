@@ -7,7 +7,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.model.cards.Input;
+import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.network.Callback;
 
 import java.rmi.Remote;
@@ -69,7 +69,7 @@ public interface RMIInterface extends Remote {
 
     Result<Card> drawCard(String name) throws RemoteException;
 
-    Result<Input> setInput(String name, Input json) throws RemoteException;
+    Result<CardInput> setInput(String name, CardInput json) throws RemoteException;
 
     Result<String> getCardData(String name) throws RemoteException;
 

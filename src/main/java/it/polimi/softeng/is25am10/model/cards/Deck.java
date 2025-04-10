@@ -103,11 +103,11 @@ public class Deck extends Card implements Serializable {
 
     /**
      * Plays the specific method from the subclass and checks the number of astronauts.
-     * @return 
+     * @return ok if its accepted, err if not
      */
     @Override
-    public Result<Output> play(){
-        Result<Output> res = selectedCard.play();
+    public Result<CardOutput> play(){
+        Result<CardOutput> res = selectedCard.play();
 
         if(res.isOk()){
             players.forEach(player -> {
@@ -121,7 +121,7 @@ public class Deck extends Card implements Serializable {
     }
 
     @Override
-    public Result<Input> set(Player player, Input input){
+    public Result<CardInput> set(Player player, CardInput input){
         return selectedCard.set(player, input);
     }
 

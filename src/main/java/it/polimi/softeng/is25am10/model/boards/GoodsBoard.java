@@ -95,9 +95,9 @@ public class GoodsBoard extends ElementsBoard{
      * @return true if the box is placeable here, false if not
      */
     @Override
-    public boolean check(Coordinate c, int qty) {
+    public boolean cantPlace(Coordinate c, int qty) {
         Tile.Type tile = tiles.getTile(c).getData().getType();
-        return box.contains(tile) && (getNBox(c) + get(c) + qty) <= MAX_VALUE.get(tile);
+        return !box.contains(tile) || (getNBox(c) + get(c) + qty) > MAX_VALUE.get(tile);
     }
 
     @Override

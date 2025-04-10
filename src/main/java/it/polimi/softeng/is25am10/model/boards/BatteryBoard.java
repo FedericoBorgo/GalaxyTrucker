@@ -32,10 +32,10 @@ public class BatteryBoard extends ElementsBoard {
      * @return true if the batteries are playable, false if not.
      */
     @Override
-    public boolean check(Coordinate c, int qty) {
+    public boolean cantPlace(Coordinate c, int qty) {
         Tile t = tiles.getTile(c).getData();
-        return Tile.battery(t) &&
-                (qty + get(c) <= (t.getType() == Tile.Type.BATTERY_2 ? 2 : 3));
+        return !Tile.battery(t) ||
+                (qty + get(c) > (t.getType() == Tile.Type.BATTERY_2 ? 2 : 3));
     }
 
     /**

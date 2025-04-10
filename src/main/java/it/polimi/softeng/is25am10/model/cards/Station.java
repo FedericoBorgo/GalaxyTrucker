@@ -9,40 +9,38 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Station extends Card {
-    private List<GoodsBoard.Type> goods;
-    private Player p;
+    private final List<GoodsBoard.Type> goods;
+    private Optional<Player> winner = Optional.empty();
     private final int requiredCrew;
-    private final int flightDays;
-    private boolean ready = false;
+    private final int days;
 
-    public Station(FlightBoard board, int crew, List<GoodsBoard.Type> goodsType, int id, int backmoves) {
+    private Station(FlightBoard board, int crew, List<GoodsBoard.Type> goodsType, int id, int days) {
         super(null, true, board, id, Type.STATION);
         this.goods = goodsType;
         this.requiredCrew = crew;
-        this.flightDays = backmoves;
+        this.days = days;
 
     }
 
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
             return Result.err("player already registered");
-
-        if(!isCorrectOrder(player)){
+        if(unexpected(player))
             return Result.err("player choice is not in order");
-        }
 
         //enough crew?
-        if(!ready && input.accept) {
+        if(input.accept) {
             int crew = player.getBoard().getAstronaut().getTotal();
-            if (crew < requiredCrew) {
+
+            if (crew < requiredCrew)
                 return Result.err("not enough crew");
-            }else{
-                ready = true;
-            }
-            p = player;
+
+            winner = Optional.of(player);
         }
 
         register(player);
@@ -51,22 +49,24 @@ public class Station extends Card {
     }
 
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         if(!ready())
             return Result.err("nobody chose yes");
 
-        p.setGoodsReward(goods);
-        board.moveRocket(p.getPawn(), -flightDays);
+        CardOutput output = new CardOutput();
 
-        Output output = new Output();
-        output.rewards.put(p.getName(), goods);
+        winner.ifPresent(player -> {
+            player.setGoodsReward(goods);
+            flight.moveRocket(player.getPawn(), -days);
+            output.rewards.put(player.getName(), goods);
+        });
 
         return Result.ok(output);
     }
 
     @Override
     public boolean ready() {
-        return ready || allRegistered();
+        return winner.isPresent() || allRegistered();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Station extends Card {
     }
 
     public static List<Card> construct(FlightBoard board){
-        String out = dump(Station.class.getResourceAsStream("station.json"));
+        String out = dump(Objects.requireNonNull(Station.class.getResourceAsStream("station.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
@@ -89,9 +89,7 @@ public class Station extends Card {
             int guys = entry.getInt("guys");
             List<GoodsBoard.Type> types = new ArrayList<>();
 
-            entry.getJSONArray("goods").forEach(type -> {
-                types.add(GoodsBoard.Type.valueOf(type.toString()));
-            });
+            entry.getJSONArray("goods").forEach(type -> types.add(GoodsBoard.Type.valueOf(type.toString())));
 
             cards.add(new Station(board, guys, types, id, days));
         });

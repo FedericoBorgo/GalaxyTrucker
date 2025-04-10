@@ -12,7 +12,7 @@ public class Pirates extends Card {
     private final Map<Player, List<Integer>> useBattery = new HashMap<>();
     private final List<Projectile> projectiles = new ArrayList<>();
 
-    private Player rewarded = null;
+    private Optional<Player> rewarded = Optional.empty();
     private boolean defeated = false;
 
     private final List<Player> shotPlayers = new ArrayList<>();
@@ -24,17 +24,9 @@ public class Pirates extends Card {
     public static int rollDice() {
         return new Random().nextInt(6) + 1;
     }
-    /**
-     * Creates the card by giving the model from which to get player data, such as
-     * the number of removed batteries, astronauts or goods.
-     *
-     * @param model     where to get the player data
-     * @param board     flight board of the game
-     * @param id        unique identification of the card
-     * @param cash      player's reward if he wins
-     * @param days      pawn's backward moves if the player accepts the reward
-     */
-    public Pirates(Model model, FlightBoard board, List<Projectile.Type> fire, int id, int cash, int days, int piratePower) {
+
+
+    private Pirates(Model model, FlightBoard board, List<Projectile.Type> fire, int id, int cash, int days, int piratePower) {
         super(model, true, board, id, Type.PIRATES);
         this.piratePower = piratePower;
         this.days = days;
@@ -50,11 +42,11 @@ public class Pirates extends Card {
     }
 
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         if (isRegistered(player))
             return Result.err("player already registered");
 
-        if (!isCorrectOrder(player))
+        if (unexpected(player))
             return Result.err("player choice is not in order");
 
         // if the player is disconnected, he's automatically defeated
@@ -77,7 +69,7 @@ public class Pirates extends Card {
                 defeated = true;
 
                 if(input.accept)
-                    rewarded = player;
+                    rewarded = Optional.of(player);
             }
         }
 
@@ -86,27 +78,23 @@ public class Pirates extends Card {
     }
 
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         if (!ready())
             return Result.err("not all player declared their decision");
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
 
         // shoot the defeated players
-        projectiles.forEach(proj -> {
-            shotPlayers.forEach((p) -> {
-                p.getBoard()
-                 .hit(proj, useBattery.get(p).contains(proj.ID()))
-                 .ifPresent(c -> {output.removed.put(p.getName(), c);});
-            });
-        });
+        projectiles.forEach(proj -> shotPlayers.forEach((p) -> p.getBoard()
+         .hit(proj, useBattery.get(p).contains(proj.ID()))
+         .ifPresent(c -> output.removed.put(p.getName(), c))));
 
         // does the player want to be rewarded?
-        if(rewarded != null){
-            rewarded.giveCash(cash);
-            board.moveRocket(rewarded.getPawn(), -days);
-            output.cash.put(rewarded.getName(), cash);
-        }
+        rewarded.ifPresent(p -> {
+            p.giveCash(cash);
+            flight.moveRocket(p.getPawn(), -days);
+            output.cash.put(p.getName(), cash);
+        });
 
         return Result.ok(output);
     }
@@ -122,16 +110,14 @@ public class Pirates extends Card {
         JSONArray fires = new JSONArray();
         json.put("type", type);
         json.put("id", id);
-        projectiles.forEach(projectile -> {
-            fires.put(projectile.toString());
-        });
+        projectiles.forEach(projectile -> fires.put(projectile.toString()));
         json.put("fires", fires);
         return json;
     }
 
 
     public static List<Card> construct(Model model,FlightBoard board) {
-        String out = dump(Pirates.class.getResourceAsStream("pirates.json"));
+        String out = dump(Objects.requireNonNull(Pirates.class.getResourceAsStream("pirates.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
 
@@ -143,9 +129,7 @@ public class Pirates extends Card {
             int power = entry.getInt("power");
 
             List<Projectile.Type> fire = new ArrayList<>();
-            entry.getJSONArray("fire").forEach(str -> {
-                fire.add(Projectile.Type.valueOf(str.toString()));
-            });
+            entry.getJSONArray("fire").forEach(str -> fire.add(Projectile.Type.valueOf(str.toString())));
 
             cards.add(new Pirates(model, board, fire, id, cash, days, power));
         });

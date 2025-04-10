@@ -14,36 +14,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Meteors extends Card {
-    private Map<Player, List<Integer>> useBattery;
-    List<Projectile> projectiles;
+    private final Map<Player, List<Integer>> useBattery = new HashMap<>();
+    private final List<Projectile> projectiles = new ArrayList<>();
 
     public static int rollDice() {
         return new Random().nextInt(6) + 1;
     }
 
-    public Meteors(FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
+    private Meteors(FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
         super(null, true, board, id, Card.Type.METEORS);
-        projectiles = new ArrayList<>();
-        useBattery = new HashMap<>();
-        AtomicInteger counter = new AtomicInteger();
-        counter.set(0);
+        
+        AtomicInteger counter = new AtomicInteger(0);
 
-        meteors.forEach(pair -> {
-            int number = rollDice() + rollDice();
-            Projectile p = new Projectile(pair.getValue(), pair.getKey(), number, counter.getAndIncrement());
-            projectiles.add(p);
-        });
+        meteors.forEach(pair -> projectiles.add(new Projectile(
+                pair.getValue(),
+                pair.getKey(),
+                rollDice() + rollDice(),
+                counter.getAndIncrement()
+        )));
     }
 
 
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         if (isRegistered(player))
             return Result.err("player already registered");
-
-        if (!isCorrectOrder(player)) {
+        if(unexpected(player))
             return Result.err("player choice is not in order");
-        }
 
         // if the player is disconnected, check if he
         // dropped enough items.
@@ -58,20 +55,16 @@ public class Meteors extends Card {
     }
 
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         if (!ready())
             return Result.err("not all player declared their decision");
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
 
         // for every projectile and for every player, hit them
-        projectiles.forEach(proj -> {
-            registered.forEach((_, p) -> {
-                p.getBoard()
-                 .hit(proj, useBattery.get(p).contains(proj.ID()))
-                 .ifPresent(c -> {output.removed.put(p.getName(), c);});
-            });
-        });
+        projectiles.forEach(proj -> registered.forEach((_, p) -> p.getBoard()
+         .hit(proj, useBattery.get(p).contains(proj.ID()))
+         .ifPresent(c -> output.removed.put(p.getName(), c))));
 
         return Result.ok(output);
     }
@@ -88,9 +81,7 @@ public class Meteors extends Card {
         data.put("id", id);
 
         JSONArray meteors = new JSONArray();
-        projectiles.forEach(projectile -> {
-            meteors.put(projectile.toString());
-        });
+        projectiles.forEach(projectile -> meteors.put(projectile.toString()));
         data.put("meteors", meteors);
         return data;
     }

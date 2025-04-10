@@ -26,7 +26,7 @@ public abstract class Card implements Serializable {
      */
     public final boolean needInput;
 
-    protected final FlightBoard board;
+    protected final FlightBoard flight;
     protected final Model model;
 
     // ID unique to every card, even if they share the same type they have different IDs
@@ -34,10 +34,10 @@ public abstract class Card implements Serializable {
 
     // When a player is ready or has declared their input, we can set the player
     // as "registered", which means that they have already given the input.
-    protected final Map<FlightBoard.Pawn, Player> registered;
+    protected final Map<FlightBoard.Pawn, Player> registered = new HashMap<>();
 
     public enum Type{
-        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION, PIRATES, SMUGGLERS, SLAVERS, WARZONE;
+        EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION, PIRATES, SMUGGLERS, SLAVERS, WAR_ZONE
     }
 
     protected final Type type;
@@ -48,17 +48,16 @@ public abstract class Card implements Serializable {
      *
      * @param model where to get the player data
      * @param needInput does the player need to give some input?
-     * @param board flight board of the game
+     * @param flight flight board of the game
      * @param id unique identification of the card
      * @param type of the card
      */
-    public Card(Model model, boolean needInput, FlightBoard board, int id, Type type) {
+    public Card(Model model, boolean needInput, FlightBoard flight, int id, Type type) {
         this.needInput = needInput;
-        this.board = board;
+        this.flight = flight;
         this.model = model;
         this.type = type;
         this.id = id;
-        registered = new HashMap<>();
     }
 
     /**
@@ -75,8 +74,8 @@ public abstract class Card implements Serializable {
      * @param player to check
      * @return true if he's him, false if not
      */
-    protected boolean isCorrectOrder(Player player) {
-        return registered.keySet().containsAll(board.getOrder().subList(0, board.getOrder().indexOf(player.getPawn())));
+    protected boolean unexpected(Player player) {
+        return !registered.keySet().containsAll(flight.getOrder().subList(0, flight.getOrder().indexOf(player.getPawn())));
     }
 
     /**
@@ -84,7 +83,7 @@ public abstract class Card implements Serializable {
      * @return true if all players did, false otherwise
      */
     protected boolean allRegistered(){
-        return registered.size() == board.getOrder().size();
+        return registered.size() == flight.getOrder().size();
     }
 
     /**
@@ -96,17 +95,6 @@ public abstract class Card implements Serializable {
     }
 
     /**
-     * Standardization of a player choice
-     * @param json from player
-     * @return player choice
-     */
-    protected boolean getChoice(JSONObject json){
-        if(!json.has("choice"))
-            return false;
-        return json.getBoolean("choice");
-    }
-
-    /**
      * Give the player's input to the card. If the player does not need to give any input,
      * this method can still be used to give all the players to the card.
      *
@@ -114,13 +102,13 @@ public abstract class Card implements Serializable {
      * @param input this is dependent of every card
      * @return ok if the input is accepted, err if not
      */
-    public abstract Result<Input> set(Player player, Input input);
+    public abstract Result<CardInput> set(Player player, CardInput input);
 
     /**
      * Apply the actions of a card. It is dependent of the specific card.
      * @return ok if succeeded, err if not
      */
-    public abstract Result<Output> play();
+    public abstract Result<CardOutput> play();
 
     /**
      * Check if a card is ready to be played.
@@ -148,12 +136,6 @@ public abstract class Card implements Serializable {
      */
     public List<Player> getRegistered(){
         return new ArrayList<>(registered.values());
-    }
-
-    protected static JSONObject genAccepted(){
-        JSONObject accepted = new JSONObject();
-        accepted.put("accepted", true);
-        return accepted;
     }
 
     @Override

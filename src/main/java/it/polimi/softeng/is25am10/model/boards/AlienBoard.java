@@ -74,9 +74,9 @@ public class AlienBoard extends ElementsBoard{
      * @return true if the alien is playable, false if not.
      */
     @Override
-    public boolean check(Coordinate c, int qty) {
-        return tiles.getTile(c).getData().getType() == Tile.Type.HOUSE
-                && thereIsAddon(c) && qty <= 1 && (get(c) + qty <= 1) && total+ qty <= 1;
+    public boolean cantPlace(Coordinate c, int qty) {
+        return tiles.getTile(c).getData().getType() != Tile.Type.HOUSE
+                || !thereIsAddon(c) || qty > 1 || (get(c) + qty > 1) || total + qty > 1;
     }
 
     /**

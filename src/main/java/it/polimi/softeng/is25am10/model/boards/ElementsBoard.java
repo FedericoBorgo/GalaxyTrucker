@@ -137,7 +137,7 @@ public abstract class ElementsBoard implements Serializable {
                 if(b.get(c) > 0)
                     return Result.err("occupied by others");
 
-        if(!check(c, qty))
+        if(cantPlace(c, qty))
             return Result.err("cant place here");
 
         set(c, get(c) + qty);
@@ -153,7 +153,7 @@ public abstract class ElementsBoard implements Serializable {
         List<Coordinate> toRemove = new ArrayList<>();
         positions.forEach((c, _) -> {
 
-            if(!check(c, 0))
+            if(cantPlace(c, 0))
                 toRemove.add(c);
         });
 
@@ -169,7 +169,7 @@ public abstract class ElementsBoard implements Serializable {
      * @param qty quantity
      * @return true if the element is placeable here, false if not
      */
-    public abstract boolean check(Coordinate c, int qty);
+    public abstract boolean cantPlace(Coordinate c, int qty);
 
     public abstract TextColor.ANSI getColor();
 

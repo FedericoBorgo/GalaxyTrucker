@@ -4,22 +4,20 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Epidemic extends Card {
-   //constructor
-    public Epidemic(FlightBoard board, int id) {
+    private Epidemic(FlightBoard board, int id) {
         super(null, false, board, id, Type.EPIDEMIC);
     }
 
-
     @Override
-    public Result<Input> set(Player player, Input input) {
+    public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
             return Result.err("player already registered");
         // the input of the player does not matter
@@ -27,18 +25,14 @@ public class Epidemic extends Card {
         return Result.ok(input);
     }
 
-    /**
-     * removes the crew members that the epidemic killed
-     * @return an error/success message
-     */
     @Override
-    public Result<Output> play() {
+    public Result<CardOutput> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
-        Output output = new Output();
+        CardOutput output = new CardOutput();
         registered.forEach((_, player) -> {
             List<Coordinate> res = player.getBoard().epidemic();
             output.killedCrew.put(player.getName(), res);
@@ -61,14 +55,12 @@ public class Epidemic extends Card {
     }
 
     public static List<Card> construct(FlightBoard board){
-        String out = dump(Epidemic.class.getResourceAsStream("epidemic.json"));
+        String out = dump(Objects.requireNonNull(Objects.requireNonNull(Epidemic.class.getResourceAsStream("epidemic.json"))));
         JSONObject jsonObject = new JSONObject(out);
         JSONArray jsonArray = jsonObject.getJSONArray("ids");
         List<Card> cards = new ArrayList<>();
 
-        jsonArray.forEach(item -> {
-            cards.add(new Epidemic(board, Integer.parseInt(item.toString())));
-        });
+        jsonArray.forEach(item -> cards.add(new Epidemic(board, Integer.parseInt(item.toString()))));
 
         return cards;
     }

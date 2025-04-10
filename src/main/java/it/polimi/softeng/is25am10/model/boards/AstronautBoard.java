@@ -32,8 +32,8 @@ public class AstronautBoard extends ElementsBoard{
      * @return true if the astronauts are placeable here or false if not-
      */
     @Override
-    public boolean check(Coordinate c, int qty) {
-        return Tile.house(tiles.getTile(c).getData()) && (get(c) + qty <= 2);
+    public boolean cantPlace(Coordinate c, int qty) {
+        return !Tile.house(tiles.getTile(c).getData()) || (get(c) + qty > 2);
     }
 
     /**

@@ -8,7 +8,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.model.cards.Input;
+import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import org.json.JSONObject;
@@ -359,8 +359,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
      * @return
      */
     @Override
-    public Result<Input> setInput(String name, Input input) {
-        Result<Input> res = getModel(name).setInput(name, input);
+    public Result<CardInput> setInput(String name, CardInput input) {
+        Result<CardInput> res = getModel(name).setInput(name, input);
 
         if(res.isOk() && getModel(name).getChanges() == null)
             askForInput(getModel(name).getNextToPlay());
@@ -417,7 +417,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         try {
             callbacks.get(name).askForInput();
         } catch (Exception _) {
-            getModel(name).setInput(name, Input.disconnected());
+            getModel(name).setInput(name, CardInput.disconnected());
         }
     }
 
@@ -448,7 +448,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
                 else if(m.getStatus() == Model.State.Type.WAITING_INPUT &&
                         name.equals(m.getNextToPlay())) {
                     Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
-                    m.setInput(name, Input.disconnected());
+                    m.setInput(name, CardInput.disconnected());
                 }
             });
     }

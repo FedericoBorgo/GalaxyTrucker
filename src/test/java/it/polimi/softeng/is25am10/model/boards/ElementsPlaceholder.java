@@ -12,8 +12,8 @@ class ElementsPlaceholder extends ElementsBoard {
         super(tiles);
     }
     @Override
-    public boolean check(Coordinate c, int qty) {
-        return Tile.real(tiles.getTile(c).getData());
+    public boolean cantPlace(Coordinate c, int qty) {
+        return !Tile.real(tiles.getTile(c).getData());
     }
 
     @Override
