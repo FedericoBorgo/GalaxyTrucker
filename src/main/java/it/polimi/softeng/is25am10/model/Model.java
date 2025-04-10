@@ -748,7 +748,7 @@ public class Model implements Serializable {
         return model;
     }
 
-    public HashMap<String, Pawn> getPawns(){
+    public HashMap<String, Pawn> getPlayers(){
         HashMap<String, Pawn> p = new HashMap<>();
         players.forEach((name, player) -> p.put(name, player.getPawn()));
 

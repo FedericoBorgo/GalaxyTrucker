@@ -7,6 +7,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 
@@ -150,7 +151,7 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushCard(Card card) {
+    public void pushCardData(CardData card) {
         call(card);
     }
 

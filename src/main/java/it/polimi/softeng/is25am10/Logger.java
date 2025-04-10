@@ -1,5 +1,8 @@
 package it.polimi.softeng.is25am10;
 
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
+
 public class Logger {
     public static boolean SILENCE = false;
 
@@ -38,10 +41,19 @@ public class Logger {
 
 
     public static void playerLog(int id, String player, String message){
-        String prefix = Controller.isRMI() ? "RMI" : "SOCKET";
+        String prefix = isRMI() ? "RMI" : "SOCKET";
         print("MODEL",
                 "[" + id + "]" +
                         "[" + prefix + "]" +
                         "[" + player + "]" + message, CYAN);
+    }
+
+    public static boolean isRMI(){
+        try {
+            RemoteServer.getClientHost();
+            return true;
+        } catch (ServerNotActiveException e) {
+            return false;
+        }
     }
 }
