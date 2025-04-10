@@ -105,14 +105,13 @@ public class Pirates extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject json = new JSONObject();
-        JSONArray fires = new JSONArray();
-        json.put("type", type);
-        json.put("id", id);
-        projectiles.forEach(projectile -> fires.put(projectile.toString()));
-        json.put("fires", fires);
-        return json;
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.projectiles = projectiles;
+        data.days = days;
+        data.cash = cash;
+        data.power = piratePower;
+        return data;
     }
 
 

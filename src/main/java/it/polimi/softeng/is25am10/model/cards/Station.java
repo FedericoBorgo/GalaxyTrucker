@@ -15,13 +15,13 @@ import java.util.Optional;
 public class Station extends Card {
     private final List<GoodsBoard.Type> goods;
     private Optional<Player> winner = Optional.empty();
-    private final int requiredCrew;
+    private final int crew;
     private final int days;
 
     private Station(FlightBoard board, int crew, List<GoodsBoard.Type> goodsType, int id, int days) {
         super(null, true, board, id, Type.STATION);
         this.goods = goodsType;
-        this.requiredCrew = crew;
+        this.crew = crew;
         this.days = days;
 
     }
@@ -37,7 +37,7 @@ public class Station extends Card {
         if(input.accept) {
             int crew = player.getBoard().getAstronaut().getTotal();
 
-            if (crew < requiredCrew)
+            if (crew < this.crew)
                 return Result.err("not enough crew");
 
             winner = Optional.of(player);
@@ -70,11 +70,12 @@ public class Station extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject json = new JSONObject();
-        json.put("type", type);
-        json.put("id", id);
-        return json;
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.days = days;
+        data.crew = crew;
+        data.rewards = goods;
+        return data;
     }
 
     public static List<Card> construct(FlightBoard board){

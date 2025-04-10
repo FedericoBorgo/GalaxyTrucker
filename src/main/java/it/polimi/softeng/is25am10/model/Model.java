@@ -5,11 +5,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.Pawn;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.model.cards.Deck;
-import it.polimi.softeng.is25am10.model.cards.CardInput;
-import it.polimi.softeng.is25am10.model.cards.CardOutput;
-import org.json.JSONObject;
+import it.polimi.softeng.is25am10.model.cards.*;
 
 import java.io.*;
 import java.util.*;
@@ -688,7 +684,7 @@ public class Model implements Serializable {
      * Get the temporary data about the drawn card.
      * @return
      */
-    public synchronized Result<JSONObject> getCardData(){
+    public synchronized Result<CardData> getCardData(){
         if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
         return Result.ok(deck.getData());

@@ -8,10 +8,10 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
-import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -374,9 +374,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
      * @return data of the card
      */
     @Override
-    public Result<String> getCardData(String name) {
-        Result<JSONObject> res = getModel(name).getCardData();
-        return res.isOk()? Result.ok(res.getData().toString()) : Result.err(res.getReason());
+    public Result<CardData> getCardData(String name) {
+        return getModel(name).getCardData();
     }
 
     /**

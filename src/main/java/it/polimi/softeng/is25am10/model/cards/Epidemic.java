@@ -47,11 +47,8 @@ public class Epidemic extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject data = new JSONObject();
-        data.put("type", type);
-        data.put("id", id);
-        return data;
+    public CardData getData() {
+        return new CardData(type, id);
     }
 
     public static List<Card> construct(FlightBoard board){

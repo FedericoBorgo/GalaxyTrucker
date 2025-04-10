@@ -127,34 +127,8 @@ public class Warzone extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject data = new JSONObject();
-        data.put("type", type);
-        data.put("id", id);
-
-        JSONArray meteors = new JSONArray();
-        fire.forEach(projectile -> meteors.put(projectile.toString()));
-        data.put("fire", meteors);
-
-        JSONArray entry = new JSONArray();
-        declaredPower.forEach((player, power) -> {
-            JSONObject obj = new JSONObject();
-            JSONObject playerJSON = new JSONObject();
-            JSONArray arr = new JSONArray();
-
-            power.forEach((type, value) -> {
-                obj.put("type", type);
-                obj.put("value", value);
-                arr.put(obj);
-            });
-
-            playerJSON.put(player.getName(), arr);
-            entry.put(playerJSON);
-        });
-
-        data.put("declaredPower", entry);
-
-        return data;
+    public CardData getData() {
+        return new CardData(type, id);
     }
 
     public static List<Card> construct(Model model, FlightBoard board){

@@ -47,11 +47,8 @@ public class Stardust extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", type);
-        jsonObject.put("id", id);
-        return jsonObject;
+    public CardData getData() {
+        return new CardData(type, id);
     }
 
     public static List<Card> construct(FlightBoard board){

@@ -83,10 +83,12 @@ public class Slavers extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject data = new JSONObject();
-        data.put("type", type);
-        data.put("id", id);
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.cash = cash;
+        data.days = days;
+        data.power = enemyPower;
+        data.crew = crew;
         return data;
     }
 

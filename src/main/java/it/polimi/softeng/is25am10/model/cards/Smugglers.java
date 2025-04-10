@@ -8,7 +8,10 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Smugglers extends Card {
 
@@ -62,10 +65,11 @@ public class Smugglers extends Card {
 
 
     @Override
-    public JSONObject getData() {
-        JSONObject data = new JSONObject();
-        data.put("type", type);
-        data.put("id", id);
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.goods = goods;
+        data.days = days;
+        data.power = enemyPower;
         return data;
     }
 

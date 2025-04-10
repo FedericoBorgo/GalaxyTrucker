@@ -75,14 +75,9 @@ public class Meteors extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject data = new JSONObject();
-        data.put("type", type);
-        data.put("id", id);
-
-        JSONArray meteors = new JSONArray();
-        projectiles.forEach(projectile -> meteors.put(projectile.toString()));
-        data.put("meteors", meteors);
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.projectiles = projectiles;
         return data;
     }
 

@@ -4,7 +4,6 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,7 +119,7 @@ public abstract class Card implements Serializable {
      * Get some specific data about the card.
      * @return the data
      */
-    public abstract JSONObject getData();
+    public abstract CardData getData();
 
     public static String dump(InputStream stream){
         try {

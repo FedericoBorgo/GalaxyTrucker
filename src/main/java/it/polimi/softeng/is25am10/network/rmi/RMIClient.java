@@ -7,6 +7,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
@@ -248,7 +249,7 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<String> getCardData() {
+    public Result<CardData> getCardData() {
         try {
             return server.getCardData(name);
         } catch (RemoteException e) {

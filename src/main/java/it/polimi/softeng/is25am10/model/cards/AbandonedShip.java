@@ -68,10 +68,11 @@ public class AbandonedShip extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject data = new JSONObject();
-        data.put("type", type);
-        data.put("id", id);
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.days = days;
+        data.crew = crew;
+        data.cash = cash;
         return data;
     }
 

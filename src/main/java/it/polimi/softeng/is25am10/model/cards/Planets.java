@@ -83,22 +83,12 @@ public class Planets extends Card{
     }
 
     @Override
-    public JSONObject getData() {
-        JSONObject json = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-
-        json.put("type", type);
-        json.put("id", id);
-
-        Arrays.asList(Planet.values()).forEach(planet -> {
-            if(planet != Planet.NOPLANET && !chosenPlanet.containsValue(planet)){
-                jsonArray.put(planet);
-            }
-        });
-
-        json.put("planets", jsonArray);
-
-        return json;
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.planets = planets;
+        data.days = days;
+        data.chosenPlanets = new ArrayList<>(chosenPlanet.values());
+        return data;
     }
 
     public static List<Card> construct(FlightBoard board){

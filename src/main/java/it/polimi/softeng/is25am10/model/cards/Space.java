@@ -56,23 +56,10 @@ public class Space extends Card {
     }
 
     @Override
-    public JSONObject getData() {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject json = new JSONObject();
-
-        json.put("type", type);
-        json.put("id", id);
-
-        enginePowerName.forEach((name, power) -> {
-            JSONObject entry = new JSONObject();
-            entry.put("name", name);
-            entry.put("power", power);
-            jsonArray.put(entry);
-        });
-
-        json.put("space", jsonArray);
-
-        return json;
+    public CardData getData() {
+        CardData data = new CardData(type, id);
+        data.declaredPower = enginePowerName;
+        return data;
     }
 
     public static List<Card> construct(Model model, FlightBoard board){

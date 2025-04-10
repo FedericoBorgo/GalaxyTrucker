@@ -4,7 +4,6 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -131,7 +130,7 @@ public class Deck extends Card implements Serializable {
     }
 
     @Override
-    public JSONObject getData(){
+    public CardData getData(){
         return selectedCard.getData();
     }
 
