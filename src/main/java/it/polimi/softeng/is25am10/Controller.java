@@ -38,6 +38,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     private final Map<Model, List<String>> games = new ConcurrentHashMap<>();
     private transient Map<String, Callback> callbacks;
     private transient BiConsumer<Model, Model.State.Type> stateEvent;
+    private final Map<Model, Set<String>> disconnected = new ConcurrentHashMap<>();
 
     private Model starting = null;
     private Model.State.Type prev = null;
@@ -62,18 +63,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         System.exit(0);
     }
 
-    /**
-     * Loads the current controller and open RMI and SOCKET server
-     * at the corresponding port.
-     *
-     * @param rmiPort port
-     * @param socketPort1 port
-     * @param socketPort2 port
-     * @throws IOException if an error occurs
-     */
-    void loadController(int rmiPort, int socketPort1, int socketPort2) throws IOException {
-        callbacks = new ConcurrentHashMap<>();
-
+    void loadEvent(){
         // create the event notifier
         stateEvent = (m, state) -> {
             Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
@@ -88,12 +78,27 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
             prev = state;
         };
+    }
+
+    /**
+     * Loads the current controller and open RMI and SOCKET server
+     * at the corresponding port.
+     *
+     * @param rmiPort port
+     * @param socketPort1 port
+     * @param socketPort2 port
+     * @throws IOException if an error occurs
+     */
+    void loadController(int rmiPort, int socketPort1, int socketPort2) throws IOException {
+        callbacks = new ConcurrentHashMap<>();
 
         // open RMI server
         Registry registry = LocateRegistry.createRegistry(rmiPort);
         registry.rebind("controller", this);
         // open SOCKET server
         new SocketListener(this, socketPort1, socketPort2);
+
+        ping();
 
         // responsible to ping every player every 1 second
         new Thread(() -> {
@@ -113,7 +118,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 backup();
 
                 try {
-                    Thread.sleep(20000);
+                    Thread.sleep(5000);
                 }
                 catch(InterruptedException e){
                     throw new RuntimeException(e);
@@ -124,6 +129,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     private Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
         super();
+        loadEvent();
         loadController(rmiPort, socketPort1, socketPort2);
     }
 
@@ -155,15 +161,19 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             callback.setPlayers(m.getPlayers());
 
             //dumps all the booked tiles
-            if(m.getState() == Model.State.Type.BUILDING){
-                m.getSeenTiles().getData().forEach(t -> {
-                    try {
-                        callback.gaveTile(t);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
+            m.getSeenTiles().forEach(t -> {
+                try {
+                    callback.gaveTile(t);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            disconnected.get(m).remove(name);
+
+            if(m.nPlayers - disconnected.get(m).size() >= 2
+                    && m.getState() == Model.State.Type.PAUSED)
+                m.resume();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -186,6 +196,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         if(starting == null) {
             starting = new Model(askHowManyPlayers(name), stateEvent);
             games.put(starting, Collections.synchronizedList(new ArrayList<>()));
+            disconnected.put(starting, new HashSet<>());
         }
 
         Model temp = starting;
@@ -341,16 +352,24 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     public void ping(){
         for(Model m: games.keySet())
             notifyPlayers(m, (name) ->{
-                if(m.getState() == Model.State.Type.ALIEN_INPUT) {
-                    if(m.init(name, Optional.empty(), Optional.empty()).isOk())
-                        Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
+                disconnected.get(m).add(name);
+
+                if(disconnected.get(m).size() >= m.nPlayers-1)
+                    m.pause();
+                else{
+                    if(m.getState() == Model.State.Type.ALIEN_INPUT) {
+                        if(m.init(name, Optional.empty(), Optional.empty()).isOk())
+                            Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
+                    }
+
+                    else if(m.getState() == Model.State.Type.WAITING_INPUT &&
+                            name.equals(m.getNextToPlay())) {
+                        Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
+                        setInput(name, CardInput.disconnected());
+                    }
                 }
 
-                else if(m.getState() == Model.State.Type.WAITING_INPUT &&
-                        name.equals(m.getNextToPlay())) {
-                    Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
-                    setInput(name, CardInput.disconnected());
-                }
+
             });
     }
 
@@ -382,13 +401,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("controller.bin"));
             Controller controller = (Controller) ois.readObject();
             ois.close();
-
-            controller.loadController(rmiPort, socketPort1, socketPort2);
+            controller.loadEvent();
             //init the games
             controller.games.keySet().forEach(model -> {
                 model.loadTimer();
                 model.setEvent(controller.stateEvent);
             });
+            controller.loadController(rmiPort, socketPort1, socketPort2);
         } catch (IOException | ClassNotFoundException e) {
             //no file or some error, create a new controller
             new Controller(rmiPort, socketPort1, socketPort2);
@@ -497,7 +516,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     @Override
     public Result<List<Tile>> getSeenTiles(String name) {
-        return getModel(name).getSeenTiles();
+        return Result.ok(getModel(name).getSeenTiles());
     }
 
     /**

@@ -151,7 +151,7 @@ public class Model implements Serializable {
     private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));
 
     //number of players
-    private final int nPlayers;
+    public final int nPlayers;
     private int countPlayers = 0;
 
     /**
@@ -548,10 +548,8 @@ public class Model implements Serializable {
      * Retrieves the list containing all the face-up tiles.
      * @return The seen list.
      */
-    public synchronized Result<List<Tile>> getSeenTiles(){
-        if(state.get() != State.Type.BUILDING)
-            return Result.err("not BUILDING state");
-        return Result.ok(tiles.getSeen());
+    public synchronized List<Tile> getSeenTiles(){
+        return tiles.getSeen();
     }
 
     /**
@@ -703,7 +701,8 @@ public class Model implements Serializable {
     //end cards section
 
     public void pause(){
-        state.next(State.Type.PAUSED);
+        if(state.curr != State.Type.PAUSED && state.curr != State.Type.JOINING)
+            state.next(State.Type.PAUSED);
     }
 
     public void resume(){
