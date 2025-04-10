@@ -1,7 +1,7 @@
-package it.polimi.softeng.is25am10.client;
+package it.polimi.softeng.is25am10.tui;
 
-import it.polimi.softeng.is25am10.client.asciiui.Config;
-import it.polimi.softeng.is25am10.client.asciiui.Game;
+import it.polimi.softeng.is25am10.tui.asciiui.Config;
+import it.polimi.softeng.is25am10.tui.asciiui.Game;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 
 import java.io.IOException;

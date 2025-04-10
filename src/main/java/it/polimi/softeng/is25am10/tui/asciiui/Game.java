@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.client.asciiui;
+package it.polimi.softeng.is25am10.tui.asciiui;
 
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;

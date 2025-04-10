@@ -51,7 +51,7 @@ public class RMIClient implements ClientInterface {
                 .getMethodName();
 
         try {
-            return (T) Callback.class.getMethod(methodName, types)
+            return (T) RMIInterface.class.getMethod(methodName, types)
                     .invoke(server, args);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);

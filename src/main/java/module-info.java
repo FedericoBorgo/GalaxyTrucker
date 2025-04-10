@@ -16,8 +16,8 @@ module it.polimi.softeng.is25am10 {
     opens it.polimi.softeng.is25am10.network to javafx.fxml;
     exports it.polimi.softeng.is25am10.network.rmi;
     opens it.polimi.softeng.is25am10.network.rmi to javafx.fxml;
-    exports it.polimi.softeng.is25am10.client;
-    opens it.polimi.softeng.is25am10.client to javafx.fxml;
-    exports it.polimi.softeng.is25am10.client.asciiui;
-    opens it.polimi.softeng.is25am10.client.asciiui to javafx.fxml;
+    exports it.polimi.softeng.is25am10.tui;
+    opens it.polimi.softeng.is25am10.tui to javafx.fxml;
+    exports it.polimi.softeng.is25am10.tui.asciiui;
+    opens it.polimi.softeng.is25am10.tui.asciiui to javafx.fxml;
 }

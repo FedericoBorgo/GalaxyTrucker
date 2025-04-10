@@ -381,7 +381,6 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("controller.bin"));
             oos.writeObject(this);
             oos.close();
-            Logger.serverLog("backup done");
         }catch(IOException e){
             throw new RuntimeException(e);
         }

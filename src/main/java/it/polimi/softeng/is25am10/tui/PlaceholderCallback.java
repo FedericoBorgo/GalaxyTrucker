@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.client;
+package it.polimi.softeng.is25am10.tui;
 
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;

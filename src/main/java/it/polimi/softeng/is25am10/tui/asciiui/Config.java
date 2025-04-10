@@ -1,4 +1,4 @@
-package it.polimi.softeng.is25am10.client.asciiui;
+package it.polimi.softeng.is25am10.tui.asciiui;
 
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
