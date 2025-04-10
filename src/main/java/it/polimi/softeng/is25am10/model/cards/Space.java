@@ -18,7 +18,7 @@ public class Space extends Card {
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -31,27 +31,22 @@ public class Space extends Card {
 
         enginePower.put(player.getPawn(), player.getBoard().getEnginePower(model.getRemovedItems(player).battery));
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
-
-        JSONObject result = new JSONObject();
-
         for(int i = board.getOrder().size() - 1; i >= 0; i--){
             FlightBoard.Pawn p = board.getOrder().get(i);
             board.moveRocket(p, enginePower.get(p));
         }
 
-        result.put("flight", board.toJSON());
-
-        return Result.ok(result);
+        return Result.ok(new Output());
     }
 
     @Override

@@ -4,9 +4,22 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 
+/**
+ * Record used to store the data of a single projectile.
+ *
+ * @param type of projectile
+ * @param side to hit
+ * @param where coordinate to HIT
+ * @param ID unique number
+ */
 public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, Tile.Side side, int where,
                          int ID) implements Serializable {
 
+    /**
+     * Convert this projectile to a String.
+     *
+     * @return converted String
+     */
     @Override
     public String toString() {
         JSONObject jsonObject = new JSONObject();
@@ -17,6 +30,11 @@ public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, 
         return jsonObject.toString();
     }
 
+    /**
+     * Get the projectile from the String
+     * @param json String to convert
+     * @return converted projectile
+     */
     static Projectile fromString(String json) {
         JSONObject jsonObject = new JSONObject(json);
         Type type = Type.valueOf(jsonObject.getString("type"));
@@ -26,6 +44,9 @@ public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, 
         return new Projectile(type, side, where, ID);
     }
 
+    /**
+     * Type of asteroid.
+     */
     public enum Type {
         SMALL_ASTEROID,
         BIG_ASTEROID,

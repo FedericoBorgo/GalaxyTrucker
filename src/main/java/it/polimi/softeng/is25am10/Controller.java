@@ -8,6 +8,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.Input;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import org.json.JSONObject;
@@ -354,17 +355,17 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
      * Method used to set the player input for the preparation of the card (so that it can be played afterward).
      * Calls {@code setInput(name, json)} in {@code Model} class. Checks if the player already sent the input.
      * @param name of the player calling the method
-     * @param json contains the data and instructions of the player
+     * @param input contains the data and instructions of the player
      * @return
      */
     @Override
-    public Result<String> setInput(String name, String json) {
-        Result<JSONObject> res = getModel(name).setInput(name, new JSONObject(json));
+    public Result<Input> setInput(String name, Input input) {
+        Result<Input> res = getModel(name).setInput(name, input);
 
-        if(res.isOk() && !res.getData().has("played"))
+        if(res.isOk() && getModel(name).getChanges() == null)
             askForInput(getModel(name).getNextToPlay());
 
-        return res.isOk()? Result.ok(res.getData().toString()) : Result.err(res.getReason());
+        return res;
     }
 
     /**
@@ -416,7 +417,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
         try {
             callbacks.get(name).askForInput();
         } catch (Exception _) {
-            getModel(name).setInput(name, new JSONObject());
+            getModel(name).setInput(name, Input.disconnected());
         }
     }
 
@@ -447,7 +448,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
                 else if(m.getStatus() == Model.State.Type.WAITING_INPUT &&
                         name.equals(m.getNextToPlay())) {
                     Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
-                    m.setInput(name, new JSONObject());
+                    m.setInput(name, Input.disconnected());
                 }
             });
     }

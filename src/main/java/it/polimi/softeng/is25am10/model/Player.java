@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Player implements Serializable {
     private final FlightBoard.Pawn pawn;
     private int cash;
-    private final ShipBoard board;
+    private final ShipBoard board = new ShipBoard();
     private List<GoodsBoard.Type> goodsReward;
     private final String name;
 
@@ -28,7 +28,6 @@ public class Player implements Serializable {
     public Player(String name, FlightBoard.Pawn pawn) {
         this.name = name;
         this.pawn = pawn;
-        board = new ShipBoard();
     }
 
     /**

@@ -10,23 +10,27 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class AbandonedShip extends Card {
-    private final int cashReward;
-    private final int daysLost;
-    private final int astronautCost;
-    private boolean someoneAccepted;
-    private Player descendingPlayer;
+    private final int cash;
+    private final int days;
+    private final int crew;
 
-    public AbandonedShip(Model model, FlightBoard board, int id, int astronaut, int cash, int days) {
+    /**
+     * The player that enters the abandoned ship.
+     */
+    private Optional<Player> descending = Optional.empty();
+
+    public AbandonedShip(Model model, FlightBoard board, int id, int crew, int cash, int days) {
         super(model, true, board, id, Type.AB_SHIP);
-       this.cashReward = cash;
-       this.daysLost = days;
-       this.astronautCost = astronaut;
+        this.cash = cash;
+        this.days = days;
+        this.crew = crew;
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -37,42 +41,41 @@ public class AbandonedShip extends Card {
         }
         //end
 
-        if(!someoneAccepted && getChoice(json)){
-            if(model.getRemovedItems(player).guys >= astronautCost){
-                someoneAccepted = true;
-                descendingPlayer = player;
-            }
+        // the player want to descend?
+        if(input.accept) {
+            // the player remove enough crews?
+            if (model.getRemovedItems(player).guys >= crew)
+                descending = Optional.of(player);
             else
                 return Result.err("not enough astronaut");
         }
 
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         // common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
-        JSONObject result = new JSONObject();
+        Output output = new Output();
 
-        if(someoneAccepted){
-            descendingPlayer.giveCash(cashReward);
-            board.moveRocket(descendingPlayer.getPawn(), -daysLost);
+        // if someone accepted, give the cash and the removed days
+        descending.ifPresent(player -> {
+            player.giveCash(cash);
+            board.moveRocket(player.getPawn(), -days);
+            output.cash.put(player.getName(), cash);
 
-            JSONObject rewarded = new JSONObject();
-            rewarded.put(descendingPlayer.getName(), cashReward);
-            result.put("cash", rewarded);
-            result.put("flight", board.toJSON());
-        }
-        return Result.ok(result);
+        });
+
+        return Result.ok(output);
     }
 
     @Override
     public boolean ready() {
-        return someoneAccepted || allRegistered();
+        return descending.isPresent() || allRegistered();
     }
 
     @Override

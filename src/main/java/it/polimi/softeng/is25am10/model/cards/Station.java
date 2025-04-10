@@ -26,7 +26,7 @@ public class Station extends Card {
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         if(isRegistered(player))
             return Result.err("player already registered");
 
@@ -35,7 +35,7 @@ public class Station extends Card {
         }
 
         //enough crew?
-        if(!ready && getChoice(json)) {
+        if(!ready && input.accept) {
             int crew = player.getBoard().getAstronaut().getTotal();
             if (crew < requiredCrew) {
                 return Result.err("not enough crew");
@@ -47,22 +47,21 @@ public class Station extends Card {
 
         register(player);
 
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         if(!ready())
             return Result.err("nobody chose yes");
-
-        JSONObject result = new JSONObject();
 
         p.setGoodsReward(goods);
         board.moveRocket(p.getPawn(), -flightDays);
 
-        result.put("flight", board.toJSON());
+        Output output = new Output();
+        output.rewards.put(p.getName(), goods);
 
-        return Result.ok(result);
+        return Result.ok(output);
     }
 
     @Override

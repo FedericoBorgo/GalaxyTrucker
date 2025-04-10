@@ -30,7 +30,7 @@ public class TilesCollection implements Serializable {
         JSONObject object = new JSONObject(out);
 
         for (Tile.Type type : Tile.Type.values()) {
-            if(type == Tile.Type.EMPTY || type == Tile.Type.WALL)
+            if(type == Tile.Type.EMPTY || type == Tile.Type.WALL || type == Tile.Type.C_HOUSE)
                 continue;
 
             JSONArray array = object.getJSONArray(type.name());

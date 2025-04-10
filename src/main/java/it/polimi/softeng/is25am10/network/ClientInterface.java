@@ -7,6 +7,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.Input;
 
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public interface ClientInterface {
 
     Result<Card> drawCard();
 
-    Result<String> setInput(String json);
+    Result<Input> setInput(Input input);
 
     Result<String> getCardData();
 

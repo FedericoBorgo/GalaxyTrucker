@@ -47,7 +47,7 @@ public class Warzone extends Card {
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         if(isRegistered(player))
             return Result.err("player already registered");
 
@@ -55,14 +55,7 @@ public class Warzone extends Card {
             return Result.err("player choice is not in order");
         }
 
-        JSONArray array = json.getJSONArray("use");
-        List<Integer> use = new ArrayList<>();
-
-        array.forEach(item -> {
-            use.add(Integer.parseInt(item.toString()));
-        });
-
-        if(use.size() > player.getBoard().getBattery().getTotal())
+        if(input.shieldFor.size() > player.getBoard().getBattery().getTotal())
             return Result.err("not enough battery");
 
         int requiredBattery = model.batteryRequiredForCannon(player.getName());
@@ -81,9 +74,9 @@ public class Warzone extends Card {
         values.put(LeastTypes.LEAST_CANNON, cannonPower);
 
         declaredPower.put(player, values);
-        useBattery.put(player, use);
+        useBattery.put(player, input.shieldFor);
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     private List<Player> findLeast(LeastTypes type){
@@ -105,12 +98,11 @@ public class Warzone extends Card {
     }
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         if(!ready())
             return Result.err("not ready");
 
-        JSONObject object = new JSONObject();
-        JSONArray array = new JSONArray();
+        Output output = new Output();
 
         malusTypes.forEach((malusType, type) -> {
             List<Player> players = findLeast(malusType);
@@ -131,18 +123,11 @@ public class Warzone extends Card {
                         model.getRemovedItems(p).battery -= useBattery.get(p).size();
                     });
 
-                    fire.forEach(p -> {
-                        players.forEach(f -> {
-                            Optional<Coordinate> destroyed = f
-                                    .getBoard()
-                                    .hit(p, useBattery.get(f).contains(p.ID()));
-
-                            destroyed.ifPresent(c -> {
-                                JSONObject obj = new JSONObject();
-                                obj.put("name", f.getName());
-                                obj.put("coord", c.toString());
-                                array.put(obj);
-                            });
+                    fire.forEach(proj -> {
+                        players.forEach(p -> {
+                            p.getBoard()
+                                    .hit(proj, useBattery.get(p).contains(proj.ID()))
+                                    .ifPresent(c -> {output.removed.put(p.getName(), c);});
                         });
                     });
                 }
@@ -154,10 +139,7 @@ public class Warzone extends Card {
             }
         });
 
-        object.put("destroyed", array);
-        object.put("flight", board.toJSON());
-
-        return Result.ok(object);
+        return Result.ok(output);
     }
 
     @Override

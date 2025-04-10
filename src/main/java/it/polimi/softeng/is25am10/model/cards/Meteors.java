@@ -4,7 +4,6 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
@@ -38,7 +37,7 @@ public class Meteors extends Card {
 
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         if (isRegistered(player))
             return Result.err("player already registered");
 
@@ -46,46 +45,35 @@ public class Meteors extends Card {
             return Result.err("player choice is not in order");
         }
 
-        JSONArray array = json.getJSONArray("use");
-        List<Integer> use = new ArrayList<>();
+        // if the player is disconnected, check if he
+        // dropped enough items.
+        if (!input.disconnected
+        && input.shieldFor.size() > model.getRemovedItems(player).battery)
+                return Result.err("not enough battery");
 
-        array.forEach(item -> {
-            use.add(Integer.parseInt(item.toString()));
-        });
-
-        if(use.size() > model.getRemovedItems(player).battery)
-            return Result.err("not enough battery");
-
-        useBattery.put(player, use);
+        useBattery.put(player, input.shieldFor);
         register(player);
 
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         if (!ready())
             return Result.err("not all player declared their decision");
 
-        JSONObject result = new JSONObject();
-        JSONArray array = new JSONArray();
+        Output output = new Output();
 
-        projectiles.forEach(projectile -> {
-            registered.forEach((pawn, p) -> {
-                Optional<Coordinate> destroyed = p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.ID()));
-
-                destroyed.ifPresent(c -> {
-                    JSONObject obj = new JSONObject();
-                    obj.put("name", p.getName());
-                    obj.put("coord", c.toString());
-                    array.put(obj);
-                });
+        // for every projectile and for every player, hit them
+        projectiles.forEach(proj -> {
+            registered.forEach((_, p) -> {
+                p.getBoard()
+                 .hit(proj, useBattery.get(p).contains(proj.ID()))
+                 .ifPresent(c -> {output.removed.put(p.getName(), c);});
             });
         });
 
-        result.put("destroyed", array);
-
-        return Result.ok(result);
+        return Result.ok(output);
     }
 
     @Override

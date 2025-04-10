@@ -10,26 +10,27 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Slavers extends Card {
-    private final int cashReward;
-    private final int daysLost;
-    private final int astronautCost;
+    private final int cash;
+    private final int days;
+    private final int crew;
     private final int enemyPower;
-    private boolean enemyIsDefeated;
-    private Result<Player> winnerPlayer;
+
+    private boolean defeated = false;
+    private Optional<Player> winner = Optional.empty();
+
     public Slavers(Model model, FlightBoard board, int id, int cash, int days, int astronauts, int enemyPower) {
         super(model, true, board, id, Type.SLAVERS);
-        this.cashReward = cash;
-        this.daysLost = days;
-        this.astronautCost = astronauts;
+        this.cash = cash;
+        this.days = days;
+        this.crew = astronauts;
         this.enemyPower = enemyPower;
-        winnerPlayer = Result.err("nobody defeated the slavers");
-        this.enemyIsDefeated = false;
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -38,58 +39,50 @@ public class Slavers extends Card {
         if(!isCorrectOrder(player)){
             return Result.err("player choice is not in order");
         }
+
         //end
-        // Controllo se il nemico deve ancora essere sconfitto
-        if(!enemyIsDefeated) {
-            // Controllo se il giocatore ha buttato abbastanza batterie
+
+        if(!input.disconnected) {
             if (model.batteryRequiredForCannon(player.getName()) > model.getRemovedItems(player).battery)
                 return Result.err("not enough batteries used to activate the cannons");
 
-            double cannonsPower = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
-            if (cannonsPower > enemyPower){
-                enemyIsDefeated = true;
-                if(this.getChoice(json))
-                    winnerPlayer = Result.err("player does not want the reward");
-                else
-                    winnerPlayer = Result.ok(player);
+            double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
+
+            if (power > enemyPower) {
+                defeated = true;
+
+                if (input.accept)
+                    winner = Optional.of(player);
             }
-            else if (cannonsPower < enemyPower)
-            {
-                if(model.getRemovedItems(player).guys < astronautCost)
+            else if (power < enemyPower)
+                if (model.getRemovedItems(player).guys < crew)
                     return Result.err("player did not give enough astronauts to the slavers");
-            }
-            // l'ultima alternativa è che il giocatore abbia pareggiato e non bisogna fare nulla
         }
+
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         // common part
         if(!ready())
             return Result.err("not all players declared their decision");
 
-        JSONObject result = new JSONObject();
+        Output output = new Output();
 
-        // Giocatore che ha vinto e accetta il premio sacrificando giorni di volo
-        if(winnerPlayer.isOk())
-        {
-            Player p = winnerPlayer.getData();
-            p.giveCash(cashReward);
-            board.moveRocket(p.getPawn(), -daysLost);
+        winner.ifPresent(p -> {
+            p.giveCash(cash);
+            board.moveRocket(p.getPawn(), -days);
+            output.cash.put(p.getName(), cash);
+        });
 
-            JSONObject rewarded = new JSONObject();
-            rewarded.put(p.getName(), cashReward);
-            result.put("cash", rewarded);
-            result.put("flight", board.toJSON());
-        }
-        return Result.ok(result);
+        return Result.ok(output);
     }
 
     @Override
     public boolean ready() {
-        return allRegistered() || enemyIsDefeated;
+        return allRegistered() || defeated;
     }
 
     @Override

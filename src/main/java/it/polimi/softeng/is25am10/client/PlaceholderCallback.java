@@ -5,6 +5,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.Output;
 import it.polimi.softeng.is25am10.network.Callback;
 
 import java.rmi.RemoteException;
@@ -40,7 +41,7 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     }
 
     @Override
-    public void pushCardChanges(String data) throws RemoteException {
+    public void pushCardChanges(Output data) throws RemoteException {
 
     }
 

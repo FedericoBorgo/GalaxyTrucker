@@ -7,6 +7,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.Output;
 import it.polimi.softeng.is25am10.network.Callback;
 
 import java.io.IOException;
@@ -154,8 +155,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushCardChanges(String data) {
-        call(data);
+    public void pushCardChanges(Output output) {
+        call(output);
     }
 
     @Override

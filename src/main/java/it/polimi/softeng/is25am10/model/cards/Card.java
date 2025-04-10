@@ -101,6 +101,8 @@ public abstract class Card implements Serializable {
      * @return player choice
      */
     protected boolean getChoice(JSONObject json){
+        if(!json.has("choice"))
+            return false;
         return json.getBoolean("choice");
     }
 
@@ -109,16 +111,16 @@ public abstract class Card implements Serializable {
      * this method can still be used to give all the players to the card.
      *
      * @param player the player that execute the action
-     * @param json this is dependent of every card
+     * @param input this is dependent of every card
      * @return ok if the input is accepted, err if not
      */
-    public abstract Result<JSONObject> set(Player player, JSONObject json);
+    public abstract Result<Input> set(Player player, Input input);
 
     /**
      * Apply the actions of a card. It is dependent of the specific card.
      * @return ok if succeeded, err if not
      */
-    public abstract Result<JSONObject> play();
+    public abstract Result<Output> play();
 
     /**
      * Check if a card is ready to be played.

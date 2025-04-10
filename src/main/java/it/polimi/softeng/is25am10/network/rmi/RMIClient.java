@@ -7,6 +7,7 @@ import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.Input;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 
@@ -239,9 +240,9 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<String> setInput(String json) {
+    public Result<Input> setInput(Input input) {
         try {
-            return server.setInput(name, json);
+            return server.setInput(name, input);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

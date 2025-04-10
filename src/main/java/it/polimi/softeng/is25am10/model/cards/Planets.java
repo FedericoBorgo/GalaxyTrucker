@@ -10,8 +10,8 @@ import org.json.JSONObject;
 import java.util.*;
 
 public class Planets extends Card{
-    private Map<Planet, List<GoodsBoard.Type>> goods;
-    private Map<Player, Planet> playerChoice;
+    private Map<Planet, List<GoodsBoard.Type>> planets;
+    private Map<Player, Planet> chosenPlanet;
     private boolean ready = false;
     private int flightDays;
 
@@ -21,13 +21,13 @@ public class Planets extends Card{
 
     public Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int backmoves) {
         super(null, true, board, id, Type.PLANETS);
-        this.goods = goodsType;
+        this.planets = goodsType;
         this.flightDays = backmoves;
 
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
@@ -38,52 +38,45 @@ public class Planets extends Card{
         }
         //end
 
-
-        Planet planet = Planet.valueOf(json.getString("planet"));
+        Planet planet = input.planet;
 
         //some player already took the planet?
-        if(planet != Planet.NOPLANET && playerChoice.containsValue(planet))
+        if(planet != Planet.NOPLANET && chosenPlanet.containsValue(planet))
             return Result.err("planet already occupied");
 
-        if(!goods.containsKey(planet))
+        if(!planets.containsKey(planet))
             return Result.err("planet does not exist");
 
-        playerChoice.put(player, planet);
+        chosenPlanet.put(player, planet);
 
-        if(playerChoice.values().containsAll(goods.keySet()))
+        if(chosenPlanet.values().containsAll(planets.keySet()))
             ready = true;
 
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
-        registered.forEach((pawn, player) -> {
-            player.setGoodsReward(goods.get(playerChoice.get(player)));
+        Output output = new Output();
+
+        chosenPlanet.forEach((player, planet) -> {
+            if(planet == Planet.NOPLANET)
+                return;
+
+            List<GoodsBoard.Type> reward = planets.get(planet);
+            board.moveRocket(player.getPawn(), -flightDays);
+            player.setGoodsReward(reward);
+            output.rewards.put(player.getName(), reward);
         });
 
-        JSONObject result = new JSONObject();
-
-        //move pawns in reverse flight order
-        List<FlightBoard.Pawn> reversed = new ArrayList<>(board.getOrder());
-        Collections.reverse(reversed);
-        for(FlightBoard.Pawn pawn : reversed){
-            Player player = registered.get(pawn);
-            if(Planet.NOPLANET != playerChoice.get(player)){
-                board.moveRocket(player.getPawn(), flightDays);
-            }
-        }
-
-        result.put("flight", board.toJSON());
-
-        return Result.ok(result);
+        return Result.ok(output);
     }
 
     @Override
@@ -100,7 +93,7 @@ public class Planets extends Card{
         json.put("id", id);
 
         Arrays.asList(Planet.values()).forEach(planet -> {
-            if(planet != Planet.NOPLANET && !playerChoice.containsValue(planet)){
+            if(planet != Planet.NOPLANET && !chosenPlanet.containsValue(planet)){
                 jsonArray.put(planet);
             }
         });

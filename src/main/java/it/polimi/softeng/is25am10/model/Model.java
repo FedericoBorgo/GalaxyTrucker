@@ -7,6 +7,8 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.Deck;
+import it.polimi.softeng.is25am10.model.cards.Input;
+import it.polimi.softeng.is25am10.model.cards.Output;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -631,6 +633,7 @@ public class Model implements Serializable {
         }
 
         state.next(State.Type.WAITING_INPUT);
+        changes = null;
 
         if(!c.needInput){
             players.forEach((p, _) -> {
@@ -641,32 +644,28 @@ public class Model implements Serializable {
         return Result.ok(c);
     }
 
-    private String changes = null;
+    private Output changes = null;
 
     /**
      * Give the player's input to the drawn card.
      * Can be called only in the WAITING state.
      *
      * @param name of the player
-     * @param json player input
+     * @param input player input
      * @return
      */
-    public synchronized Result<JSONObject> setInput(String name, JSONObject json){
+    public synchronized Result<Input> setInput(String name, Input input){
         if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
-        Result<JSONObject> res = deck.set(get(name), json);
+        Result<Input> res = deck.set(get(name), input);
 
-        if(deck.ready()) {
-            res = playCard();
-            res.getData().put("accepted", true);
-            res.getData().put("played", true);
-            changes = res.getData().toString();
-        }
+        if(deck.ready())
+            changes = playCard().getData();
 
         return res;
     }
 
-    public synchronized String getChanges(){
+    public synchronized Output getChanges(){
         return changes;
     }
 
@@ -706,11 +705,11 @@ public class Model implements Serializable {
         return debt.get();
     }
 
-    private Result<JSONObject> playCard(){
+    private Result<Output> playCard(){
         if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
 
-        Result<JSONObject> res = deck.play();
+        Result<Output> res = deck.play();
 
         if(res.isOk()){
             List<Pawn> quitted = new ArrayList<>(flight.getQuitters());

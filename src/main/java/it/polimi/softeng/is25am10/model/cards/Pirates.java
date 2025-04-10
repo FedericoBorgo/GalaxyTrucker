@@ -1,7 +1,6 @@
 package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.*;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,11 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Pirates extends Card {
     private final Map<Player, List<Integer>> useBattery = new HashMap<>();
     private final List<Projectile> projectiles = new ArrayList<>();
-    private Player rewardedPlayer = null;
+
+    private Player rewarded = null;
     private boolean defeated = false;
-    private List<Player> defeatedPlayers = new ArrayList<>();
-    private int cash;
-    private int days;
+
+    private final List<Player> shotPlayers = new ArrayList<>();
+
+    private final int cash;
+    private final int days;
     private final int piratePower;
 
     public static int rollDice() {
@@ -37,9 +39,9 @@ public class Pirates extends Card {
         this.piratePower = piratePower;
         this.days = days;
         this.cash = cash;
+
         AtomicInteger counter = new AtomicInteger();
         counter.set(0);
-
         fire.forEach(type -> {
             int number = rollDice() + rollDice();
             Projectile p = new Projectile(type, Tile.Side.UP, number, counter.getAndIncrement());
@@ -48,77 +50,65 @@ public class Pirates extends Card {
     }
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         if (isRegistered(player))
             return Result.err("player already registered");
 
         if (!isCorrectOrder(player))
             return Result.err("player choice is not in order");
 
-        if(model.batteryRequiredForCannon(player.getName()) > model.getRemovedItems(player).battery)
-            return Result.err("battery required");
+        // if the player is disconnected, he's automatically defeated
+        if(input.disconnected)
+            shotPlayers.add(player);
+        else{
+            //does the player dropped enough batteries?
+            if(model.batteryRequiredForCannon(player.getName()) > model.getRemovedItems(player).battery)
+                return Result.err("battery required");
 
-        double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
-        if(power < piratePower) {
-            if(!json.has("use"))
-                return Result.err("missing use");
+            double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
 
-            JSONArray array = json.getJSONArray("use");
-            if(array.length() > model.getRemovedItems(player).battery)
-                return Result.err("not enough battery required");
+            if(power < piratePower) {
+                if(input.shieldFor.size() > model.getRemovedItems(player).battery)
+                    return Result.err("not enough battery required");
 
-            List<Integer> use = new ArrayList<>();
+                useBattery.put(player, input.shieldFor);
+                shotPlayers.add(player);
+            }else if(power > piratePower) {
+                defeated = true;
 
-            array.forEach(item -> {
-                use.add(Integer.parseInt(item.toString()));
-            });
-
-            useBattery.put(player, use);
-            defeatedPlayers.add(player);
-        }else if(power > piratePower) {
-            defeated = true;
-
-            if(getChoice(json))
-                rewardedPlayer = player;
+                if(input.accept)
+                    rewarded = player;
+            }
         }
+
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         if (!ready())
             return Result.err("not all player declared their decision");
 
-        JSONObject result = new JSONObject();
-        JSONArray array = new JSONArray();
+        Output output = new Output();
 
-        projectiles.forEach(projectile -> {
-            defeatedPlayers.forEach(( p) -> {
-                Optional<Coordinate> destroyed = p.getBoard().hit(projectile, useBattery.get(p).contains(projectile.ID()));
-                destroyed.ifPresent(c -> {
-                    JSONObject obj = new JSONObject();
-                    obj.put("name", p.getName());
-                    obj.put("coord", c.toString());
-                    array.put(obj);
-                });
+        // shoot the defeated players
+        projectiles.forEach(proj -> {
+            shotPlayers.forEach((p) -> {
+                p.getBoard()
+                 .hit(proj, useBattery.get(p).contains(proj.ID()))
+                 .ifPresent(c -> {output.removed.put(p.getName(), c);});
             });
         });
 
-        JSONObject prize = new JSONObject();
-
-        if(rewardedPlayer != null){
-            rewardedPlayer.giveCash(cash);
-            board.moveRocket(rewardedPlayer.getPawn(), -days);
-            prize.put(rewardedPlayer.getName(), days);
-            result.put("flight", board.toJSON());
-            result.put("cash", prize);
+        // does the player want to be rewarded?
+        if(rewarded != null){
+            rewarded.giveCash(cash);
+            board.moveRocket(rewarded.getPawn(), -days);
+            output.cash.put(rewarded.getName(), cash);
         }
 
-        if(!array.isEmpty())
-            result.put("destroyed", array);
-
-        return Result.ok(result);
+        return Result.ok(output);
     }
 
     @Override

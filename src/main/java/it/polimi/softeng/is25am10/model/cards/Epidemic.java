@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,11 +19,12 @@ public class Epidemic extends Card {
 
 
     @Override
-    public Result<JSONObject> set(Player player, JSONObject json) {
+    public Result<Input> set(Player player, Input input) {
         if(isRegistered(player))
             return Result.err("player already registered");
+        // the input of the player does not matter
         register(player);
-        return Result.ok(genAccepted());
+        return Result.ok(input);
     }
 
     /**
@@ -30,33 +32,19 @@ public class Epidemic extends Card {
      * @return an error/success message
      */
     @Override
-    public Result<JSONObject> play() {
+    public Result<Output> play() {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
         //end
 
-        JSONObject result = new JSONObject();
-        JSONArray changes = new JSONArray();
-
+        Output output = new Output();
         registered.forEach((_, player) -> {
-            JSONObject entry = new JSONObject();
-            JSONArray removed = new JSONArray();
             List<Coordinate> res = player.getBoard().epidemic();
-
-            res.forEach(coordinate -> {
-                removed.put(coordinate.toString());
-            });
-
-            entry.put("name", player.getName());
-            entry.put("removed", removed);
-
-            changes.put(entry);
+            output.killedCrew.put(player.getName(), res);
         });
 
-        result.put("removed", changes);
-
-        return Result.ok(result);
+        return Result.ok(output);
     }
 
     @Override

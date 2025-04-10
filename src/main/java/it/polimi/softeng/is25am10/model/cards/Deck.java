@@ -19,7 +19,7 @@ import java.util.Objects;
  * The Card is played inside this class.
  * All the Card's method should be called by the Deck and not by the player.
  */
-public class Deck implements Serializable {
+public class Deck extends Card implements Serializable {
     /// the list of the cards in a single game.
     private final List<Card> deck;
     /// the 9 visible cards during the building
@@ -38,6 +38,7 @@ public class Deck implements Serializable {
      * @param board flight board to move the Pawns.
      */
     public Deck(Model model, FlightBoard board){
+        super(null, false, null, -1, null);
         List<Card> cards = new ArrayList<>();
         deck = new ArrayList<>();
         visible = new Card[3][3];
@@ -104,8 +105,9 @@ public class Deck implements Serializable {
      * Plays the specific method from the subclass and checks the number of astronauts.
      * @return 
      */
-    public Result<JSONObject> play(){
-        Result<JSONObject> res = selectedCard.play();
+    @Override
+    public Result<Output> play(){
+        Result<Output> res = selectedCard.play();
 
         if(res.isOk()){
             players.forEach(player -> {
@@ -118,18 +120,22 @@ public class Deck implements Serializable {
         return res;
     }
 
-    public Result<JSONObject> set(Player player, JSONObject json){
-        return selectedCard.set(player, json);
+    @Override
+    public Result<Input> set(Player player, Input input){
+        return selectedCard.set(player, input);
     }
 
+    @Override
     public boolean ready(){
         return selectedCard.ready();
     }
 
+    @Override
     public JSONObject getData(){
         return selectedCard.getData();
     }
 
+    @Override
     public List<Player> getRegistered(){
         return selectedCard.getRegistered();
     }
