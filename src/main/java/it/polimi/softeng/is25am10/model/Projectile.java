@@ -31,20 +31,6 @@ public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, 
     }
 
     /**
-     * Get the projectile from the String
-     * @param json String to convert
-     * @return converted projectile
-     */
-    static Projectile fromString(String json) {
-        JSONObject jsonObject = new JSONObject(json);
-        Type type = Type.valueOf(jsonObject.getString("type"));
-        Tile.Side side = Tile.Side.valueOf(jsonObject.getString("side"));
-        int where = jsonObject.getInt("where");
-        int ID = jsonObject.getInt("ID");
-        return new Projectile(type, side, where, ID);
-    }
-
-    /**
      * Type of asteroid.
      */
     public enum Type {

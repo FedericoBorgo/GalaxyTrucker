@@ -57,8 +57,8 @@ public class Warzone extends Card {
         if(input.shieldFor.size() > player.getBoard().getBattery().getTotal())
             return Result.err("not enough battery");
 
-        int requiredBattery = model.batteryRequiredForCannon(player.getName());
-        int removedBattery = model.getRemovedItems(player).battery;
+        int requiredBattery = model.batteryForCannon(player.getName());
+        int removedBattery = model.getRemoved(player).battery;
 
         if(requiredBattery > removedBattery)
             return Result.err("not enough battery");
@@ -106,15 +106,15 @@ public class Warzone extends Card {
 
             switch(type){
                 case DAYS -> players.forEach(p -> flight.moveRocket(p.getPawn(), -days));
-                case GUYS -> players.forEach(p -> model.getRemovedItems(p).guys -= guys);
+                case GUYS -> players.forEach(p -> model.getRemoved(p).guys -= guys);
                 case FIRE -> {
-                    players.forEach(p -> model.getRemovedItems(p).battery -= useBattery.get(p).size());
+                    players.forEach(p -> model.getRemoved(p).battery -= useBattery.get(p).size());
 
                     fire.forEach(proj -> players.forEach(p -> p.getBoard()
                             .hit(proj, useBattery.get(p).contains(proj.ID()))
                             .ifPresent(c -> output.removed.put(p.getName(), c))));
                 }
-                case GOODS -> players.forEach(p -> model.getRemovedItems(p).goods -= goods);
+                case GOODS -> players.forEach(p -> model.getRemoved(p).goods -= goods);
             }
         });
 

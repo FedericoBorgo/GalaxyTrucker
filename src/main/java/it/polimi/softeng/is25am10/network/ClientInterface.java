@@ -27,19 +27,11 @@ public interface ClientInterface {
 
     Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation);
 
-    Result<Tile> getTile(Coordinate c);
-
-    Tile.Rotation getRotation(Coordinate c);
-
     Result<Tile> bookTile(Tile t);
 
     Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c);
 
-    List<Tile> getBooked();
-
     Result<String> remove(Coordinate c);
-
-    Set<Coordinate> checkShip();
 
     ShipBoard getShip();
 

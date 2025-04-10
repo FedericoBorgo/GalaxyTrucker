@@ -53,7 +53,7 @@ public class Tile implements Serializable {
         BATTERY_2,
         SHIELD,
         EMPTY,
-        WALL;
+        WALL
     }
 
     // "Special tiles": WALL and EMPTY

@@ -111,14 +111,6 @@ public class SocketClient extends Thread implements ClientInterface {
         return call(name, c, t, rotation);
     }
 
-    public Result<Tile> getTile(Coordinate c) {
-        return call(name, c);
-    }
-
-    public Tile.Rotation getRotation(Coordinate c) {
-        return call(name, c);
-    }
-
     public Result<Tile> bookTile(Tile t) {
         return call(name, t);
     }
@@ -127,16 +119,8 @@ public class SocketClient extends Thread implements ClientInterface {
         return call(name, t, rotation, c);
     }
 
-    public List<Tile> getBooked() {
-        return call(name);
-    }
-
     public Result<String> remove(Coordinate c) {
         return call(name, c);
-    }
-
-    public Set<Coordinate> checkShip() {
-        return call(name);
     }
 
     public ShipBoard getShip() {

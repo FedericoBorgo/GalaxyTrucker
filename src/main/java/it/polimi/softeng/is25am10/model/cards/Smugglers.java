@@ -40,7 +40,7 @@ public class Smugglers extends Card {
             return Result.err("player choice is not in order");
 
         if(!input.disconnected) {
-            if (model.batteryRequiredForCannon(player.getName()) > model.getRemovedItems(player).battery)
+            if (model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
                 return Result.err("not enough batteries used to activate the cannons");
 
             double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
@@ -50,7 +50,7 @@ public class Smugglers extends Card {
                 if(input.accept)
                     winner = Optional.of(player);
 
-            } else if (power < enemyPower && model.getRemovedItems(player).goods < goods)
+            } else if (power < enemyPower && model.getRemoved(player).goods < goods)
                     return Result.err("player did not give enough goods to the smugglers");
         }
         register(player);

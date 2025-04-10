@@ -81,22 +81,6 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public Result<Tile> getTile(Coordinate c) {
-        try {
-            return server.getTile(name, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Tile.Rotation getRotation(Coordinate c) {
-        try {
-            return server.getRotation(name, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public Result<Tile> bookTile(Tile t) {
         try {
             return server.bookTile(name, t);
@@ -113,25 +97,9 @@ public class RMIClient implements ClientInterface {
         }
     }
 
-    public List<Tile> getBooked() {
-        try {
-            return server.getBooked(name);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public Result<String> remove(Coordinate c) {
         try {
             return server.remove(name, c);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Set<Coordinate> checkShip() {
-        try {
-            return server.checkShip(name);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

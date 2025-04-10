@@ -54,13 +54,13 @@ public class Pirates extends Card {
             shotPlayers.add(player);
         else{
             //does the player dropped enough batteries?
-            if(model.batteryRequiredForCannon(player.getName()) > model.getRemovedItems(player).battery)
+            if(model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
                 return Result.err("battery required");
 
             double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
 
             if(power < piratePower) {
-                if(input.shieldFor.size() > model.getRemovedItems(player).battery)
+                if(input.shieldFor.size() > model.getRemoved(player).battery)
                     return Result.err("not enough battery required");
 
                 useBattery.put(player, input.shieldFor);

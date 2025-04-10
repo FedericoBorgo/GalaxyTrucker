@@ -27,7 +27,7 @@ public class Space extends Card {
             return Result.err("player choice is not in order");
         //end
 
-        int power = player.getBoard().getEnginePower(model.getRemovedItems(player).battery);
+        int power = player.getBoard().getEnginePower(model.getRemoved(player).battery);
         enginePower.put(player.getPawn(), power);
         enginePowerName.put(player.getName(), power);
 

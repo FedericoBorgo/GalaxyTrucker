@@ -35,7 +35,7 @@ public class AbandonedShip extends Card {
         // the player want to descend?
         if(input.accept) {
             // the player remove enough crews?
-            if (model.getRemovedItems(player).guys >= crew)
+            if (model.getRemoved(player).guys >= crew)
                 winner = Optional.of(player);
             else
                 return Result.err("not enough astronaut");

@@ -45,7 +45,7 @@ public class Meteors extends Card {
         // if the player is disconnected, check if he
         // dropped enough items.
         if (!input.disconnected
-        && input.shieldFor.size() > model.getRemovedItems(player).battery)
+        && input.shieldFor.size() > model.getRemoved(player).battery)
                 return Result.err("not enough battery");
 
         useBattery.put(player, input.shieldFor);

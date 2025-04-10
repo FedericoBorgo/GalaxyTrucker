@@ -40,7 +40,7 @@ public class Slavers extends Card {
         //end
 
         if(!input.disconnected) {
-            if (model.batteryRequiredForCannon(player.getName()) > model.getRemovedItems(player).battery)
+            if (model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
                 return Result.err("not enough batteries used to activate the cannons");
 
             double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
@@ -52,7 +52,7 @@ public class Slavers extends Card {
                     winner = Optional.of(player);
             }
             else if (power < enemyPower)
-                if (model.getRemovedItems(player).guys < crew)
+                if (model.getRemoved(player).guys < crew)
                     return Result.err("player did not give enough astronauts to the slavers");
         }
 

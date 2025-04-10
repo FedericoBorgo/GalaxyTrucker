@@ -87,10 +87,10 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
             try {
                 callback.pushFlight(m.getFlight());
                 callback.pushBoard(m.ship(name));
-                callback.pushState(m.getStatus());
-                callback.setPlayers(m.getPlayers());
+                callback.pushState(m.getState());
+                callback.setPlayers(m.getPawns());
 
-                if(m.getStatus() == Model.State.Type.BUILDING){
+                if(m.getState() == Model.State.Type.BUILDING){
                     m.getSeenTiles().getData().forEach(t -> {
                         try {
                             callback.gaveTile(t);
@@ -153,7 +153,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
             throw new RuntimeException(e);
         }
 
-        m.getPlayers().forEach((name, pawn) -> {
+        m.getPawns().forEach((name, pawn) -> {
             try {
                 method.invoke(callbacks.get(name), args);
             } catch (IllegalAccessException e) {
@@ -210,16 +210,6 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     @Override
-    public Result<Tile> getTile(String name, Coordinate c) {
-        return getModel(name).getTile(name, c);
-    }
-
-    @Override
-    public Tile.Rotation getRotation(String name, Coordinate c) {
-        return getModel(name).getRotation(name, c);
-    }
-
-    @Override
     public Result<Tile> bookTile(String name, Tile t) {
         return getModel(name).bookTile(name, t);
     }
@@ -230,18 +220,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     @Override
-    public List<Tile> getBooked(String name) {
-        return getModel(name).getBooked(name);
-    }
-
-    @Override
     public Result<String> remove(String name, Coordinate c) {
         return getModel(name).remove(name, c);
-    }
-
-    @Override
-    public Set<Coordinate> checkShip(String name) {
-        return getModel(name).checkShip(name);
     }
 
     @Override
@@ -389,7 +369,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     public void setPlayers(Model m) {
-        notifyPlayers(m, null, m.getPlayers());
+        notifyPlayers(m, null, m.getPawns());
     }
 
     public int askHowManyPlayers(String name){
@@ -401,7 +381,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     }
 
     public void pushState(Model m) {
-        notifyPlayers(m, null, m.getStatus());
+        notifyPlayers(m, null, m.getState());
     }
 
     public void pushCard(Model card) {
@@ -439,12 +419,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface {
     public void ping(){
         for(Model m: games.keySet())
             notifyPlayers(m, (name) ->{
-                if(m.getStatus() == Model.State.Type.ALIEN_INPUT) {
+                if(m.getState() == Model.State.Type.ALIEN_INPUT) {
                     if(m.init(name, Optional.empty(), Optional.empty()).isOk())
                         Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
                 }
 
-                else if(m.getStatus() == Model.State.Type.WAITING_INPUT &&
+                else if(m.getState() == Model.State.Type.WAITING_INPUT &&
                         name.equals(m.getNextToPlay())) {
                     Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
                     m.setInput(name, CardInput.disconnected());

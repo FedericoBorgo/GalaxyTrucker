@@ -48,12 +48,12 @@ public class Model implements Serializable {
     /**
      * Counter for the removed items.
      */
-    public static class RemovedItems implements Serializable{
+    public static class Removed implements Serializable{
         public int battery;
         public int guys;
         public int goods;
 
-        public RemovedItems(){
+        public Removed(){
             reset();
         }
         
@@ -69,7 +69,7 @@ public class Model implements Serializable {
 
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) return false;
-            RemovedItems that = (RemovedItems) o;
+            Removed that = (Removed) o;
             return battery == that.battery && guys == that.guys && goods == that.goods;
         }
     }
@@ -109,7 +109,7 @@ public class Model implements Serializable {
             this.curr = curr;
             this.m = m;
             this.notify = notify;
-        };
+        }
 
         public void setNotify(BiConsumer<Model, Type> notify){
             this.notify = notify;
@@ -137,7 +137,7 @@ public class Model implements Serializable {
 
     //Data about the single player.
     private final Map<String, Player> players = new HashMap<>();
-    private final Map<Player, RemovedItems> removedItems = new HashMap<>();
+    private final Map<Player, Removed> removed = new HashMap<>();
     private final Map<Player, Map<Tile.Rotation, Integer>> cannonsToUse = new HashMap<>();
     private final Map<String, Player> quitters = new HashMap<>();
 
@@ -185,7 +185,7 @@ public class Model implements Serializable {
     /**
      * @return get the current state of the game
      */
-    public State.Type getStatus() {
+    public State.Type getState() {
         return state.get();
     }
 
@@ -206,29 +206,16 @@ public class Model implements Serializable {
         //associate name -> player
         players.put(name, new Player(name, unusedPawns.removeFirst()));
         //associate player -> removed items
-        removedItems.put(get(name), new RemovedItems());
+        removed.put(get(name), new Removed());
 
-        if(countPlayers == nPlayers)
-            startGame();
+        if(countPlayers == nPlayers){
+            // start the game
+            state.next(State.Type.BUILDING);
+            countPlayers = 0;
+            timer.schedule(task, TIMER_DELAY);
+        }
 
         return Result.ok(get(name).getPawn());
-    }
-
-    /**
-     * Start the game. Move the state from JOINING to BUILDING.
-     * If not all players joined, it fails.
-     * @return ok if it started, err if not
-     */
-    public Result<String> startGame(){
-        if(state.get() != State.Type.JOINING)
-            return Result.err("not JOINING state");
-        if(countPlayers != nPlayers)
-            return Result.err("waiting for players");
-
-        state.next(State.Type.BUILDING);
-        countPlayers = 0;
-        timer.schedule(task, TIMER_DELAY);
-        return Result.ok("");
     }
 
     /// name -> player
@@ -252,20 +239,17 @@ public class Model implements Serializable {
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         if(canMove.get()) {
-            if(flight.getTimer() == 2){
-                players.forEach((p,v)-> setReady(p));
-            }
+            if(flight.getTimer() == 2)
+                players.forEach((p,_)-> setReady(p));
             else {
                 flight.moveTimer();
                 loadTimer();
                 timer.schedule(task, TIMER_DELAY);
             }
-
             canMove.set(false);
         }
         else
             return Result.err("clessidra non ancora esaurita");
-
 
         return Result.ok(flight.getTimer());
     }
@@ -306,6 +290,9 @@ public class Model implements Serializable {
 
     /// quit: ignoring the state
     private void quitIgnore(String name){
+        if(quitters.containsKey(name))
+            return;
+
         quitters.put(name, get(name));
         flight.quit(players.get(name).getPawn());
         players.remove(name);
@@ -336,16 +323,6 @@ public class Model implements Serializable {
         return ship(name).getTiles().setTile(c, t, rotation);
     }
 
-    /// get tile
-    public Result<Tile> getTile(String name, Coordinate c){
-        return ship(name).getTiles().getTile(c);
-    }
-
-    /// get rotation
-    public Tile.Rotation getRotation(String name, Coordinate c){
-        return ship(name).getTiles().getRotation(c);
-    }
-
     /// book tile
     public synchronized Result<Tile> bookTile(String name, Tile t){
         if(state.get() != State.Type.BUILDING)
@@ -358,11 +335,6 @@ public class Model implements Serializable {
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return ship(name).getTiles().useBookedTile(t, rotation, c);
-    }
-
-    /// get booked tiles
-    public synchronized List<Tile> getBooked(String name) {
-        return ship(name).getTiles().getBooked();
     }
 
     /// remove a tile
@@ -384,10 +356,6 @@ public class Model implements Serializable {
         return Result.ok("");
     }
 
-    public synchronized Set<Coordinate> checkShip(String name){
-        return ship(name).getTiles().isOK();
-    }
-
     /**
      * Check if every ship is ok.
      * @return true if yes, false if not
@@ -396,8 +364,8 @@ public class Model implements Serializable {
         AtomicBoolean ok = new AtomicBoolean();
         ok.set(true);
 
-        players.forEach((n, p) -> {
-            if(!checkShip(n).isEmpty())
+        players.forEach((_, p) -> {
+            if(!p.getBoard().getTiles().isOK().isEmpty())
                 ok.set(false);
         });
 
@@ -460,19 +428,19 @@ public class Model implements Serializable {
 
         if(ship.getBattery().get(c) > 0){
             ship.getBattery().remove(c, 1);
-            removedItems.get(p).battery++;
+            removed.get(p).battery++;
         }
         else if(ship.getAstronaut().get(c) > 0){
             ship.getAstronaut().remove(c, 1);
-            removedItems.get(p).guys++;
+            removed.get(p).guys++;
         }
         else if(ship.getBrown().get(c) > 0){
             ship.getBrown().remove(c, 1);
-            removedItems.get(p).guys++;
+            removed.get(p).guys++;
         }
         else if(ship.getPurple().get(c) > 0){
             ship.getPurple().remove(c, 1);
-            removedItems.get(p).guys++;
+            removed.get(p).guys++;
         }
         else
             return Result.err("no one removed");
@@ -485,10 +453,10 @@ public class Model implements Serializable {
     /**
      * Same drop but for goods.
      *
-     * @param name
-     * @param c
-     * @param t
-     * @return
+     * @param name name of the player
+     * @param c coordinate to remove the single element
+     * @param t type of goods to remove
+     * @return ok if its accepted, err if not
      */
     public synchronized Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
         if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
@@ -502,7 +470,7 @@ public class Model implements Serializable {
         updateDebt();
 
         if(res.isOk())
-            removedItems.get(get(name)).goods++;
+            removed.get(get(name)).goods++;
         return res;
     }
 
@@ -510,9 +478,7 @@ public class Model implements Serializable {
         if(state.get() == State.Type.PAY_DEBT && !someoneDebt()){
             state.next(State.Type.WAITING_INPUT);
 
-            removedItems.forEach((_, item) -> {
-                item.reset();
-            });
+            removed.forEach((_, item) -> item.reset());
 
             if(allShipOk())
                 state.next(State.Type.DRAW_CARD);
@@ -522,13 +488,8 @@ public class Model implements Serializable {
     }
 
     /// removed items
-    public RemovedItems getRemovedItems(Player player){
-        return removedItems.get(player);
-    }
-
-    /// removed items
-    public RemovedItems getRemovedItems(String name){
-        return getRemovedItems(get(name));
+    public Removed getRemoved(Player player){
+        return removed.get(player);
     }
 
     /**
@@ -537,7 +498,7 @@ public class Model implements Serializable {
      *
      * @param name name of the player
      * @param map witch cannons activate to shoot
-     * @return
+     * @return ok if succeeded, err if not
      */
     public synchronized Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map){
         if(state.get() != State.Type.WAITING_INPUT)
@@ -560,13 +521,11 @@ public class Model implements Serializable {
      * @param name of the player
      * @return number of batteries required for activating all the cannons
      */
-    public int batteryRequiredForCannon(String name){
+    public int batteryForCannon(String name){
         AtomicInteger total = new AtomicInteger();
         total.set(0);
 
-        cannonsToUse.get(get(name)).forEach((_, val) -> {
-            total.addAndGet(val);
-        });
+        cannonsToUse.get(get(name)).forEach((_, val) -> total.addAndGet(val));
 
         return total.get();
     }
@@ -591,7 +550,7 @@ public class Model implements Serializable {
     /**
      * Adds a tile to the face-up tiles.
      * @param t the tile to be added to the seen list.
-     * @return
+     * @return ok if succeeded, err if not
      */
     public synchronized Result<String> giveTile(Tile t){
         if(state.get() != State.Type.BUILDING)
@@ -632,9 +591,7 @@ public class Model implements Serializable {
         changes = null;
 
         if(!c.needInput){
-            players.forEach((p, _) -> {
-                setInput(p, null);
-            });
+            players.forEach((p, _) -> setInput(p, null));
         }
 
         return Result.ok(c);
@@ -648,7 +605,7 @@ public class Model implements Serializable {
      *
      * @param name of the player
      * @param input player input
-     * @return
+     * @return ok if succeeded, err if not
      */
     public synchronized Result<CardInput> setInput(String name, CardInput input){
         if(state.get() != State.Type.WAITING_INPUT)
@@ -682,7 +639,7 @@ public class Model implements Serializable {
 
     /**
      * Get the temporary data about the drawn card.
-     * @return
+     * @return the card data
      */
     public synchronized Result<CardData> getCardData(){
         if(state.get() != State.Type.WAITING_INPUT)
@@ -693,7 +650,7 @@ public class Model implements Serializable {
     private boolean someoneDebt(){
         AtomicBoolean debt = new AtomicBoolean(false);
 
-        removedItems.values().forEach(rm -> {
+        removed.values().forEach(rm -> {
             if(rm.isDebt())
                 debt.set(true);
         });
@@ -708,23 +665,18 @@ public class Model implements Serializable {
         Result<CardOutput> res = deck.play();
 
         if(res.isOk()){
-            List<Pawn> quitted = new ArrayList<>(flight.getQuitters());
-            quitted.removeAll(quitters.values().stream().map(Player::getPawn).toList());
+            List<Pawn> rm = new ArrayList<>(flight.getQuitters());
 
-            quitted.forEach(pawn -> {
-                players.forEach((name, player) -> {
-                    if(pawn == player.getPawn())
-                        quitIgnore(name);
-                });
-            });
+            players.values()
+                    .stream()
+                    .filter(p -> rm.contains(p.getPawn()))
+                    .forEach(p -> quitIgnore(p.getName()));
 
-            if(someoneDebt()){
+
+            if(someoneDebt())
                 state.next(State.Type.PAY_DEBT);
-            }
             else{
-                removedItems.forEach((name, item) -> {
-                    item.reset();
-                });
+                removed.forEach((_, item) -> item.reset());
 
                 if(allShipOk())
                     state.next(State.Type.DRAW_CARD);
@@ -762,40 +714,43 @@ public class Model implements Serializable {
     /**
      * Store the current state of the game to a file.
      *
-     * @param filename
-     * @return
-     * @throws IOException
+     * @param filename name of the file
+     * @return ok if its stored, err if not
      */
-    public Result<String> store(String filename) throws IOException {
+    public Result<String> store(String filename) {
         if(state.get() != State.Type.DRAW_CARD)
             return Result.err("not DRAW state");
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-        oos.writeObject(this);
-        oos.close();
+        try{
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
+            oos.writeObject(this);
+            oos.close();
+        }catch(IOException e){
+            return Result.err(e.getMessage());
+        }
+
         return Result.ok(filename);
     }
 
     /**
      * Load the state of a game from a file.
      *
-     * @param filename
-     * @return
-     * @throws IOException
+     * @param filename name of the file
+     * @param notifier function to call when the state has changed
+     * @return loaded model
+     * @throws IOException if it can load the model from the file
      */
-    static public Model load(String filename, BiConsumer<Model, State.Type> notifer) throws IOException, ClassNotFoundException {
+    static public Model load(String filename, BiConsumer<Model, State.Type> notifier) throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
         Model model = (Model) ois.readObject();
         model.loadTimer();
-        model.state.setNotify(notifer);
+        model.state.setNotify(notifier);
         ois.close();
         return model;
     }
 
-    public HashMap<String, Pawn> getPlayers(){
+    public HashMap<String, Pawn> getPawns(){
         HashMap<String, Pawn> p = new HashMap<>();
-        players.forEach((name, player) -> {
-            p.put(name, player.getPawn());
-        });
+        players.forEach((name, player) -> p.put(name, player.getPawn()));
 
         return p;
     }
