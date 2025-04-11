@@ -102,12 +102,14 @@ public class Game extends UnicastRemoteObject implements Callback {
 
         Result<String> res = server.init(purple, brown);
 
-        if(res.isErr())
-            return res.getReason();
+        Result<Coordinate> finalPurple = purple;
+        Result<Coordinate> finalBrown = brown;
+        res.ifPresent(_ -> {
+            board.init(finalPurple.isOk()? Optional.of(finalPurple.getData()) : Optional.empty(),
+                    finalBrown.isOk()? Optional.of(finalBrown.getData()) : Optional.empty());
+        });
 
-        board.init(purple.isOk()? Optional.of(purple.getData()) : Optional.empty(),
-                brown.isOk()? Optional.of(brown.getData()) : Optional.empty());
-        return "nave riempita";
+        return res.unwrap("nave riempita");
     };
 
     Predicate<String> checkAlien = (cmd) -> {
@@ -175,19 +177,16 @@ public class Game extends UnicastRemoteObject implements Callback {
 
         Result<Tile> res;
 
-        if(from == 2)
-             res = server.setTile(coord, currentTile, pos);
+        if(from == 2) {
+            res = server.setTile(coord, currentTile, pos);
+            res.ifPresent(_ -> currentTile = null);
+        }
         else if (from < 2)
             res = server.useBookedTile(board.getBooked().get(from), pos, coord);
         else
             res = server.placeOpenTile(openTiles.get(from-3), pos, coord);
 
-        if(res.isErr())
-            return res.getReason();
-
-        if(from == 2)
-            currentTile = null;
-        return "piazzata";
+        return res.unwrap("piazzata");
     };
 
     Predicate<String> checkPlace = (cmd) -> {
@@ -216,17 +215,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         return rot < 4;
     };
 
-    Function<String, String> remove = (cmd) -> {
-        Coordinate c = new Coordinate(cmd.charAt(0) - '0', cmd.charAt(1) - '0');
-
-        Result<String> res = server.remove(c);
-
-        if(res.isErr())
-            return res.getReason();
-
-        board.getTiles().remove(c);
-        return "rimosso";
-    };
+    Function<String, String> remove = (cmd) -> server.remove(new Coordinate(cmd.charAt(0) - '0', cmd.charAt(1) - '0')).unwrap("rimosso");
 
     Predicate<String> checkRemove = (where) -> {
         if(state != Model.State.Type.CHECKING)
@@ -239,37 +228,26 @@ public class Game extends UnicastRemoteObject implements Callback {
     };
 
     Function<String, String> book = (cmd) -> {
-        if(currentTile != null){
-            Result<Tile> res = server.bookTile(currentTile);
-
-            if(res.isErr())
-                return res.getReason();
-            else {
-                board.getTiles().bookTile(currentTile);
-                currentTile = null;
-                return "fatto";
-            }
-        }
-        else
-            return "nessun elemento pescato";
+        if(currentTile != null)
+            return server.bookTile(currentTile).unwrap("prenotato");
+        return "nessun elemento pescato";
     };
 
     Predicate<String> checkBook = (cmd) -> state == Model.State.Type.BUILDING;
 
     Function<String, String> draw = (cmd) -> {
+        Result<?> res;
         if(state == Model.State.Type.BUILDING){
-            Result<Tile> res = server.drawTile();
-            if(res.isErr())
-                return res.getReason();
-            else {
+            res = server.drawTile();
+            if(res.isOk()){
                 if(currentTile != null)
                     server.giveTile(currentTile);
-                currentTile = res.getData();
+                currentTile = (Tile)res.getData();
             }
         }
         else
-            server.drawCard();
-        return "pescata";
+            res = server.drawCard();
+        return res.unwrap("pescata");
     };
 
     Predicate<String> checkDraw = (cmd) -> {
@@ -280,24 +258,13 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     Function<String, String> ready = (cmd) -> {
         Result<String> res = server.setReady();
-
-        if(res.isErr())
-            return res.getReason();
-        else {
-            notReady = false;
-            return "ok";
-        }
+        res.ifPresent(_ -> notReady = false);
+        return res.unwrap("ok");
     };
 
     Predicate<String> checkReady = (cmd) -> state == Model.State.Type.BUILDING;
 
-    Function<String, String> clock = (cmd) -> {
-        Result<Integer> res = server.moveTimer();
-
-        if(res.isErr())
-            return res.getReason();
-        return "spostata";
-    };
+    Function<String, String> clock = (cmd) -> server.moveTimer().unwrap("spostato");
 
     Predicate<String> checkClock = (cmd) -> state == Model.State.Type.BUILDING;
 
@@ -318,6 +285,13 @@ public class Game extends UnicastRemoteObject implements Callback {
         return new Pair<>(request, args);
     }
 
+    Function<String, String> exit = (cmd) -> {
+        System.exit(0);
+        return null;
+    };
+
+    Predicate<String> checkExit = (cmd) -> true;
+
     public String execute(String cmd) {
         Pair<String, String> request = convert(cmd);
         return executors.get(request.getKey()).apply(request.getValue()) + board.hashCode();
@@ -332,12 +306,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         return false;
     }
 
-    Function<String, String> exit = (cmd) -> {
-        System.exit(0);
-        return null;
-    };
-
-    Predicate<String> checkExit = (cmd) -> true;
+    // callbacks
 
     @Override
     public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
@@ -403,5 +372,15 @@ public class Game extends UnicastRemoteObject implements Callback {
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
         board.getTiles().getBooked().removeIf((tile) -> tile.equals(t));
         board.getTiles().setTile(c, t, r);
+    }
+
+    @Override
+    public void bookedTile(Tile t) throws RemoteException {
+        board.getTiles().bookTile(t);
+    }
+
+    @Override
+    public void removed(Coordinate c) throws RemoteException{
+        board.getTiles().remove(c);
     }
 }

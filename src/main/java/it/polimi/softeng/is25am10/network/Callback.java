@@ -38,4 +38,8 @@ public interface Callback extends Remote {
     int ping() throws RemoteException;
 
     void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException;
+
+    void bookedTile(Tile t) throws RemoteException;
+
+    void removed(Coordinate c) throws RemoteException;
 }

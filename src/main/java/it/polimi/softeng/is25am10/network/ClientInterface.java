@@ -125,13 +125,13 @@ public abstract class ClientInterface extends Thread{
         return call(name);
     }
 
-    protected Class<?>[] getClasses(Object... args) {
+    static public Class<?>[] getClasses(Object... args) {
         return Arrays.stream(args)
                 .map(Object::getClass)
                 .toArray(Class<?>[]::new);
     }
 
-    protected String getCallerName(){
+    static public String getCallerName(){
         return Thread.currentThread()
                 .getStackTrace()[3]
                 .getMethodName();

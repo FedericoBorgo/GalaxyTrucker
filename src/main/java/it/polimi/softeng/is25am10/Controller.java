@@ -11,6 +11,7 @@ import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.network.Callback;
+import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import it.polimi.softeng.is25am10.network.socket.SocketListener;
 
@@ -34,13 +35,30 @@ import java.util.function.Consumer;
  * name of the player calling the method.
  */
 public class Controller extends UnicastRemoteObject implements RMIInterface, Serializable {
-    private final Map<String, Model> players = new ConcurrentHashMap<>();
-    private final Map<Model, List<String>> games = new ConcurrentHashMap<>();
+    /**
+     * Associate players name to a model.
+     */
+    private final Map<String, Model> games = new ConcurrentHashMap<>();
+
+    /**
+     * Associate a player name to their corresponding callbacks.
+     */
     private transient Map<String, Callback> callbacks;
-    private transient BiConsumer<Model, Model.State.Type> stateEvent;
+
+    /**
+     * Store the disconnected players
+     */
     private final Map<Model, Set<String>> disconnected = new ConcurrentHashMap<>();
 
+    /**
+     * Method to call when the game state changed.
+     */
+    private transient BiConsumer<Model, Model.State.Type> stateEvent;
+
+    ///  starting game
     private Model starting = null;
+
+    ///  previous game
     private Model.State.Type prev = null;
 
     public static void main(String[] args) throws IOException {
@@ -100,6 +118,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
         ping();
 
+        // ping the player every 500ms
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -107,6 +126,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             }
         }, 0, 500);
 
+        // run a controller backup every 5s
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -114,10 +134,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             }
         }, 0, 5000);
 
+        // notify the clock for every game and player every 500ms
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                games.keySet().forEach(m -> {
+                games.values().forEach(m -> {
                     if(m.getState() == Model.State.Type.BUILDING)
                         pushSecondsLeft(m);
                 });
@@ -184,7 +205,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     public synchronized Result<FlightBoard.Pawn> join(String name){
         //in case of disconnected player
-        if(players.containsKey(name)) {
+        if(games.containsKey(name)) {
             rejoined(name);
             Logger.playerLog(getModel(name).hashCode(), name, "reconnected");
             return Result.ok(getModel(name).get(name).getPawn());
@@ -193,13 +214,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         // no game is starting
         if(starting == null) {
             starting = new Model(askHowManyPlayers(name), stateEvent);
-            games.put(starting, Collections.synchronizedList(new ArrayList<>()));
             disconnected.put(starting, new HashSet<>());
         }
 
         Model temp = starting;
-        games.get(starting).add(name);
-        players.put(name, starting);
+        games.put(name, starting);
         Logger.playerLog(starting.hashCode(), name, "joined");
         Result<FlightBoard.Pawn> pawn = starting.addPlayer(name);
 
@@ -215,7 +234,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @return associated model
      */
     private Model getModel(String name){
-        return players.get(name);
+        return games.get(name);
     }
 
     /**
@@ -227,21 +246,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param args arguments gave to the player
      */
     private void notifyPlayers(Model m, Consumer<String> error , Object... args){
-        // get the caller name
-        String methodName = Thread.currentThread()
-                .getStackTrace()[2]
-                .getMethodName();
-
-        // get the arguments types
-        Class<?>[] types = Arrays.stream(args)
-                .map(Object::getClass)
-                .toArray(Class<?>[]::new);
-
         Method method;
 
         // get the method name-arguments
         try {
-            method = Callback.class.getMethod(methodName, types);
+            method = Callback.class.getMethod(ClientInterface.getCallerName(), ClientInterface.getClasses(args));
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -347,12 +356,19 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         }
     }
 
+    /**
+     * Sends to the player how many seconds remains for the clock.
+     * @param m model to notify
+     */
     public void pushSecondsLeft(Model m) {
         notifyPlayers(m, null, m.getSecondsLeft());
     }
 
+    /**
+     * Check if players are unreachable.
+     */
     public void ping(){
-        for(Model m: games.keySet()) {
+        for(Model m: games.values()) {
             notifyPlayers(m, (name) -> {
                 disconnected.get(m).add(name);
 
@@ -401,7 +417,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             ois.close();
             controller.loadEvent();
             //init the games
-            controller.games.keySet().forEach(model -> {
+            controller.games.values().forEach(model -> {
                 model.loadTimer();
                 model.setEvent(controller.stateEvent);
             });
@@ -455,7 +471,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<Tile> bookTile(String name, Tile t) {
-        return getModel(name).bookTile(name, t);
+        Result<Tile> res = getModel(name).bookTile(name, t);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).bookedTile(t);
+            } catch (RemoteException _) {}
+        }
+        return res;
     }
 
     @Override
@@ -488,7 +511,16 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<String> remove(String name, Coordinate c) {
-        return getModel(name).remove(name, c);
+        Result<String> res = getModel(name).remove(name, c);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).removed(c);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return res;
     }
 
     @Override

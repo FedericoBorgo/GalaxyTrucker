@@ -4,7 +4,6 @@ import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -85,4 +85,14 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
 
     }
+
+    @Override
+    public void bookedTile(Tile t) throws RemoteException {
+
+    }
+
+    @Override
+    public void removed(Coordinate c) throws RemoteException {
+
+    }
 }

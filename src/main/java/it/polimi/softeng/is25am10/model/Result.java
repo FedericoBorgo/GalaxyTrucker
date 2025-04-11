@@ -53,9 +53,19 @@ public class Result<T> implements Serializable {
         return data;
     }
 
+    /**
+     * Execute the consumer if its present.
+     * @param consumer to call
+     */
     public void ifPresent(Consumer<T> consumer) {
         if(isOk())
             consumer.accept(data);
+    }
+
+    public String unwrap(String message) {
+        if(isErr())
+            return reason;
+        return message;
     }
 
     /**

@@ -10,6 +10,7 @@ import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
+import it.polimi.softeng.is25am10.network.ClientInterface;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,7 +20,6 @@ import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class SocketListener {
@@ -117,16 +117,8 @@ class EventInvoker implements Callback {
 
     private synchronized <T> T call(Object... args){
         try {
-            Class<?>[] types = Arrays.stream(args)
-                    .map(Object::getClass)
-                    .toArray(Class<?>[]::new);
-
-            String methodName = Thread.currentThread()
-                                .getStackTrace()[2]
-                                .getMethodName();
-
             output.reset();
-            output.writeObject(new Request(methodName, types, args));
+            output.writeObject(new Request(ClientInterface.getCallerName(), ClientInterface.getClasses(args), args));
             output.flush();
 
             return (T) input.readObject();
@@ -198,5 +190,15 @@ class EventInvoker implements Callback {
     @Override
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
         call(c, t, r);
+    }
+
+    @Override
+    public void bookedTile(Tile t) throws RemoteException {
+        call(t);
+    }
+
+    @Override
+    public void removed(Coordinate c) throws RemoteException {
+        call(c);
     }
 }
