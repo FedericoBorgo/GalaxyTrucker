@@ -30,10 +30,10 @@ public class Game extends UnicastRemoteObject implements Callback {
     ShipBoard board = new ShipBoard();
     FlightBoard flight = new FlightBoard();
     ArrayList<Tile> openTiles = new ArrayList<>();
+    String[] cardData = null;
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
     Tile currentTile = null;
-    long startTime = 0;
 
     boolean notReady = true;
 
@@ -41,9 +41,12 @@ public class Game extends UnicastRemoteObject implements Callback {
     Map<String, Function<String, String>> executors = new HashMap<>();
     Map<String, Predicate<String>> checkers = new HashMap<>();
 
+    public int secondsLeft = 0;
+
 
     public Game(ClientInterface server) throws IOException {
         super();
+
         frame = new FrameGenerator(this);
         try{
             server.join(this).getData();
@@ -59,6 +62,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         executors.put("pesca", draw);
         executors.put("pronto", ready);
         executors.put("clessidra", clock);
+        executors.put("esci", exit);
 
         checkers.put("alieni", checkAlien);
         checkers.put("piazza", checkPlace);
@@ -67,6 +71,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         checkers.put("pesca", checkDraw);
         checkers.put("pronto", checkReady);
         checkers.put("clessidra", checkClock);
+        checkers.put("esci", checkExit);
 
         this.server = server;
     }
@@ -168,46 +173,21 @@ public class Game extends UnicastRemoteObject implements Callback {
             default -> Tile.Rotation.NONE;
         };
 
-        if(from == 2) {
-            Result<Tile> res = server.setTile(coord, currentTile, pos);
+        Result<Tile> res;
 
-            if(res.isOk()){
-                board.setTile(coord, currentTile, pos);
-                currentTile = null;
-                return "piazzata";
-            }
+        if(from == 2)
+             res = server.setTile(coord, currentTile, pos);
+        else if (from < 2)
+            res = server.useBookedTile(board.getBooked().get(from), pos, coord);
+        else
+            res = server.placeOpenTile(openTiles.get(from-3), pos, coord);
+
+        if(res.isErr())
             return res.getReason();
-        }
-        else if (from < 2){
-            Tile t = board.getBooked().get(from);
 
-            Result<Tile> res = server.useBookedTile(t, pos, coord);
-
-            if(res.isOk()){
-                board.useBookedTile(t, pos, coord);
-                return "piazzata";
-            }
-            return res.getReason();
-        }
-        else {
-            from = from-3;
-            Tile t = openTiles.get(from);
-            Result<Tile> res = server.getTileFromSeen(t);
-
-            if(res.isErr())
-                return res.getReason();
-
-            res = server.setTile(coord, t, pos);
-
-            if(res.isOk()){
-                board.setTile(coord, t, pos);
-                return "piazzata";
-            }
-            else {
-                server.giveTile(t);
-                return res.getReason();
-            }
-        }
+        if(from == 2)
+            currentTile = null;
+        return "piazzata";
     };
 
     Predicate<String> checkPlace = (cmd) -> {
@@ -277,19 +257,26 @@ public class Game extends UnicastRemoteObject implements Callback {
     Predicate<String> checkBook = (cmd) -> state == Model.State.Type.BUILDING;
 
     Function<String, String> draw = (cmd) -> {
-        Result<Tile> res = server.drawTile();
-
-        if(res.isErr())
-            return res.getReason();
-        else {
-            if(currentTile != null)
-                server.giveTile(currentTile);
-            currentTile = res.getData();
-            return "pescata";
+        if(state == Model.State.Type.BUILDING){
+            Result<Tile> res = server.drawTile();
+            if(res.isErr())
+                return res.getReason();
+            else {
+                if(currentTile != null)
+                    server.giveTile(currentTile);
+                currentTile = res.getData();
+            }
         }
+        else
+            server.drawCard();
+        return "pescata";
     };
 
-    Predicate<String> checkDraw = (cmd) -> state == Model.State.Type.BUILDING && notReady;
+    Predicate<String> checkDraw = (cmd) -> {
+        if (state == Model.State.Type.BUILDING && notReady)
+            return true;
+        return state == Model.State.Type.DRAW_CARD && players.get(server.getPlayerName()) == flight.getOrder().getFirst();
+    };
 
     Function<String, String> ready = (cmd) -> {
         Result<String> res = server.setReady();
@@ -309,10 +296,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
         if(res.isErr())
             return res.getReason();
-        else {
-            startTime = System.currentTimeMillis();
-            return "spostata";
-        }
+        return "spostata";
     };
 
     Predicate<String> checkClock = (cmd) -> state == Model.State.Type.BUILDING;
@@ -336,7 +320,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     public String execute(String cmd) {
         Pair<String, String> request = convert(cmd);
-        return executors.get(request.getKey()).apply(request.getValue());
+        return executors.get(request.getKey()).apply(request.getValue()) + board.hashCode();
     };
 
     public boolean checkCommand(String cmd) {
@@ -347,6 +331,13 @@ public class Game extends UnicastRemoteObject implements Callback {
         catch (Exception _) {}
         return false;
     }
+
+    Function<String, String> exit = (cmd) -> {
+        System.exit(0);
+        return null;
+    };
+
+    Predicate<String> checkExit = (cmd) -> true;
 
     @Override
     public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
@@ -359,16 +350,18 @@ public class Game extends UnicastRemoteObject implements Callback {
     }
 
     @Override
+    public void pushSecondsLeft(Integer seconds) throws RemoteException {
+        secondsLeft = seconds;
+    }
+
+    @Override
     public void pushState(Model.State.Type state) throws RemoteException {
         this.state = state;
-
-        if(state == Model.State.Type.BUILDING)
-            startTime = System.currentTimeMillis();
     }
 
     @Override
     public void pushCardData(CardData card) throws RemoteException {
-
+        cardData = card.toString().split("\n");
     }
 
     @Override
@@ -399,12 +392,16 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
         this.flight = board;
-        startTime = System.currentTimeMillis();
-        System.out.println();
     }
 
     @Override
     public int ping(){
         return 0;
+    }
+
+    @Override
+    public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
+        board.getTiles().getBooked().removeIf((tile) -> tile.equals(t));
+        board.getTiles().setTile(c, t, r);
     }
 }

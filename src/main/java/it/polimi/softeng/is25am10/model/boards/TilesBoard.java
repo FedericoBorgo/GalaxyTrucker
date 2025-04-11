@@ -48,11 +48,11 @@ public class TilesBoard implements Serializable {
         booked = new ArrayList<>();
 
         // fill with empty tiles (on which can be placed the game tiles)
-        Coordinate.forEach(c -> set(c, Tile.EMPTY_TILE, Tile.Rotation.NONE));
+        Coordinate.forEach(c -> set(c, new Tile(Tile.Type.EMPTY, "uuuu"), Tile.Rotation.NONE));
 
         // fill the implacable spaces with WALL
         for (Coordinate c : WALL_POSITION)
-            set(c, Tile.WALL_TILE, Tile.Rotation.NONE);
+            set(c, new Tile(Tile.Type.WALL, "uuuu"), Tile.Rotation.NONE);
 
         // the start of building a ship
         set(new Coordinate(3, 2), new Tile(Tile.Type.C_HOUSE, "uuuu"), Tile.Rotation.NONE);
@@ -128,10 +128,10 @@ public class TilesBoard implements Serializable {
     public Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation) {
         Tile result = get(c);
 
-        if (result == null || result == Tile.WALL_TILE)
+        if (result == null || result.getType().equals(Tile.Type.WALL))
             return Result.err("cant place out of bound");
 
-        if (result != Tile.EMPTY_TILE)
+        if (!result.getType().equals(Tile.Type.EMPTY))
             return Result.err("occupied tile");
 
         // is there a tile nearby?
@@ -153,7 +153,7 @@ public class TilesBoard implements Serializable {
     public Result<Tile> getTile(Coordinate c) {
         Tile t = get(c);
 
-        if (t == null || t == Tile.WALL_TILE)
+        if (t == null || t.getType().equals(Tile.Type.WALL))
             return Result.err("out of bound");
 
         return Result.ok(t);
@@ -232,7 +232,7 @@ public class TilesBoard implements Serializable {
      */
     public void remove(Coordinate c) {
         trashed.add(board[c.x()][c.y()]);
-        board[c.x()][c.y()] = Tile.EMPTY_TILE;
+        board[c.x()][c.y()] = new Tile(Tile.Type.EMPTY, "uuuu");
         rotation[c.x()][c.y()] = Tile.Rotation.NONE;
     }
 

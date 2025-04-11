@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.network;
 
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.CardData;
@@ -15,6 +16,8 @@ public interface Callback extends Remote {
     void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException;
 
     int askHowManyPlayers() throws RemoteException;
+
+    void pushSecondsLeft(Integer seconds) throws RemoteException;
 
     void pushState(Model.State.Type state) throws RemoteException;
 
@@ -33,4 +36,6 @@ public interface Callback extends Remote {
     void pushFlight(FlightBoard board) throws RemoteException;
 
     int ping() throws RemoteException;
+
+    void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException;
 }

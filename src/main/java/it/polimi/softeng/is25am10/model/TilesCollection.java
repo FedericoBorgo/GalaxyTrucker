@@ -49,7 +49,7 @@ public class TilesCollection implements Serializable {
      */
     public Tile getNew(){
         if(tiles.isEmpty())
-            return Tile.EMPTY_TILE;
+            return new Tile(Tile.Type.EMPTY, "uuuu");
 
         Tile tile = tiles.getFirst();
         tiles.removeFirst();
@@ -74,7 +74,7 @@ public class TilesCollection implements Serializable {
      */
     public Tile getFromSeen(Tile tile){
         if(!seen.remove(tile))
-            return Tile.EMPTY_TILE;
+            return new Tile(Tile.Type.EMPTY, "uuuu");
 
         return tile;
     }

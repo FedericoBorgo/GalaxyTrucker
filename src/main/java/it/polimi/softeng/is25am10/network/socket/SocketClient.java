@@ -22,8 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class SocketClient extends Thread implements ClientInterface {
-    private final String name;
+public class SocketClient extends ClientInterface {
     private Callback callback;
     private final ObjectOutputStream methodOutput;
     private final ObjectInputStream methodInput;
@@ -31,8 +30,7 @@ public class SocketClient extends Thread implements ClientInterface {
     private final ObjectInputStream eventInput;
 
     public SocketClient(String name, String host, int port1, int port2) {
-        super();
-        this.name = name;
+        super(name);
 
         try {
             Socket method = new Socket(host, port1);
@@ -65,22 +63,10 @@ public class SocketClient extends Thread implements ClientInterface {
     }
 
     @Override
-    public String getPlayerName(){
-        return name;
-    }
-
-    private synchronized <T> T call(Object... args){
+    protected synchronized <T> T call(Object... args){
         try {
-            Class<?>[] types = Arrays.stream(args)
-                    .map(Object::getClass)
-                    .toArray(Class<?>[]::new);
-
-            String methodName = Thread.currentThread()
-                    .getStackTrace()[2]
-                    .getMethodName();
-
             methodOutput.reset();
-            methodOutput.writeObject(new Request(methodName, types, args));
+            methodOutput.writeObject(new Request(getCallerName(), getClasses(args), args));
             methodOutput.flush();
 
             return (T) methodInput.readObject();
@@ -89,100 +75,9 @@ public class SocketClient extends Thread implements ClientInterface {
         }
     }
 
+    @Override
     public Result<FlightBoard.Pawn> join(Callback callback){
         this.callback = callback;
-        return call(name);
-    }
-
-    public Result<Integer> moveTimer() {
-        return call(name);
-    }
-
-    public Result<String> setReady() {
-        return call(name);
-    }
-
-    public Result<String> quit() {
-        return call(name);
-    }
-
-    public Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation) {
-        return call(name, c, t, rotation);
-    }
-
-    public Result<Tile> bookTile(Tile t) {
-        return call(name, t);
-    }
-
-    public Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c) {
-        return call(name, t, rotation, c);
-    }
-
-    public Result<String> remove(Coordinate c) {
-        return call(name, c);
-    }
-
-    public ShipBoard getShip() {
-        return call(name);
-    }
-
-    public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
-        return call(name, purple, brown);
-    }
-
-    public List<GoodsBoard.Type> getReward() {
-        return call(name);
-    }
-
-    public Result<Integer> placeReward(GoodsBoard.Type t, Coordinate c) {
-        return call(name, t, c);
-    }
-
-    public int getCash() {
-        return call(name);
-    }
-
-    public Result<Integer> drop(Coordinate c) {
-        return call(name, c);
-    }
-
-    public Result<Integer> drop(Coordinate c, GoodsBoard.Type t) {
-        return call(name, c, t);
-    }
-
-    public Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map) {
-        return call(name, map);
-    }
-
-    public Result<Tile> drawTile() {
-        return call(name);
-    }
-
-    public Result<List<Tile>> getSeenTiles() {
-        return call(name);
-    }
-
-    public Result<String> giveTile(Tile t) {
-        return call(name, t);
-    }
-
-    public Result<Tile> getTileFromSeen(Tile t) {
-        return call(name, t);
-    }
-
-    public Result<Card> drawCard() {
-        return call(name);
-    }
-
-    public Result<CardInput> setInput(CardInput input) {
-        return call(name, input);
-    }
-
-    public Result<CardData> getCardData() {
-        return call(name);
-    }
-
-    public Result<Card[][]> getVisible() {
-        return call(name);
+        return call(getPlayerName());
     }
 }

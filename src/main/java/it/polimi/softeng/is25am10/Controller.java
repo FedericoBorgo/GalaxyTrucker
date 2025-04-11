@@ -100,31 +100,29 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
         ping();
 
-        // responsible to ping every player every 1 second
-        new Thread(() -> {
-            while(true){
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
                 ping();
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
             }
-        }).start();
+        }, 0, 500);
 
-        // responsible to save the current game to the file
-        new Thread(() -> {
-            while(true){
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
                 backup();
-
-                try {
-                    Thread.sleep(5000);
-                }
-                catch(InterruptedException e){
-                    throw new RuntimeException(e);
-                }
             }
-        }).start();
+        }, 0, 5000);
+
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                games.keySet().forEach(m -> {
+                    if(m.getState() == Model.State.Type.BUILDING)
+                        pushSecondsLeft(m);
+                });
+            }
+        }, 0, 500);
     }
 
     private Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
@@ -349,28 +347,29 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         }
     }
 
+    public void pushSecondsLeft(Model m) {
+        notifyPlayers(m, null, m.getSecondsLeft());
+    }
+
     public void ping(){
-        for(Model m: games.keySet())
-            notifyPlayers(m, (name) ->{
+        for(Model m: games.keySet()) {
+            notifyPlayers(m, (name) -> {
                 disconnected.get(m).add(name);
 
-                if(disconnected.get(m).size() >= m.nPlayers-1)
+                if (disconnected.get(m).size() >= m.nPlayers - 1)
                     m.pause();
-                else{
-                    if(m.getState() == Model.State.Type.ALIEN_INPUT) {
-                        if(m.init(name, Optional.empty(), Optional.empty()).isOk())
+                else {
+                    if (m.getState() == Model.State.Type.ALIEN_INPUT) {
+                        if (m.init(name, Optional.empty(), Optional.empty()).isOk())
                             Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
-                    }
-
-                    else if(m.getState() == Model.State.Type.WAITING_INPUT &&
+                    } else if (m.getState() == Model.State.Type.WAITING_INPUT &&
                             name.equals(m.getNextToPlay())) {
                         Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
                         setInput(name, CardInput.disconnected());
                     }
                 }
-
-
             });
+        }
     }
 
     /**
@@ -444,7 +443,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation) {
-        return getModel(name).setTile(name, c, t, rotation);
+        Result<Tile> res = getModel(name).setTile(name, c, t, rotation);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).placeTile(c, t, rotation);
+            } catch (RemoteException _) {}
+        }
+        return res;
     }
 
     @Override
@@ -454,7 +460,30 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<Tile> useBookedTile(String name, Tile t, Tile.Rotation rotation, Coordinate c) {
-        return getModel(name).useBookedTile(name, t, rotation, c);
+        Result<Tile> res = getModel(name).useBookedTile(name, t, rotation, c);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).placeTile(c, t, rotation);
+            } catch (RemoteException _) {}
+        }
+
+        return res;
+    }
+
+    public Result<Tile> placeOpenTile(String name, Tile t, Tile.Rotation rotation, Coordinate c){
+        Model m = getModel(name);
+        Result<Tile> res = getTileFromSeen(name, t);
+
+        if(res.isErr())
+            return res;
+
+        res = setTile(name, c, t, rotation);
+
+        if(res.isErr())
+            giveTile(name, t);
+
+        return res;
     }
 
     @Override

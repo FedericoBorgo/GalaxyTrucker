@@ -33,6 +33,8 @@ public interface RMIInterface extends Remote {
 
     Result<Tile> useBookedTile(String name, Tile t, Tile.Rotation rotation, Coordinate c) throws RemoteException;
 
+    Result<Tile> placeOpenTile(String name, Tile t, Tile.Rotation rotation, Coordinate c) throws RemoteException;
+
     Result<String> remove(String name, Coordinate c) throws RemoteException;
 
     ShipBoard getShip(String name) throws RemoteException;

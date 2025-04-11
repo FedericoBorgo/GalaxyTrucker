@@ -157,10 +157,10 @@ public class Model implements Serializable {
     /**
      * Used for the timer
      */
-    private final AtomicBoolean canMove = new AtomicBoolean(false);
     private transient Timer timer;
     private transient TimerTask task;
-    public static final long TIMER_DELAY = 1000L;
+    public static final int TIMER_DELAY = 10;
+    private int secondsLeft = TIMER_DELAY;
 
     /**
      * Builds a new Model with the number of required players.
@@ -177,12 +177,17 @@ public class Model implements Serializable {
         timer = new Timer();
         task = new TimerTask() {
             public void run() {
-                canMove.set(true);
-                if(flight.getTimer() == 2){
+                if(state.curr != State.Type.BUILDING)
+                    return;
+
+                if(secondsLeft > 0)
+                    secondsLeft--;
+
+                if(secondsLeft == 0 && flight.getTimer() == 2)
                     moveTimer();
-                }
-        }
+            }
         };
+        timer.scheduleAtFixedRate(task, 0, 1000);
     }
 
     public void setEvent(BiConsumer<Model, State.Type> notify){
@@ -219,7 +224,7 @@ public class Model implements Serializable {
             // start the game
             state.next(State.Type.BUILDING);
             countPlayers = 0;
-            timer.schedule(task, TIMER_DELAY);
+            secondsLeft = TIMER_DELAY;
         }
 
         return Result.ok(get(name).getPawn());
@@ -245,20 +250,22 @@ public class Model implements Serializable {
     public synchronized Result<Integer> moveTimer(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
-        if(canMove.get()) {
+        if(secondsLeft == 0) {
             if(flight.getTimer() == 2)
                 players.forEach((p,_)-> setReady(p));
             else {
                 flight.moveTimer();
-                loadTimer();
-                timer.schedule(task, TIMER_DELAY);
+                secondsLeft = TIMER_DELAY;
             }
-            canMove.set(false);
         }
         else
             return Result.err("clessidra non ancora esaurita");
 
         return Result.ok(flight.getTimer());
+    }
+
+    public int getSecondsLeft(){
+        return secondsLeft;
     }
 
     /// get the flight board

@@ -251,12 +251,8 @@ public class FrameGenerator {
         graphics.drawRectangle(new TerminalPosition(122+ game.flight.getTimer()*10, 25),
                 new TerminalSize(8, 4), '#');
 
-        if(game.state == Model.State.Type.BUILDING) {
-            long time = Model.TIMER_DELAY/1000-((System.currentTimeMillis()-game.startTime)/1000);
-            if(time < 0)
-                time = 0;
-            graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(time));
-        }
+        if(game.state == Model.State.Type.BUILDING)
+            graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(game.secondsLeft));
     }
 
     /**
@@ -317,6 +313,7 @@ public class FrameGenerator {
         drawInput();
         drawCurrentTile();
         drawOpenTiles();
+        drawCardData();
 
         try {
             screen.refresh();
@@ -407,7 +404,7 @@ public class FrameGenerator {
         }
     }
 
-    void dialog(String message){
+    public void dialog(String message){
         pauseRender = true;
         WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
         Window window = new BasicWindow("Dialog");
@@ -419,5 +416,13 @@ public class FrameGenerator {
         textGUI.waitForWindowToClose(window);
         screen.clear();
         pauseRender = false;
+    }
+
+    public void drawCardData(){
+        if(game.cardData == null || game.state != Model.State.Type.WAITING_INPUT)
+            return;
+
+        for (int i = 0; i < game.cardData.length; i++)
+            graphics.putString(new TerminalPosition(163, 2+i), game.cardData[i]);
     }
 }

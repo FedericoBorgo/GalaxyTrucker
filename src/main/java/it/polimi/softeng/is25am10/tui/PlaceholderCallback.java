@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.tui;
 
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.CardData;
@@ -27,6 +28,11 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     @Override
     public int askHowManyPlayers() throws RemoteException {
         return 2;
+    }
+
+    @Override
+    public void pushSecondsLeft(Integer seconds) throws RemoteException {
+
     }
 
     @Override
@@ -73,5 +79,10 @@ public class PlaceholderCallback extends UnicastRemoteObject implements Callback
     @Override
     public int ping() throws RemoteException {
         return 0;
+    }
+
+    @Override
+    public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
+
     }
 }

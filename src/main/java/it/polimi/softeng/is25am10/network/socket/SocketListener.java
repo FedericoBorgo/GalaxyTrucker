@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.Controller;
 import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.CardData;
@@ -145,6 +146,11 @@ class EventInvoker implements Callback {
     }
 
     @Override
+    public void pushSecondsLeft(Integer seconds) {
+        call(seconds);
+    }
+
+    @Override
     public void pushState(Model.State.Type state) {
         call(state);
     }
@@ -187,5 +193,10 @@ class EventInvoker implements Callback {
     @Override
     public int ping() throws RemoteException{
         return call();
+    }
+
+    @Override
+    public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
+        call(c, t, r);
     }
 }

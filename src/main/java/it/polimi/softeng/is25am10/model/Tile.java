@@ -56,10 +56,6 @@ public class Tile implements Serializable {
         WALL
     }
 
-    // "Special tiles": WALL and EMPTY
-    public static final Tile WALL_TILE = new Tile(Type.WALL, "ssss");
-    public static final Tile EMPTY_TILE = new Tile(Type.EMPTY, "ssss");
-
     /**
      * Constructs a Tile with a specified type and connector configuration.
      * It uses {@code ConnectorType.fromChar()} for the conversion from {@code String} to {@code ConnectorType}.

@@ -10,57 +10,130 @@ import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardInput;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public interface ClientInterface {
-    String getPlayerName();
+public abstract class ClientInterface extends Thread{
+    String name;
 
-    Result<FlightBoard.Pawn> join(Callback callback);
+    protected ClientInterface(String name) {
+        this.name = name;
+    }
 
-    Result<Integer> moveTimer();
+    protected abstract <T> T call(Object... args);
 
-    Result<String> setReady();
+    public abstract Result<FlightBoard.Pawn> join(Callback callback);
 
-    Result<String> quit();
+    public String getPlayerName(){
+        return name;
+    }
 
-    Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation);
+    public Result<Integer> moveTimer() {
+        return call(name);
+    }
 
-    Result<Tile> bookTile(Tile t);
+    public Result<String> setReady() {
+        return call(name);
+    }
 
-    Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c);
+    public Result<String> quit() {
+        return call(name);
+    }
 
-    Result<String> remove(Coordinate c);
+    public Result<Tile> setTile(Coordinate c, Tile t, Tile.Rotation rotation) {
+        return call(name, c, t, rotation);
+    }
 
-    ShipBoard getShip();
+    public Result<Tile> bookTile(Tile t) {
+        return call(name, t);
+    }
 
-    Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown);
+    public Result<Tile> useBookedTile(Tile t, Tile.Rotation rotation, Coordinate c) {
+        return call(name, t, rotation, c);
+    }
 
-    List<GoodsBoard.Type> getReward();
+    public Result<Tile> placeOpenTile(Tile t, Tile.Rotation rotation, Coordinate c) {
+        return call(name, t, rotation, c);
+    }
 
-    Result<Integer> placeReward(GoodsBoard.Type t, Coordinate c);
+    public Result<String> remove(Coordinate c) {
+        return call(name, c);
+    }
 
-    int getCash();
+    public ShipBoard getShip() {
+        return call(name);
+    }
 
-    Result<Integer> drop(Coordinate c);
+    public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
+        return call(name, purple, brown);
+    }
 
-    Result<Integer> drop(Coordinate c, GoodsBoard.Type t);
+    public List<GoodsBoard.Type> getReward() {
+        return call(name);
+    }
 
-    Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map);
+    public Result<Integer> placeReward(GoodsBoard.Type t, Coordinate c) {
+        return call(name, t, c);
+    }
 
-    Result<Tile> drawTile();
+    public int getCash() {
+        return call(name);
+    }
 
-    Result<List<Tile>> getSeenTiles();
+    public Result<Integer> drop(Coordinate c) {
+        return call(name, c);
+    }
 
-    Result<String> giveTile(Tile t);
+    public Result<Integer> drop(Coordinate c, GoodsBoard.Type t) {
+        return call(name, c, t);
+    }
 
-    Result<Tile> getTileFromSeen(Tile t);
+    public Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map) {
+        return call(name, map);
+    }
 
-    Result<Card> drawCard();
+    public Result<Tile> drawTile() {
+        return call(name);
+    }
 
-    Result<CardInput> setInput(CardInput input);
+    public Result<List<Tile>> getSeenTiles() {
+        return call(name);
+    }
 
-    Result<CardData> getCardData();
+    public Result<String> giveTile(Tile t) {
+        return call(name, t);
+    }
 
-    Result<Card[][]> getVisible();
+    public Result<Tile> getTileFromSeen(Tile t) {
+        return call(name, t);
+    }
+
+    public Result<Card> drawCard() {
+        return call(name);
+    }
+
+    public Result<CardInput> setInput(CardInput input) {
+        return call(name, input);
+    }
+
+    public Result<CardData> getCardData() {
+        return call(name);
+    }
+
+    public Result<Card[][]> getVisible() {
+        return call(name);
+    }
+
+    protected Class<?>[] getClasses(Object... args) {
+        return Arrays.stream(args)
+                .map(Object::getClass)
+                .toArray(Class<?>[]::new);
+    }
+
+    protected String getCallerName(){
+        return Thread.currentThread()
+                .getStackTrace()[3]
+                .getMethodName();
+    }
 }
