@@ -33,11 +33,11 @@ public class Game extends UnicastRemoteObject implements Callback {
     int cash = 0;
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
-    Tile currentTile = null;
+    public Tile currentTile = null;
 
     boolean notReady = true;
 
-    Model.State.Type state = Model.State.Type.JOINING;
+    public Model.State.Type state = Model.State.Type.JOINING;
     Map<String, Function<String, String>> executors = new HashMap<>();
     Map<String, Predicate<String>> checkers = new HashMap<>();
 
@@ -48,12 +48,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     public Game(ClientInterface server) throws IOException {
         super();
 
-        //frame = new FrameGenerator(this);
-
-        server.join(this).ifNotPresent(() -> {
-            System.out.println("unable to join");
-            System.exit(1);
-        });
+        frame = new FrameGenerator(this);
 
         executors.put("alieni", alien);
         executors.put("piazza", place);
@@ -80,6 +75,11 @@ public class Game extends UnicastRemoteObject implements Callback {
         checkers.put("invia", checkSend);
 
         this.server = server;
+
+        server.join(this).ifNotPresent(() -> {
+            System.out.println("unable to join");
+            System.exit(1);
+        });
     }
 
     Function<String, String> alien = (cmd) -> {
@@ -113,6 +113,8 @@ public class Game extends UnicastRemoteObject implements Callback {
         res.ifPresent(_ -> {
             board.init(finalPurple.isOk()? Optional.of(finalPurple.getData()) : Optional.empty(),
                     finalBrown.isOk()? Optional.of(finalBrown.getData()) : Optional.empty());
+
+            frame.drawElements();
         });
 
         return res.unwrap("nave riempita");
@@ -186,6 +188,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         if(from == 2) {
             res = server.setTile(coord, currentTile, pos);
             res.ifPresent(_ -> currentTile = null);
+            frame.drawCurrentTile();
         }
         else if (from < 2)
             res = server.useBookedTile(board.getBooked().get(from), pos, coord);
@@ -249,6 +252,7 @@ public class Game extends UnicastRemoteObject implements Callback {
                 if(currentTile != null)
                     server.giveTile(currentTile);
                 currentTile = (Tile)res.getData();
+                frame.drawCurrentTile();
             }
         }
         else
@@ -475,6 +479,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
         this.players = players;
+        frame.drawPlayersName();
     }
 
     @Override
@@ -485,6 +490,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void pushSecondsLeft(Integer seconds) throws RemoteException {
         secondsLeft = seconds;
+        frame.drawSecondsLeft();
     }
 
     @Override
@@ -493,6 +499,11 @@ public class Game extends UnicastRemoteObject implements Callback {
 
         if(state == Model.State.Type.DRAW_CARD)
             dropped.reset();
+
+        if(state == Model.State.Type.ALIEN_INPUT)
+            frame.clearUnusedSpace();
+
+        frame.drawState();
     }
 
     @Override
@@ -524,11 +535,13 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void gaveTile(Tile t) throws RemoteException {
         openTiles.add(t);
+        frame.drawOpenTiles();
     }
 
     @Override
     public void gotTile(Tile t) throws RemoteException {
         openTiles.remove(t);
+        frame.drawOpenTiles();
     }
 
     @Override
@@ -539,6 +552,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
         this.flight = board;
+        frame.drawFlight();
     }
 
     @Override
@@ -550,16 +564,20 @@ public class Game extends UnicastRemoteObject implements Callback {
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
         board.getTiles().getBooked().removeIf((tile) -> tile.equals(t));
         board.getTiles().setTile(c, t, r);
+        frame.drawTile(c, t, r);
+        frame.drawBooked();
     }
 
     @Override
     public void bookedTile(Tile t) throws RemoteException {
         board.getTiles().bookTile(t);
+        frame.drawBooked();
     }
 
     @Override
     public void removed(Coordinate c) throws RemoteException{
         board.getTiles().remove(c);
+        frame.clearTile(c);
     }
 
     @Override

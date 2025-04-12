@@ -1,1 +1,3 @@
-mvn compile exec:java
+#!/bin/sh
+
+mvn compile exec:java -Dexec.args="$(printf "%q " "$@")"

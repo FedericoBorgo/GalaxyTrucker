@@ -20,8 +20,6 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;
 
@@ -31,10 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class FrameGenerator {
     private final JSONObject textures;
-    private final String[] boardBorder;
     private final Game game;
     private final Screen screen;
-    private final Terminal terminal;
     private final TextGraphics graphics;
     private boolean pauseRender = false;
     private boolean isOkCommand = false;
@@ -45,41 +41,35 @@ public class FrameGenerator {
     String response = "";
 
     public FrameGenerator(Game game) throws IOException {
-        terminal = new DefaultTerminalFactory().createTerminal();
-        screen = new TerminalScreen(terminal);
+        screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal());
         screen.startScreen();
         graphics = screen.newTextGraphics();
         graphics.enableModifiers(SGR.BOLD);
-        screen.setCursorPosition(null);
 
-        //get the textures
-        boardBorder = Card.dump(Game.class.getResourceAsStream("board.txt")).split("\n");
-        textures = new JSONObject(Card.dump(Game.class.getResourceAsStream("textures.json")));
+        textures = new JSONObject(Card.dump(Objects.requireNonNull(Game.class.getResourceAsStream("textures.json"))));
 
         this.game = game;
 
         new Thread(() -> {
             try{
                 while(true){
-                    if(!pauseRender){
-                        draw();
+                    if(!pauseRender)
                         handleKeyBoard();
-                    }
-                    Thread.sleep(30);
+                    Thread.sleep(100/6);
                 }
             }
             catch (Exception _){}}
         ).start();
+
+        initBoard();
     }
 
-    /**
-     * Draw the scheme of the board from the config file.
-     * Draw also the indexes of the board.
-     */
-    private void drawBorderBoard(){
+    private synchronized void initBoard(){
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
         graphics.putString(new TerminalPosition(1, 0), "x");
         graphics.putString(new TerminalPosition(0, 1), "y");
+
+        String[] boardBorder = Card.dump(Objects.requireNonNull(Game.class.getResourceAsStream("board.txt"))).split("\n");
 
         for(int i = 0; i < 7; i++)
             graphics.putString(new TerminalPosition(i*16+2, 0), Integer.toString(i+4));
@@ -91,58 +81,36 @@ public class FrameGenerator {
         for(int i = 0; i < boardBorder.length; i++)
             graphics.putString(new TerminalPosition(1, i+1), boardBorder[i]);
 
-        if(game.state != Model.State.Type.BUILDING){
-            graphics.fillRectangle(new TerminalPosition(119, 1), new TerminalSize(107, 15), ' ');
-            graphics.fillRectangle(new TerminalPosition(161, 16), new TerminalSize(65, 28), ' ');
-        }
+        drawTile(new Coordinate(3, 2), new Tile(Tile.Type.C_HOUSE, "uuuu"), Tile.Rotation.NONE);
+        drawFlight();
+        drawPlayersName();
     }
 
-    /**
-     * Convert the game coordinate to screen coordinate.
-     * The game use a smaller coordinate from x0y0 to x7y5 to
-     * identify the Tiles position.
-     * The screen use the position of characters as coordinate.
-     * Return the position of the top left caracter.
-     * @param coord game coordinate
-     * @return converted coordinate
-     */
     private TerminalPosition coordToTerminalPosition(Coordinate coord){
         return new TerminalPosition(coord.x()*16+2, coord.y()*6+2);
     }
 
-    /**
-     * Draw the tiles board to the screen using the textures in the config file.
-     * @param board the board to draw.
-     */
-    void drawTiles(TilesBoard board){
-        Coordinate.forEach(c -> {
-            Result<Tile> res = board.getTile(c);
+    public synchronized void drawBooked(){
+        clearTile(new TerminalPosition(120, 2));
+        clearTile(new TerminalPosition(120, 8));
+        clearTile(new TerminalPosition(140, 2));
+        List<Tile> booked = game.board.getTiles().getBooked();
 
-            if(res.isErr())
-                return;
-
-            drawTile(coordToTerminalPosition(c), res.getData(), board.getRotation(c));
-        });
-    }
-
-    /**
-     * Draw the booked ties in their space
-     * @param board
-     */
-    void drawBooked(TilesBoard board){
-        if(game.state != Model.State.Type.BUILDING)
-            return;
-
-        if(!board.getBooked().isEmpty())
+        if(!booked.isEmpty())
             drawTile(new TerminalPosition(120, 2),
-                    board.getBooked().getFirst(), Tile.Rotation.NONE);
+                    booked.getFirst(), Tile.Rotation.NONE);
 
-        if(board.getBooked().size() > 1)
+        if(booked.size() > 1)
             drawTile(new TerminalPosition(120, 8),
-                    board.getBooked().getLast(), Tile.Rotation.NONE);
+                    booked.getLast(), Tile.Rotation.NONE);
     }
 
-    private void drawTile(TerminalPosition pos, Tile t, Tile.Rotation rotation){
+    public synchronized void drawTile(Coordinate c, Tile t, Tile.Rotation r){
+        drawTile(coordToTerminalPosition(c), t, r);
+        drawErrors(game.board.getTiles().isOK());
+    }
+
+    public synchronized void drawTile(TerminalPosition pos, Tile t, Tile.Rotation rotation){
         // get the texture of the corresponding tile
         JSONObject texture = textures.getJSONObject(t.getType().name());
 
@@ -179,17 +147,37 @@ public class FrameGenerator {
             for(int i = 0; texture.has(String.valueOf(i)); i++)
                 graphics.putString(pos.plus(new TerminalPosition(xOffset, yOffset + i)), texture.getString(String.valueOf(i)));
         }
+
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /**
-     * Draw the wrong placed tiles.
-     * @param errors set of coordinates of wrong tiels
-     */
-    void drawErrors(Set<Coordinate> errors){
+    public synchronized void clearTile(Coordinate coord){
+        clearTile(coordToTerminalPosition(coord));
+        drawErrors(game.board.getTiles().isOK());
+    }
+
+    public synchronized void clearTile(TerminalPosition pos){
+        graphics.fillRectangle(pos, new TerminalSize(15, 5), ' ');
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void drawErrors(Set<Coordinate> errors){
         graphics.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
 
+        Coordinate.forEach(c -> {
+            graphics.putString(coordToTerminalPosition(c).plus(new TerminalPosition(2, 1)), "   ");
+        });
+
         if(errors.contains(new Coordinate(0, 0))) {
-            graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "Nave separata in più pezzi.");
+            graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "SEP");
             return;
         }
 
@@ -199,14 +187,27 @@ public class FrameGenerator {
         });
     }
 
-    /**
-     * Draw the batteries, astronauts, goods and aliens to the
-     * screen.
-     * @param board to draw
-     */
-    void drawElements(ShipBoard board){
+    public void drawElements(){
         Map<Coordinate, Integer> offset = new HashMap<>();
-        board.boards().forEach(b ->{
+
+        Coordinate.forEach(c -> {
+            Result<Tile> res = game.board.getTiles().getTile(c);
+
+            if(res.isErr())
+                return;
+
+            Tile t = res.getData();
+
+            if(!(Tile.box(t) || Tile.house(t) || Tile.battery(t)))
+                return;
+
+            TerminalPosition pos = coordToTerminalPosition(c);
+            graphics.putString(pos.plus(new TerminalPosition(7, 1)), " ");
+            graphics.putString(pos.plus(new TerminalPosition(7, 2)), " ");
+            graphics.putString(pos.plus(new TerminalPosition(7, 3)), " ");
+        });
+
+        game.board.boards().forEach(b ->{
             graphics.setForegroundColor(b.getColor());
 
             b.getPositions().forEach((c, tot) -> {
@@ -220,14 +221,22 @@ public class FrameGenerator {
             });
         });
     }
-
-    /**
-     * Draws the flightboard to the screen
-     */
-    void drawFlight(){
+    public void drawFlight(){
         List<FlightBoard.Pawn> order = game.flight.getOrder();
         int leader = game.flight.getLeaderPosition();
         List<Integer> offset = game.flight.getOffset();
+
+        for(int i = 0; i < 24; i ++){
+            String pos = textures.getJSONObject("FLIGHT")
+                    .getString(String.valueOf(i));
+
+            int x = Integer.parseInt(pos.substring(0, pos.indexOf(' ')));
+            int y = Integer.parseInt(pos.substring(pos.indexOf(' ')+1));
+
+            TerminalPosition screenPos = new TerminalPosition(120 + y, 17 + x);
+
+            graphics.putString(screenPos," ");
+        }
 
         for(int i = 0; i < order.size(); i++){
             String pos = textures.getJSONObject("FLIGHT")
@@ -241,38 +250,78 @@ public class FrameGenerator {
             graphics.setForegroundColor(order.get(i).getColor());
             graphics.putString(screenPos, "X");
         }
-    }
 
-    /**
-     * Draw the clock position
-     */
-    void drawClock(){
+        graphics.drawRectangle(new TerminalPosition(122, 25),
+                new TerminalSize(8, 4), ' ');
+        graphics.drawRectangle(new TerminalPosition(132, 25),
+                new TerminalSize(8, 4), ' ');
+
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
         graphics.drawRectangle(new TerminalPosition(122+ game.flight.getTimer()*10, 25),
                 new TerminalSize(8, 4), '#');
 
-        if(game.state == Model.State.Type.BUILDING)
-            graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(game.secondsLeft));
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /**
-     * Draw the players connected to the game
-     */
-    void drawPlayersName(){
+    public synchronized void drawSecondsLeft(){
+        graphics.putString(new TerminalPosition(122, 30), "                     ");
+        graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(game.secondsLeft));
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public synchronized void drawPlayersName() {
         AtomicInteger pos = new AtomicInteger(34);
-        game.players.forEach((name, pawn) -> {
-            graphics.setForegroundColor(pawn.getColor());
-            graphics.putString(new TerminalPosition(0, pos.get()), "#"+name);
-            pos.getAndIncrement();
-        });
-    }
+        try{
+            game.players.forEach((name, pawn) -> {
+                graphics.setForegroundColor(pawn.getColor());
+                graphics.putString(new TerminalPosition(0, pos.get()), "#" + name + (name.equals(game.server.getPlayerName())? "*" : "     "));
+                pos.getAndIncrement();
+            });
 
-    void drawState(){
+            screen.refresh();
+        }catch (Exception _){}
+
+
+    }
+    public synchronized void drawState(){
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
         graphics.putString(new TerminalPosition(93, 2), game.state.name());
     }
+    public synchronized void drawOpenTiles(){
+        TerminalPosition start = new TerminalPosition(162, 2);
 
-    void drawInput(){
+        for(int i = 0; i < 30; i++)
+            clearTile(start.plus(new TerminalPosition(
+                    (i/7)*16,
+                    (i%7)*6)));
+
+        for (int i = 0; i < game.openTiles.size(); i++) {
+            drawTile(start.plus(new TerminalPosition(
+                    (i/7)*16,
+                    (i%7)*6
+            )), game.openTiles.get(i), Tile.Rotation.NONE);
+        }
+    }
+
+    public synchronized void clearUnusedSpace(){
+        graphics.fillRectangle(new TerminalPosition(117, 1), new TerminalSize(109, 16), ' ');
+        graphics.fillRectangle(new TerminalPosition(161, 17), new TerminalSize(65, 43), ' ');
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    synchronized void drawInput() throws IOException {
+        graphics.putString(new TerminalPosition(29, 34), "                              ");
         graphics.setForegroundColor(isOkCommand? TextColor.ANSI.WHITE_BRIGHT : TextColor.ANSI.RED_BRIGHT);
 
         for(int i = 0; i < command.size(); i++){
@@ -283,11 +332,11 @@ public class FrameGenerator {
 
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
         graphics.putString(new TerminalPosition(29, 36), response);
-    }
 
-    void drawCurrentTile(){
-        if(game.state != Model.State.Type.BUILDING)
-            return;
+        screen.refresh();
+    }
+    synchronized void drawCurrentTile(){
+        clearTile(new TerminalPosition(140, 2));
 
         if(game.currentTile == null)
             return;
@@ -296,34 +345,6 @@ public class FrameGenerator {
                 game.currentTile, Tile.Rotation.NONE);
     }
 
-    /**
-     * Draw everything to the screen.
-     */
-    public void draw(){
-        screen.clear();
-        drawBorderBoard();
-        drawFlight();
-        drawTiles(game.board.getTiles());
-        drawBooked(game.board.getTiles());
-        drawElements(game.board);
-        drawErrors(game.board.getTiles().isOK());
-        drawClock();
-        drawPlayersName();
-        drawState();
-        drawInput();
-        drawCurrentTile();
-        drawOpenTiles();
-        drawCardData();
-        drawDroppedItems();
-        drawCannonsToUse();
-        drawCash();
-
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private String toStringCommand(){
         StringBuilder builder = new StringBuilder();
@@ -362,6 +383,8 @@ public class FrameGenerator {
                         cursor = 0;
                     }
                 }
+
+                drawInput();
             }
         } catch (IOException _) {}
     }
@@ -390,21 +413,16 @@ public class FrameGenerator {
         textGUI.waitForWindowToClose(window);
         screen.clear();
         pauseRender = false;
-        return box.getInt();
-    }
 
-    void drawOpenTiles(){
-        if(game.state != Model.State.Type.BUILDING)
-            return;
-
-        TerminalPosition start = new TerminalPosition(162, 2);
-
-        for (int i = 0; i < game.openTiles.size(); i++) {
-            drawTile(start.plus(new TerminalPosition(
-                    (i/7)*16,
-                    (i%7)*6
-            )), game.openTiles.get(i), Tile.Rotation.NONE);
+        screen.clear();
+        initBoard();
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+        return box.getInt();
     }
 
     public void dialog(String message){

@@ -191,6 +191,10 @@ public class Tile implements Serializable {
         return t.type == Type.BATTERY_2 || t.type == Type.BATTERY_3;
     }
 
+    static public boolean box(Tile t){
+        return t.type == Type.B_BOX_3 || t.type == Type.B_BOX_2 || t.type == Type.R_BOX_2 || t.type == Type.R_BOX_1;
+    }
+
     public enum ConnectorType {
         ONE_PIPE,
         TWO_PIPE,

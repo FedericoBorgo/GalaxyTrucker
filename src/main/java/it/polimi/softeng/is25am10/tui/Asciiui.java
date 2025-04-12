@@ -2,74 +2,120 @@ package it.polimi.softeng.is25am10.tui;
 
 import it.polimi.softeng.is25am10.Controller;
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.TilesCollection;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
+import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
 import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
+import it.polimi.softeng.is25am10.network.socket.SocketListener;
 import it.polimi.softeng.is25am10.tui.asciiui.Config;
 import it.polimi.softeng.is25am10.tui.asciiui.Game;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.random.RandomGenerator;
 
 public class Asciiui {
+    static Random rmd = new Random();
 
-    public static void main(String[] args) {
+    static TilesCollection collection = new TilesCollection();
+
+    static Tile genRandomTile() {
+        Tile t = collection.getNew();
+        if(t == null){
+            collection = new TilesCollection();
+            t = collection.getNew();
+        }
+        return t;
+    }
+
+    static Tile.Rotation genRandomOri(){
+        return switch(rmd.nextInt(0, 4)){
+            case 1 -> Tile.Rotation.CLOCK;
+            case 2 -> Tile.Rotation.DOUBLE;
+            case 3 -> Tile.Rotation.INV;
+            default -> Tile.Rotation.NONE;
+        };
+    }
+
+    static int getOri(Tile.Rotation rot){
+        return switch(rot){
+            case CLOCK -> 1;
+            case DOUBLE -> 2;
+            case INV -> 3;
+            default -> 0;
+        };
+    }
+
+    static Coordinate genRandomCoord(){
+        return new Coordinate(rmd.nextInt(0, TilesBoard.BOARD_WIDTH), rmd.nextInt(0, TilesBoard.BOARD_HEIGHT));
+    }
+
+    static void genRandomShip(Game game) {
+        TilesBoard board = new TilesBoard();
+        AtomicInteger piazzate = new AtomicInteger(0);
+
+        while(piazzate.get() < 50){
+            Coordinate c = genRandomCoord();
+            Tile t = genRandomTile();
+            Tile.Rotation r = genRandomOri();
+
+            board.setTile(c, t, r).ifPresent(_ -> {
+                if(!board.isOK().isEmpty())
+                    board.remove(c);
+                else {
+                    piazzate.incrementAndGet();
+                    String coord = "" + c.x() + c.y();
+                    game.currentTile = t;
+                    game.execute("piazza 2 " + coord +" " + getOri(r));
+                }
+            });
+        }
+    }
+
+    static void placeRandom(Game game, int timeout){
+        Future<?> future =  Executors.newSingleThreadExecutor().submit(() -> {
+            genRandomShip(game);
+        });
+
+        try {
+            future.get(timeout, TimeUnit.SECONDS);
+        } catch (Exception _) {}
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
         try{
-            new Thread(() -> {
-                try {
-                    Controller.main(new String[]{"true"});
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }).start();
-            while(!Controller.ready);
+            Controller.main(new String[]{"true"});
+        }catch(Exception _){}
 
-            Game render_p2 = new Game(new SocketClient("p2", "localhost", 1235, 1236));
-            Game render_p1 = new Game(new RMIClient("p1", "localhost", 1234));
 
-            System.out.println(render_p1.execute("clessidra"));
-            System.out.println(render_p1.execute("clessidra"));
-            System.out.println(render_p1.execute("clessidra"));
-            System.out.println(render_p1.execute("alieni no"));
-            System.out.println(render_p2.execute("alieni no"));
-            System.out.println(render_p1.execute("pesca"));
+        String name = args[0];
+        String conn = args[1];
 
-            Scanner scanner = new Scanner(System.in);
+        ClientInterface client = conn.equals("rmi")?
+                new RMIClient(name, "localhost", 1234) :
+                new SocketClient(name, "localhost", 1235, 1236);
 
-            /*
-            TESTATE: OPEN_SPACE AB_SHIP EPIDEMIC PIRATES PLANETS STATION SMUGLERS
-            SLAVERS STARDUST
+        Game game = new Game(client);
 
-             */
+        //new SocketClient("npc", "localhost", 1235, 1236).join(new PlaceholderCallback());
 
-            while(true) {
-                System.out.print("> ");
-                String line = scanner.nextLine();
-                String cmd = line.substring(1);
+        while(game.state != Model.State.Type.BUILDING)
+            Thread.sleep(100);
 
-                boolean check = switch (line.charAt(0)){
-                    case '1' -> render_p1.checkCommand(cmd);
-                    case '2' -> render_p2.checkCommand(cmd);
-                    default -> false;
-                };
+        placeRandom(game, 5);
 
-                if(check) {
-                    System.out.println(switch(line.charAt(0)){
-                        case '1' -> render_p1.execute(cmd);
-                        case '2' -> render_p2.execute(cmd);
-                        default -> "";
-                    });
-                }
-                else
-                    System.out.println("rifiutato");
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+        game.execute("clessidra");
     }
 }
