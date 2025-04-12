@@ -11,7 +11,9 @@ import it.polimi.softeng.is25am10.network.Callback;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class PlaceholderCallback implements Callback {
     @Override
@@ -95,7 +97,12 @@ public class PlaceholderCallback implements Callback {
     }
 
     @Override
-    public void pushCannons(Map<Tile.Rotation, Integer> cannons) throws RemoteException {
+    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
+
+    }
+
+    @Override
+    public void pushQuit(HashSet<String> quit) throws RemoteException {
 
     }
 }

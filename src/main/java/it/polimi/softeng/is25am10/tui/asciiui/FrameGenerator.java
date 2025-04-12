@@ -20,6 +20,7 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import org.json.JSONObject;
 
@@ -50,18 +51,23 @@ public class FrameGenerator {
 
         this.game = game;
 
-        new Thread(() -> {
-            try{
-                while(true){
-                    if(!pauseRender)
-                        handleKeyBoard();
-                    Thread.sleep(100/6);
-                }
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if(!pauseRender)
+                    handleKeyBoard();
             }
-            catch (Exception _){}}
-        ).start();
+        }, 0, 100/6);
 
         initBoard();
+    }
+
+    private void refresh(){
+        try {
+            screen.refresh();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private synchronized void initBoard(){
@@ -103,6 +109,7 @@ public class FrameGenerator {
         if(booked.size() > 1)
             drawTile(new TerminalPosition(120, 8),
                     booked.getLast(), Tile.Rotation.NONE);
+        refresh();
     }
 
     public synchronized void drawTile(Coordinate c, Tile t, Tile.Rotation r){
@@ -148,11 +155,7 @@ public class FrameGenerator {
                 graphics.putString(pos.plus(new TerminalPosition(xOffset, yOffset + i)), texture.getString(String.valueOf(i)));
         }
 
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        refresh();
     }
 
     public synchronized void clearTile(Coordinate coord){
@@ -162,11 +165,7 @@ public class FrameGenerator {
 
     public synchronized void clearTile(TerminalPosition pos){
         graphics.fillRectangle(pos, new TerminalSize(15, 5), ' ');
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        refresh();
     }
 
     private void drawErrors(Set<Coordinate> errors){
@@ -185,6 +184,8 @@ public class FrameGenerator {
             TerminalPosition pos = coordToTerminalPosition(c);
             graphics.putString(pos.plus(new TerminalPosition(2, 1)), "FIX");
         });
+
+        refresh();
     }
 
     public void drawElements(){
@@ -220,6 +221,8 @@ public class FrameGenerator {
                 offset.put(c, tot+plus);
             });
         });
+
+        refresh();
     }
     public void drawFlight(){
         List<FlightBoard.Pawn> order = game.flight.getOrder();
@@ -260,40 +263,36 @@ public class FrameGenerator {
         graphics.drawRectangle(new TerminalPosition(122+ game.flight.getTimer()*10, 25),
                 new TerminalSize(8, 4), '#');
 
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        refresh();
     }
 
     public synchronized void drawSecondsLeft(){
         graphics.putString(new TerminalPosition(122, 30), "                     ");
         graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(game.secondsLeft));
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        refresh();
     }
+
     public synchronized void drawPlayersName() {
         AtomicInteger pos = new AtomicInteger(34);
         try{
             game.players.forEach((name, pawn) -> {
                 graphics.setForegroundColor(pawn.getColor());
-                graphics.putString(new TerminalPosition(0, pos.get()), "#" + name + (name.equals(game.server.getPlayerName())? "*" : "     "));
+                graphics.putString(new TerminalPosition(0, pos.get()), "#" + name +
+                        (name.equals(game.server.getPlayerName())? "*" : "") +
+                        (game.quit.contains(name)? "fuori" : "     "));
                 pos.getAndIncrement();
             });
 
             screen.refresh();
         }catch (Exception _){}
-
-
     }
+
     public synchronized void drawState(){
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-        graphics.putString(new TerminalPosition(93, 2), game.state.name());
+        graphics.putString(new TerminalPosition(93, 2), game.state.name() + "    ");
+        refresh();
     }
+
     public synchronized void drawOpenTiles(){
         TerminalPosition start = new TerminalPosition(162, 2);
 
@@ -308,19 +307,32 @@ public class FrameGenerator {
                     (i%7)*6
             )), game.openTiles.get(i), Tile.Rotation.NONE);
         }
+
+        refresh();
+    }
+
+    public void drawTilesBoar(TilesBoard board){
+        Coordinate.forEach(c -> {
+            Result<Tile> res = board.getTile(c);
+
+            if(res.isErr())
+                return;
+
+            Tile t = res.getData();
+
+            drawTile(c, t, board.getRotation(c));
+        });
+
+        refresh();
     }
 
     public synchronized void clearUnusedSpace(){
         graphics.fillRectangle(new TerminalPosition(117, 1), new TerminalSize(109, 16), ' ');
         graphics.fillRectangle(new TerminalPosition(161, 17), new TerminalSize(65, 43), ' ');
-        try {
-            screen.refresh();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        refresh();
     }
 
-    synchronized void drawInput() throws IOException {
+    synchronized void drawInput(){
         graphics.putString(new TerminalPosition(29, 34), "                              ");
         graphics.setForegroundColor(isOkCommand? TextColor.ANSI.WHITE_BRIGHT : TextColor.ANSI.RED_BRIGHT);
 
@@ -333,7 +345,7 @@ public class FrameGenerator {
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
         graphics.putString(new TerminalPosition(29, 36), response);
 
-        screen.refresh();
+        refresh();
     }
     synchronized void drawCurrentTile(){
         clearTile(new TerminalPosition(140, 2));
@@ -343,6 +355,8 @@ public class FrameGenerator {
 
         drawTile(new TerminalPosition(140, 2),
                 game.currentTile, Tile.Rotation.NONE);
+
+        refresh();
     }
 
 

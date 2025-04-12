@@ -43,6 +43,7 @@ public class SocketClient extends ClientInterface {
                 Object obj = eventInput.readObject();
                 Request request = (Request) obj;
                 Method method = Callback.class.getMethod(request.getMethod(), request.getType());
+                eventOutput.reset();
                 eventOutput.writeObject(method.invoke(callback, request.getArgs()));
                 eventOutput.flush();
             } catch (IOException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException |

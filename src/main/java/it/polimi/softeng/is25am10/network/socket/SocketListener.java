@@ -21,7 +21,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class SocketListener {
     private final ServerSocket methodInvoker;
@@ -88,7 +90,9 @@ class MethodInvoker extends Thread {
             try {
                 Request request = (Request) input.readObject();
                 Method method = Controller.class.getMethod(request.getMethod(), request.getType());
+                output.reset();
                 output.writeObject(method.invoke(controller, request.getArgs()));
+                output.flush();
             } catch (IOException | ClassNotFoundException | NoSuchMethodException |
                      IllegalAccessException e) {
                 Logger.serverLog("[" +  address + "]disconnected");
@@ -212,7 +216,12 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushCannons(Map<Tile.Rotation, Integer> cannons) throws RemoteException {
+    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
         call(cannons);
+    }
+
+    @Override
+    public void pushQuit(HashSet<String> quit) throws RemoteException {
+        call(quit);
     }
 }

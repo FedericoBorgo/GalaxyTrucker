@@ -91,6 +91,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
             pushState(m);
             pushFlight(m);
+            pushQuit(m);
 
             if(state == Model.State.Type.DRAW_CARD && m.getChanges() != null)
                 pushCardChanges(m);
@@ -265,8 +266,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             throw new RuntimeException(e);
         }
 
+        Set<String> dis = disconnected.get(m);
+
         // call the event for every player connected to this model
         m.getPlayers().forEach((name, _) -> {
+            if(dis.contains(name))
+                return;
+
             try {
                 method.invoke(callbacks.get(name), args);
             } catch (IllegalAccessException e) {
@@ -336,6 +342,10 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     public void pushFlight(Model m) {
         notifyPlayers(m, null, m.getFlight());
+    }
+
+    public void pushQuit(Model m){
+        notifyPlayers(m, null, m.getQuit());
     }
 
     /**

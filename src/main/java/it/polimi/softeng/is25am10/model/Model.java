@@ -139,7 +139,7 @@ public class Model implements Serializable {
     //Data about the single player.
     private final Map<String, Player> players = new ConcurrentHashMap<>();
     private final Map<Player, Removed> removed = new ConcurrentHashMap<>();
-    private final Map<Player, Map<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
+    private final Map<Player, HashMap<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
     private final Map<String, Player> quitters = new ConcurrentHashMap<>();
 
     //Current state of the game
@@ -199,8 +199,8 @@ public class Model implements Serializable {
         return state.get();
     }
 
-    public static Map<Tile.Rotation, Integer> generateCannons(){
-        Map<Tile.Rotation, Integer> cannons = new HashMap<>();
+    public static HashMap<Tile.Rotation, Integer> generateCannons(){
+        HashMap<Tile.Rotation, Integer> cannons = new HashMap<>();
 
         for (Tile.Rotation value : Tile.Rotation.values())
             cannons.put(value, 0);
@@ -321,6 +321,13 @@ public class Model implements Serializable {
 
         if(players.isEmpty())
             state.next(State.Type.ENDED);
+    }
+
+    public HashSet<String> getQuit(){
+        HashSet<String> q = new HashSet<>();
+
+        quitters.forEach((p,_)->{ q.add(p);});
+        return q;
     }
 
     /**
@@ -544,11 +551,11 @@ public class Model implements Serializable {
     }
 
     /// cannons
-    public Map<Tile.Rotation, Integer> getCannonsToUse(Player p){
+    public HashMap<Tile.Rotation, Integer> getCannonsToUse(Player p){
         return cannonsToUse.getOrDefault(p, null);
     }
 
-    public Map<Tile.Rotation, Integer> getCannonsToUse(String name){
+    public HashMap<Tile.Rotation, Integer> getCannonsToUse(String name){
         return getCannonsToUse(get(name));
     }
 

@@ -33,6 +33,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     int cash = 0;
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
+    Set<String> quit = new HashSet<>();
     public Tile currentTile = null;
 
     boolean notReady = true;
@@ -547,6 +548,8 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void pushBoard(ShipBoard board) throws RemoteException {
         this.board = board;
+        frame.drawTilesBoar(board.getTiles());
+        frame.drawElements();
     }
 
     @Override
@@ -586,7 +589,13 @@ public class Game extends UnicastRemoteObject implements Callback {
     }
 
     @Override
-    public void pushCannons(Map<Tile.Rotation, Integer> cannons) throws RemoteException {
+    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
         this.cannonsToUse = cannons;
+    }
+
+    @Override
+    public void pushQuit(HashSet<String> quit) throws RemoteException {
+        this.quit = quit;
+        frame.drawPlayersName();
     }
 }
