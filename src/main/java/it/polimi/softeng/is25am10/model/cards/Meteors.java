@@ -1,9 +1,6 @@
 package it.polimi.softeng.is25am10.model.cards;
 
-import it.polimi.softeng.is25am10.model.Player;
-import it.polimi.softeng.is25am10.model.Projectile;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.util.Pair;
 import org.json.JSONArray;
@@ -21,8 +18,8 @@ public class Meteors extends Card {
         return new Random().nextInt(6) + 1;
     }
 
-    private Meteors(FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
-        super(null, true, board, id, Card.Type.METEORS);
+    private Meteors(Model m, FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
+        super(m, true, board, id, Card.Type.METEORS);
         
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -64,7 +61,7 @@ public class Meteors extends Card {
         // for every projectile and for every player, hit them
         projectiles.forEach(proj -> registered.forEach((_, p) -> p.getBoard()
          .hit(proj, useBattery.get(p).contains(proj.ID()))
-         .ifPresent(c -> output.removed.put(p.getName(), c))));
+         .ifPresent(c -> output.addDestroyed(p.getName(), c))));
 
         return Result.ok(output);
     }
@@ -81,7 +78,7 @@ public class Meteors extends Card {
         return data;
     }
 
-    public static List<Card> construct(FlightBoard board){
+    public static List<Card> construct(Model m, FlightBoard board){
         String out = dump(Objects.requireNonNull(Meteors.class.getResourceAsStream("meteors.json")));
         JSONArray jsonCards = new JSONArray(out);
         List<Card> cards = new ArrayList<>();
@@ -98,7 +95,7 @@ public class Meteors extends Card {
                 meteors.add(new Pair<>(side, type));
             });
 
-            cards.add(new Meteors(board, meteors, id));
+            cards.add(new Meteors(m, board, meteors, id));
         });
 
         return cards;

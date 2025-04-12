@@ -174,6 +174,15 @@ public class Tile implements Serializable {
     }
 
     /**
+     * Check if a tile is an addon
+     * @param t the tile to check
+     * @return true if it can, false otherwise
+     */
+    static public boolean addon(Tile t){
+        return t.type == Type.B_ADDON || t.type == Type.P_ADDON;
+    }
+
+    /**
      * Check if a tile can contain batteries
      * @param t the tile to check
      * @return true if it can, false otherwise

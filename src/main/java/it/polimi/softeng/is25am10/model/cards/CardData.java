@@ -30,7 +30,7 @@ public class CardData implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Card data\n");
+        builder.append("Card\n");
         builder.append("type: ").append(type).append("\n");
         builder.append("id: ").append(id).append("\n");
 
@@ -64,6 +64,7 @@ public class CardData implements Serializable {
         if(rewards != null){
             builder.append("rewards:\n ");
             rewards.forEach((p) -> {builder.append(p).append(", ");});
+            builder.append("\n");
         }
 
         if(cash != 0)

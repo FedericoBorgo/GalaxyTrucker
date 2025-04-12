@@ -4,6 +4,7 @@ import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,21 @@ public class CardOutput implements Serializable {
     /**
      * Removed tiles by an asteroid.
      */
-    public Map<String, Coordinate> removed = new HashMap<>();
+    public Map<String, List<Coordinate>> removed = new HashMap<>();
 
     /**
      * Rewarded items to player
      */
     public Map<String, List<GoodsBoard.Type>> rewards = new HashMap<>();
+
+
+    public void addDestroyed(String name, Coordinate c){
+        List<Coordinate> coordinates = removed.getOrDefault(name, null);
+
+        if(coordinates == null)
+            coordinates = new ArrayList<>();
+
+        coordinates.add(c);
+        removed.put(name, coordinates);
+    }
 }

@@ -226,4 +226,8 @@ public class ShipBoard implements Serializable {
     public List<ElementsBoard> boards(){
         return boards;
     }
+
+    public int getTotalGoods(){
+        return goods.values().stream().map(ElementsBoard::getTotal).reduce(0, Integer::sum);
+    }
 }

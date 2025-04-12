@@ -3,12 +3,11 @@ package it.polimi.softeng.is25am10.tui.asciiui;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import it.polimi.softeng.is25am10.model.boards.TilesBoard;
+import it.polimi.softeng.is25am10.model.boards.*;
 import it.polimi.softeng.is25am10.model.cards.CardData;
+import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
+import it.polimi.softeng.is25am10.model.cards.Planets;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.util.Pair;
@@ -16,10 +15,7 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -30,7 +26,11 @@ public class Game extends UnicastRemoteObject implements Callback {
     ShipBoard board = new ShipBoard();
     FlightBoard flight = new FlightBoard();
     ArrayList<Tile> openTiles = new ArrayList<>();
-    String[] cardData = null;
+    String[] cardDataStr = null;
+    CardData cardData = null;
+    public Model.Removed dropped = new Model.Removed();
+    public Map<Tile.Rotation, Integer> cannonsToUse = Model.generateCannons();
+    int cash = 0;
 
     Map<String, FlightBoard.Pawn> players = new HashMap<>();
     Tile currentTile = null;
@@ -42,18 +42,18 @@ public class Game extends UnicastRemoteObject implements Callback {
     Map<String, Predicate<String>> checkers = new HashMap<>();
 
     public int secondsLeft = 0;
+    public String waitFor = "";
 
 
     public Game(ClientInterface server) throws IOException {
         super();
 
-        frame = new FrameGenerator(this);
-        try{
-            server.join(this).getData();
-        }catch (Exception e){
-            System.out.println("Error: " + e.getMessage());
+        //frame = new FrameGenerator(this);
+
+        server.join(this).ifNotPresent(() -> {
+            System.out.println("unable to join");
             System.exit(1);
-        }
+        });
 
         executors.put("alieni", alien);
         executors.put("piazza", place);
@@ -63,6 +63,9 @@ public class Game extends UnicastRemoteObject implements Callback {
         executors.put("pronto", ready);
         executors.put("clessidra", clock);
         executors.put("esci", exit);
+        executors.put("getta", drop);
+        executors.put("cannoni", cannons);
+        executors.put("invia", send);
 
         checkers.put("alieni", checkAlien);
         checkers.put("piazza", checkPlace);
@@ -72,6 +75,9 @@ public class Game extends UnicastRemoteObject implements Callback {
         checkers.put("pronto", checkReady);
         checkers.put("clessidra", checkClock);
         checkers.put("esci", checkExit);
+        checkers.put("getta", checkDrop);
+        checkers.put("cannoni", checkCannons);
+        checkers.put("invia", checkSend);
 
         this.server = server;
     }
@@ -292,9 +298,167 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     Predicate<String> checkExit = (cmd) -> true;
 
+    Function<String, String> drop = (cmd) -> {
+        Coordinate c = new Coordinate(cmd.charAt(0) - '0', cmd.charAt(1) - '0');
+        Result<Integer> res;
+        GoodsBoard.Type type;
+
+        if(cmd.length() != 2){
+            type = switch (cmd.charAt(3)) {
+                case 'r' -> GoodsBoard.Type.RED;
+                case 'b' -> GoodsBoard.Type.BLUE;
+                case 'v' -> GoodsBoard.Type.GREEN;
+                case 'g' -> GoodsBoard.Type.YELLOW;
+                default -> throw new IllegalStateException("Unexpected value: " + cmd.charAt(3));
+            };
+
+            res = server.drop(c, type);
+        }
+        else {
+            type = null;
+            res = server.drop(c);
+        }
+
+        res.ifPresent(_ -> {
+            board.removeSomeone(c);
+            board.getBattery().remove(c, 1);
+
+            if(type != null)
+                board.getGoods(type).remove(c, 1);
+        });
+
+        return res.unwrap("rimosso");
+    };
+
+    Predicate<String> checkDrop = (cmd) -> {
+        int x = cmd.charAt(0) - '0';
+        int y = cmd.charAt(1) - '0';
+
+        if (cmd.length() != 2) {
+            GoodsBoard.Type type = switch (cmd.charAt(3)) {
+                case 'r' -> GoodsBoard.Type.RED;
+                case 'b' -> GoodsBoard.Type.BLUE;
+                case 'v' -> GoodsBoard.Type.GREEN;
+                case 'g' -> GoodsBoard.Type.YELLOW;
+                default -> null;
+            };
+
+            if (type == null)
+                return false;
+        }
+
+        return !Coordinate.isInvalid(x, y);
+    };
+
+    Function<String, String> cannons = (cmd) -> {
+        String[] args = cmd.split(" ");
+        int diff = args[0].equals("dim")? -1 : 1;
+
+        Tile.Rotation rotation = switch(args[1].charAt(0) - '0'){
+            case 0 -> Tile.Rotation.NONE;
+            case 1 -> Tile.Rotation.CLOCK;
+            case 2 -> Tile.Rotation.DOUBLE;
+            case 3 -> Tile.Rotation.INV;
+            default -> null;
+        };
+
+        return server.increaseCannon(rotation, diff).unwrap("cambiato");
+    };
+
+    Predicate<String> checkCannons = (cmd) -> {
+        String[] args = cmd.split(" ");
+
+        if(!(args[0].equals("dim") || args[0].equals("inc")))
+            return false;
+
+        int val = args[1].charAt(0) - '0';
+
+        return val >= 0 && val <= 3;
+    };
+
+    Function<String, String> send = (cmd) -> {
+        CardInput input = new CardInput();
+        String[] args = cmd.split(" ");
+
+        switch(cardData.type){
+            case EPIDEMIC:
+            case STARDUST:
+            case OPEN_SPACE:
+            case SLAVERS:
+            case SMUGGLERS:
+                break;
+            case PLANETS:
+                input.planet = Planets.Planet.values()[Integer.parseInt(args[0])-1];
+                break;
+            case METEORS:
+            case WAR_ZONE:
+                for(String s: args)
+                    if(!s.isEmpty())
+                        input.shieldFor.add(Integer.parseInt(s));
+                break;
+            case AB_SHIP:
+            case STATION:
+                input.accept = args[0].equals("si");
+                break;
+            case PIRATES:
+                input.accept = args[0].equals("si");
+
+                for (int i = 1; i < args.length ; i++)
+                    input.shieldFor.add(Integer.parseInt(args[i]));
+                break;
+
+        }
+
+        return server.setInput(input).unwrap("dichiarato");
+    };
+
+    Predicate<String> checkSend = (cmd) -> {
+        String[] args = cmd.split(" ");
+
+        if(state != Model.State.Type.WAITING_INPUT)
+            return false;
+
+        switch(cardData.type){
+            case EPIDEMIC:
+            case STARDUST:
+            case OPEN_SPACE:
+            case SLAVERS:
+            case SMUGGLERS:
+                return true;
+            case PLANETS:
+                Planets.Planet chosen = Planets.Planet.values()[Integer.parseInt(args[0])-1];
+
+                if(cardData.chosenPlanets.contains(chosen) && chosen != Planets.Planet.NOPLANET)
+                    return false;
+
+                return cardData.planets.containsKey(chosen) || chosen == Planets.Planet.NOPLANET;
+            case METEORS:
+            case WAR_ZONE:
+                for (String s : args)
+                    if(!s.isEmpty() && Integer.parseInt(s) > cardData.projectiles.getLast().ID())
+                        return false;
+                return true;
+            case AB_SHIP:
+            case STATION:
+                return args[0].equals("si") || args[0].equals("no");
+            case PIRATES:
+                if(!(args[0].equals("si") || args[0].equals("no")))
+                    return false;
+
+                for (int i = 1; i < args.length ; i++)
+                    if(Integer.parseInt(args[i]) > cardData.projectiles.getLast().ID())
+                        return false;
+                return true;
+        }
+
+
+
+        return false;
+    };
+
     public String execute(String cmd) {
         Pair<String, String> request = convert(cmd);
-        return executors.get(request.getKey()).apply(request.getValue()) + board.hashCode();
+        return executors.get(request.getKey()).apply(request.getValue());
     };
 
     public boolean checkCommand(String cmd) {
@@ -315,7 +479,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return frame.askHowManyPlayer();
+        return 2;//frame.askHowManyPlayer();
     }
 
     @Override
@@ -326,21 +490,35 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void pushState(Model.State.Type state) throws RemoteException {
         this.state = state;
+
+        if(state == Model.State.Type.DRAW_CARD)
+            dropped.reset();
     }
 
     @Override
     public void pushCardData(CardData card) throws RemoteException {
-        cardData = card.toString().split("\n");
+        cardDataStr = card.toString().split("\n");
+        cardData = card;
     }
 
     @Override
     public void pushCardChanges(CardOutput output) throws RemoteException {
+        List<Coordinate> remove = output.killedCrew.getOrDefault(server.getPlayerName(), null);
 
+        if(remove != null)
+            remove.forEach(c -> {board.removeSomeone(c);});
+
+        remove = output.removed.getOrDefault(server.getPlayerName(), null);
+
+        if(remove != null)
+            remove.forEach(c -> {board.getTiles().remove(c);});
+
+        cash += output.cash.getOrDefault(server.getPlayerName(), 0);
     }
 
     @Override
-    public void askForInput() throws RemoteException {
-
+    public void waitFor(String name) throws RemoteException {
+        this.waitFor = name;
     }
 
     @Override
@@ -382,5 +560,15 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public void removed(Coordinate c) throws RemoteException{
         board.getTiles().remove(c);
+    }
+
+    @Override
+    public void pushDropped(Model.Removed dropped) throws RemoteException {
+        this.dropped = dropped;
+    }
+
+    @Override
+    public void pushCannons(Map<Tile.Rotation, Integer> cannons) throws RemoteException {
+        this.cannonsToUse = cannons;
     }
 }

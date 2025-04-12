@@ -51,7 +51,7 @@ public class Slavers extends Card {
                     winner = Result.ok(player);
             }
             else if (power < enemyPower)
-                if (model.getRemoved(player).guys < crew)
+                if (model.getRemoved(player).guys < crew && player.getBoard().getAstronaut().getTotal() > 0)
                     return Result.err("player did not give enough astronauts to the slavers");
         }
 

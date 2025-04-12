@@ -62,10 +62,23 @@ public class Result<T> implements Serializable {
             consumer.accept(data);
     }
 
+    /**
+     * @param message to return in case of success
+     * @return return the error or the message.
+     */
     public String unwrap(String message) {
         if(isErr())
             return reason;
         return message;
+    }
+
+    /**
+     * Execute the method if its err
+     * @param runnable to run
+     */
+    public void ifNotPresent(Runnable runnable) {
+        if(isErr())
+            runnable.run();
     }
 
     /**

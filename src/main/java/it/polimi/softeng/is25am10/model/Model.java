@@ -7,11 +7,9 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -139,10 +137,10 @@ public class Model implements Serializable {
     private final Deck deck;
 
     //Data about the single player.
-    private final Map<String, Player> players = new HashMap<>();
-    private final Map<Player, Removed> removed = new HashMap<>();
-    private final Map<Player, Map<Tile.Rotation, Integer>> cannonsToUse = new HashMap<>();
-    private final Map<String, Player> quitters = new HashMap<>();
+    private final Map<String, Player> players = new ConcurrentHashMap<>();
+    private final Map<Player, Removed> removed = new ConcurrentHashMap<>();
+    private final Map<Player, Map<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
+    private final Map<String, Player> quitters = new ConcurrentHashMap<>();
 
     //Current state of the game
     private final State state;
@@ -159,7 +157,7 @@ public class Model implements Serializable {
      */
     private transient Timer timer;
     private transient TimerTask task;
-    public static final int TIMER_DELAY = 10;
+    public static final int TIMER_DELAY = 0;
     private int secondsLeft = TIMER_DELAY;
 
     /**
@@ -201,6 +199,15 @@ public class Model implements Serializable {
         return state.get();
     }
 
+    public static Map<Tile.Rotation, Integer> generateCannons(){
+        Map<Tile.Rotation, Integer> cannons = new HashMap<>();
+
+        for (Tile.Rotation value : Tile.Rotation.values())
+            cannons.put(value, 0);
+
+        return cannons;
+    }
+
     /**
      * Add a player to the game.
      * Can be called only during the JOINING state.
@@ -219,6 +226,7 @@ public class Model implements Serializable {
         players.put(name, new Player(name, unusedPawns.removeFirst()));
         //associate player -> removed items
         removed.put(get(name), new Removed());
+        cannonsToUse.put(players.get(name), generateCannons());
 
         if(countPlayers == nPlayers){
             // start the game
@@ -506,28 +514,42 @@ public class Model implements Serializable {
         return removed.get(player);
     }
 
+    /// removed items
+    public Removed getRemoved(String name){
+        return getRemoved(get(name));
+    }
+
     /**
      * Configure how many cannons use to shoot.
      * Can be called only in a waiting state.
      *
      * @param name name of the player
-     * @param map witch cannons activate to shoot
      * @return ok if succeeded, err if not
      */
-    public synchronized Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map){
+    public synchronized Result<String> increaseCannon(String name, Tile.Rotation r, int count){
         if(state.get() != State.Type.WAITING_INPUT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)))
             return Result.err("player already registered");
 
-        cannonsToUse.put(get(name), map);
+        Map<Tile.Rotation, Integer> cannons = cannonsToUse.get(get(name));
+        int total = cannons.get(r) + count;
+        if(total < 0)
+            return Result.err("troppo pochi");
+
+        cannons.put(r, total);
+
         return Result.ok("");
     }
 
     /// cannons
     public Map<Tile.Rotation, Integer> getCannonsToUse(Player p){
         return cannonsToUse.getOrDefault(p, null);
+    }
+
+    public Map<Tile.Rotation, Integer> getCannonsToUse(String name){
+        return getCannonsToUse(get(name));
     }
 
     /**
@@ -592,19 +614,15 @@ public class Model implements Serializable {
         if(flight.getOrder().getFirst() != get(name).getPawn())
             return Result.err("only the leader can draw");
 
-        Card c = deck.draw(new ArrayList<>(players.values()));
+        Card c = deck.draw(players.values().stream().toList());
 
         if(c == null) {
             state.next(State.Type.ENDED);
             return Result.ok(null);
         }
 
-        state.next(State.Type.WAITING_INPUT);
         changes = null;
-
-        if(!c.needInput){
-            players.forEach((p, _) -> setInput(p, null));
-        }
+        state.next(State.Type.WAITING_INPUT);
 
         return Result.ok(c);
     }
@@ -625,7 +643,7 @@ public class Model implements Serializable {
         Result<CardInput> res = deck.set(get(name), input);
 
         if(deck.ready())
-            changes = playCard().getData();
+            changes = playCard();
 
         return res;
     }
@@ -653,10 +671,8 @@ public class Model implements Serializable {
      * Get the temporary data about the drawn card.
      * @return the card data
      */
-    public synchronized Result<CardData> getCardData(){
-        if(state.get() != State.Type.WAITING_INPUT)
-            return Result.err("not WAITING state");
-        return Result.ok(deck.getData());
+    public synchronized CardData getCardData(){
+        return deck.getData();
     }
 
     private boolean someoneDebt(){
@@ -670,31 +686,33 @@ public class Model implements Serializable {
         return debt.get();
     }
 
-    private Result<CardOutput> playCard(){
-        if(state.get() != State.Type.WAITING_INPUT)
-            return Result.err("not WAITING state");
+    private CardOutput playCard(){
+        CardOutput res = deck.play().getData();
 
-        Result<CardOutput> res = deck.play();
+        List<Pawn> rm = new ArrayList<>(flight.getQuitters());
 
-        if(res.isOk()){
-            List<Pawn> rm = new ArrayList<>(flight.getQuitters());
+        players.values()
+                .stream()
+                .filter(p -> rm.contains(p.getPawn()))
+                .forEach(p -> quitIgnore(p.getName()));
 
-            players.values()
-                    .stream()
-                    .filter(p -> rm.contains(p.getPawn()))
-                    .forEach(p -> quitIgnore(p.getName()));
+        if(state.curr == State.Type.ENDED)
+            return res;
 
+        if(someoneDebt())
+            state.next(State.Type.PAY_DEBT);
+        else{
+            removed.forEach((_, item) -> item.reset());
+            cannonsToUse.forEach((_, map) -> {
+                for (Tile.Rotation value : Tile.Rotation.values()) {
+                    map.put(value, 0);
+                }
+            });
 
-            if(someoneDebt())
-                state.next(State.Type.PAY_DEBT);
-            else{
-                removed.forEach((_, item) -> item.reset());
-
-                if(allShipOk())
-                    state.next(State.Type.DRAW_CARD);
-                else
-                    state.next(State.Type.CHECKING);
-            }
+            if(allShipOk())
+                state.next(State.Type.DRAW_CARD);
+            else
+                state.next(State.Type.CHECKING);
         }
 
         return res;
@@ -723,28 +741,6 @@ public class Model implements Serializable {
     public FlightBoard debug_getFlightBoard(){
         return flight;
     }
-
-    /**
-     * Store the current state of the game to a file.
-     *
-     * @param filename name of the file
-     * @return ok if its stored, err if not
-     */
-    public Result<String> store(String filename) {
-        if(state.get() != State.Type.DRAW_CARD)
-            return Result.err("not DRAW state");
-        try{
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-            oos.writeObject(this);
-            oos.close();
-        }catch(IOException e){
-            return Result.err(e.getMessage());
-        }
-
-        return Result.ok(filename);
-    }
-
-
 
     public HashMap<String, Pawn> getPlayers(){
         HashMap<String, Pawn> p = new HashMap<>();

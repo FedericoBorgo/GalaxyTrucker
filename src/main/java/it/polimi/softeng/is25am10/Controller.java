@@ -58,8 +58,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     ///  starting game
     private Model starting = null;
 
-    ///  previous game
-    private Model.State.Type prev = null;
+    public static boolean ready = false;
 
     public static void main(String[] args) throws IOException {
         if(args.length > 0)
@@ -69,16 +68,21 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         load(1234, 1235, 1236);
         Logger.serverLog("controller started");
 
-        // wait for the stop signal
-        Scanner scanner = new Scanner(System.in);
-        while(!scanner.nextLine().equals("stop"));
+        ready = true;
 
-        // delete che tmp files
-        File file = new File("controller.bin");
-        file.delete();
+        if(args.length == 0){
+            // wait for the stop signal
+            Scanner scanner = new Scanner(System.in);
 
-        // terminate all the threads and quit
-        System.exit(0);
+            while(!scanner.nextLine().equals("stop"));
+
+            // delete che tmp files
+            File file = new File("controller.bin");
+            file.delete();
+
+            // terminate all the threads and quit
+            System.exit(0);
+        }
     }
 
     void loadEvent(){
@@ -88,13 +92,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             pushState(m);
             pushFlight(m);
 
-            if(prev == Model.State.Type.WAITING_INPUT)
+            if(state == Model.State.Type.DRAW_CARD && m.getChanges() != null)
                 pushCardChanges(m);
 
             if(state == Model.State.Type.BUILDING)
                 starting = null;
-
-            prev = state;
         };
     }
 
@@ -130,7 +132,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                backup();
+                //backup();
             }
         }, 0, 5000);
 
@@ -178,21 +180,29 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             callback.pushBoard(m.ship(name));
             callback.pushState(m.getState());
             callback.setPlayers(m.getPlayers());
-
-            //dumps all the booked tiles
-            m.getSeenTiles().forEach(t -> {
-                try {
-                    callback.gaveTile(t);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            callback.pushDropped(m.getRemoved(name));
+            callback.pushCannons(m.getCannonsToUse(name));
 
             disconnected.get(m).remove(name);
 
             if(m.nPlayers - disconnected.get(m).size() >= 2
                     && m.getState() == Model.State.Type.PAUSED)
                 m.resume();
+
+            if(m.getState() == Model.State.Type.WAITING_INPUT) {
+                callback.waitFor(m.getNextToPlay());
+                callback.pushCardData(m.getCardData());
+            }
+
+            if(m.getState() == Model.State.Type.BUILDING){
+                m.getSeenTiles().forEach(t -> {
+                    try {
+                        callback.gaveTile(t);
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -282,7 +292,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param m model to notify
      */
     public void pushCardData(Model m) {
-        notifyPlayers(m, null, m.getCardData().getData());
+        notifyPlayers(m, null, m.getCardData());
     }
 
     /**
@@ -295,14 +305,9 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     /**
      * Notify the player to give the card input
-     * @param name player to notify
      */
-    public void askForInput(String name) {
-        try {
-            callbacks.get(name).askForInput();
-        } catch (Exception _) {
-            setInput(name, CardInput.disconnected());
-        }
+    public void waitFor(Model m) {
+        notifyPlayers(m, null, m.getNextToPlay());
     }
 
     /**
@@ -495,7 +500,6 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     }
 
     public Result<Tile> placeOpenTile(String name, Tile t, Tile.Rotation rotation, Coordinate c){
-        Model m = getModel(name);
         Result<Tile> res = getTileFromSeen(name, t);
 
         if(res.isErr())
@@ -551,17 +555,39 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<Integer> drop(String name, Coordinate c) {
-        return getModel(name).drop(name, c);
+        Result<Integer> res = getModel(name).drop(name, c);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).pushDropped(getModel(name).getRemoved(name));
+            } catch (RemoteException _) {}
+        }
+        return res;
     }
 
     @Override
     public Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t) {
-        return getModel(name).drop(name, c, t);
+        Result<Integer> res = getModel(name).drop(name, c, t);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).pushDropped(getModel(name).getRemoved(name));
+            } catch (RemoteException _) {}
+        }
+        return res;
     }
 
     @Override
-    public Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map) {
-        return getModel(name).setCannonsToUse(name, map);
+    public Result<String> increaseCannon(String name, Tile.Rotation r, Integer count) {
+        Result<String> res = getModel(name).increaseCannon(name, r, count);
+
+        if(res.isOk()) {
+            try {
+                callbacks.get(name).pushCannons(getModel(name).getCannonsToUse(name));
+            } catch (RemoteException _) {}
+        }
+
+        return res;
     }
 
     @Override
@@ -620,12 +646,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     @Override
     public Result<Card> drawCard(String name) {
         Result<Card> res = getModel(name).drawCard(name);
-        if(res.isOk()){
+        if(res.isOk()) {
             pushCardData(getModel(name));
-
-            if(res.getData().needInput)
-                askForInput(getModel(name).getNextToPlay());
+            waitFor(getModel(name));
         }
+
         return res;
     }
 
@@ -634,14 +659,17 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * Calls {@code setInput(name, json)} in {@code Model} class. Checks if the player already sent the input.
      * @param name of the player calling the method
      * @param input contains the data and instructions of the player
-     * @return
+     * @return ok if succeeded, err if not
      */
     @Override
     public Result<CardInput> setInput(String name, CardInput input) {
+        //TODO stardust meteors
         Result<CardInput> res = getModel(name).setInput(name, input);
 
-        if(res.isOk() && getModel(name).getChanges() == null)
-            askForInput(getModel(name).getNextToPlay());
+        if(res.isOk() && getModel(name).getChanges() == null) {
+            waitFor(getModel(name));
+            pushCardData(getModel(name));
+        }
 
         return res;
     }
@@ -653,7 +681,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     @Override
     public Result<CardData> getCardData(String name) {
-        return getModel(name).getCardData();
+        return Result.ok(getModel(name).getCardData());
     }
 
     /**

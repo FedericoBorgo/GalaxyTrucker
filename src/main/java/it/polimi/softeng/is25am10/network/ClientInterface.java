@@ -89,8 +89,8 @@ public abstract class ClientInterface extends Thread{
         return call(name, c, t);
     }
 
-    public Result<String> setCannonsToUse(Map<Tile.Rotation, Integer> map) {
-        return call(name, map);
+    public Result<String> increaseCannon(Tile.Rotation r, int count) {
+        return call(name, r, count);
     }
 
     public Result<Tile> drawTile() {

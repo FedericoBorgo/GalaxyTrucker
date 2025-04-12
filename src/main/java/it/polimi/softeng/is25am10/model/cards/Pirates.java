@@ -87,7 +87,7 @@ public class Pirates extends Card {
         // shoot the defeated players
         projectiles.forEach(proj -> shotPlayers.forEach((p) -> p.getBoard()
          .hit(proj, useBattery.get(p).contains(proj.ID()))
-         .ifPresent(c -> output.removed.put(p.getName(), c))));
+         .ifPresent(c -> output.addDestroyed(p.getName(), c))));
 
         // does the player want to be rewarded?
         rewarded.ifPresent(p -> {

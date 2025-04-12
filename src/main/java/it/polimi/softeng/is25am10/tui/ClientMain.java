@@ -23,9 +23,6 @@ public class ClientMain {
         ClientInterface client = new RMIClient("fede", "localhost", 1234);
         ClientInterface client1 = new SocketClient("MARCO", "localhost", 1235, 1236);
 
-        client.join(new PlaceholderCallback("FEDE"));
-        client1.join(new PlaceholderCallback("MARCO"));
-
 
         Thread.sleep(2000);
         client.moveTimer();

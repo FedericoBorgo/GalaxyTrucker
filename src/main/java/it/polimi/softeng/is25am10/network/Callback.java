@@ -11,6 +11,7 @@ import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.Map;
 
 public interface Callback extends Remote {
     void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException;
@@ -25,7 +26,7 @@ public interface Callback extends Remote {
 
     void pushCardChanges(CardOutput output) throws RemoteException;
 
-    void askForInput() throws RemoteException;
+    void waitFor(String name) throws RemoteException;
 
     void gaveTile(Tile t) throws RemoteException;
 
@@ -42,4 +43,8 @@ public interface Callback extends Remote {
     void bookedTile(Tile t) throws RemoteException;
 
     void removed(Coordinate c) throws RemoteException;
+
+    void pushDropped(Model.Removed dropped) throws RemoteException;
+
+    void pushCannons(Map<Tile.Rotation, Integer> cannons) throws RemoteException;
 }

@@ -314,6 +314,9 @@ public class FrameGenerator {
         drawCurrentTile();
         drawOpenTiles();
         drawCardData();
+        drawDroppedItems();
+        drawCannonsToUse();
+        drawCash();
 
         try {
             screen.refresh();
@@ -419,10 +422,39 @@ public class FrameGenerator {
     }
 
     public void drawCardData(){
-        if(game.cardData == null || game.state != Model.State.Type.WAITING_INPUT)
+        if(game.cardDataStr == null || game.state != Model.State.Type.WAITING_INPUT)
             return;
 
-        for (int i = 0; i < game.cardData.length; i++)
-            graphics.putString(new TerminalPosition(163, 2+i), game.cardData[i]);
+        for (int i = 0; i < game.cardDataStr.length; i++)
+            graphics.putString(new TerminalPosition(160, 2+i), game.cardDataStr[i]);
     }
+
+    public void drawDroppedItems(){
+        if(game.state != Model.State.Type.WAITING_INPUT)
+            return;
+
+        graphics.putString(new TerminalPosition(120, 2), "Elementi rimossi");
+        graphics.putString(new TerminalPosition(120, 3), "batterie: " + game.dropped.battery);
+        graphics.putString(new TerminalPosition(120, 4), "membri: " + game.dropped.guys);
+        graphics.putString(new TerminalPosition(120, 5), "scatole: " + game.dropped.goods);
+    }
+
+    public void drawCannonsToUse(){
+        if(game.state != Model.State.Type.WAITING_INPUT)
+            return;
+
+        graphics.putString(new TerminalPosition(93, 4), "turno di " + game.waitFor);
+
+        graphics.putString(new TerminalPosition(120, 7), "Cannoni");
+        graphics.putString(new TerminalPosition(120, 8), "sorpa: " + game.cannonsToUse.get(Tile.Rotation.NONE));
+        graphics.putString(new TerminalPosition(120, 9),"destra: " + game.cannonsToUse.get(Tile.Rotation.CLOCK));
+        graphics.putString(new TerminalPosition(120, 10), "sotto: " + game.cannonsToUse.get(Tile.Rotation.DOUBLE));
+        graphics.putString(new TerminalPosition(120, 11), "sinistra: " + game.cannonsToUse.get(Tile.Rotation.INV));
+    }
+
+    public void drawCash(){
+        graphics.putString(new TerminalPosition(3, 3), "SOLDI");
+        graphics.putString(new TerminalPosition(3, 4), ""+ game.cash);
+    }
+
 }

@@ -42,7 +42,7 @@ public class Planets extends Card{
         if(planet != Planet.NOPLANET && chosenPlanet.containsValue(planet))
             return Result.err("planet already occupied");
 
-        if(!planets.containsKey(planet))
+        if(!planets.containsKey(planet) && planet != Planet.NOPLANET)
             return Result.err("planet does not exist");
 
         chosenPlanet.put(player, planet);

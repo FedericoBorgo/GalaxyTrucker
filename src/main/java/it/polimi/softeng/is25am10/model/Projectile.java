@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @param where coordinate to HIT
  * @param ID unique number
  */
-public record Projectile(it.polimi.softeng.is25am10.model.Projectile.Type type, Tile.Side side, int where,
+public record Projectile(Type type, Tile.Side side, int where,
                          int ID) implements Serializable {
 
     /**

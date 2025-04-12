@@ -46,7 +46,7 @@ public class Deck extends Card implements Serializable {
 
         //build all the cards type
         cards.addAll(Epidemic.construct(board));
-        cards.addAll(Meteors.construct(board));
+        cards.addAll(Meteors.construct(model, board));
         cards.addAll(Planets.construct(board));
         cards.addAll(AbandonedShip.construct(model, board));
         cards.addAll(Space.construct(model, board));
@@ -90,14 +90,8 @@ public class Deck extends Card implements Serializable {
      * @return the drew card
      */
     public Card draw(List<Player> players){
-        selectedCard = deck.removeFirst();
         this.players = players;
-
-        if(selectedCard != null && !selectedCard.needInput){
-            players.forEach(player -> selectedCard.set(player, null));
-        }
-
-        return selectedCard;
+        return selectedCard = deck.removeFirst();
     }
 
     /**

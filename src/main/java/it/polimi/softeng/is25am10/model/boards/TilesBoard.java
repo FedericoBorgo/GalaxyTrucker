@@ -541,14 +541,38 @@ public class TilesBoard implements Serializable {
         return c == null? Optional.empty() : Optional.of(c);
     }
 
+    private Projectile convertProjectile(Projectile proj){
+        int where = proj.where();
+
+        if(proj.side() == Tile.Side.UP || proj.side() == Tile.Side.DOWN){
+            where -= 4;
+
+            if(where < 0 || where >= BOARD_WIDTH)
+                return null;
+        }
+        else {
+            where -= 5;
+
+            if(where < 0 || where >= BOARD_HEIGHT)
+                return null;
+        }
+
+        return new Projectile(proj.type(), proj.side(), where, proj.ID());
+    }
+
     /**
      * Hit the board with the projectile.
      *
-     * @param p projectile to hit
+     * @param proj projectile to hit
      * @param useBattery ?
      * @return the broken tile
      */
-    public Optional<Coordinate> hit(Projectile p, boolean useBattery){
+    public Optional<Coordinate> hit(Projectile proj, boolean useBattery){
+        Projectile p = convertProjectile(proj);
+
+        if(p == null)
+            return Optional.empty();
+
         boolean saved = false;
         Optional<Coordinate> pos = whatWillHit(p);
 
@@ -574,6 +598,18 @@ public class TilesBoard implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         TilesBoard that = (TilesBoard) o;
         return Objects.deepEquals(board, that.board) && Objects.deepEquals(rotation, that.rotation) && Objects.equals(booked, that.booked) && Objects.equals(trashed, that.trashed);
+    }
+
+    public boolean hasAddon(){
+        AtomicBoolean has = new AtomicBoolean(false);
+        Coordinate.forEachUntil(c -> {
+            if(Tile.addon(get(c))){
+                has.set(true);
+                return false;
+            }
+            return true;
+        });
+        return has.get();
     }
 }
 

@@ -49,7 +49,7 @@ public class Smugglers extends Card {
                 if(input.accept)
                     winner = Result.ok(player);
 
-            } else if (power < enemyPower && model.getRemoved(player).goods < goods)
+            } else if (power < enemyPower && (model.getRemoved(player).goods < goods && model.getRemoved(player).goods + player.getBoard().getTotalGoods() >= goods))
                     return Result.err("player did not give enough goods to the smugglers");
         }
         register(player);

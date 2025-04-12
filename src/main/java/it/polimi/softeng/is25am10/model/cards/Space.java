@@ -41,6 +41,11 @@ public class Space extends Card {
         //begin common part
         if(!ready())
             return Result.err("not all player declared their decision");
+
+        enginePower.forEach((p, v) -> {
+            if(v == 0)
+                flight.quit(p);
+        });
         //end
         for(int i = flight.getOrder().size() - 1; i >= 0; i--){
             FlightBoard.Pawn p = flight.getOrder().get(i);

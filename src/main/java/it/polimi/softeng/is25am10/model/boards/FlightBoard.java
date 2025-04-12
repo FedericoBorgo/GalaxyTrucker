@@ -78,6 +78,9 @@ public class FlightBoard implements Serializable {
 
     ///  normalize the offsets of the players
     private void shift(){
+        if(offset.isEmpty())
+            return;
+
         int shift = offset.getFirst();
         offset.replaceAll(val -> val - shift);
         leaderPosition += shift;
@@ -153,6 +156,9 @@ public class FlightBoard implements Serializable {
      * @param pawn the player to quit
      */
     public void quit(Pawn pawn) {
+        if(!order.contains(pawn))
+            return;
+
         offset.remove(order.indexOf(pawn));
         order.remove(pawn);
         quitters.add(pawn);

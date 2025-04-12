@@ -51,7 +51,7 @@ public interface RMIInterface extends Remote {
 
     Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t) throws RemoteException;
 
-    Result<String> setCannonsToUse(String name, Map<Tile.Rotation, Integer> map) throws RemoteException;
+    Result<String> increaseCannon(String name, Tile.Rotation r, Integer count) throws RemoteException;
 
     Result<Tile> drawTile(String name) throws RemoteException;
 
