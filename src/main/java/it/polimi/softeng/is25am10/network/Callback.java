@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface Callback extends Remote {
-    void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException;
+    void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException;
 
     int askHowManyPlayers() throws RemoteException;
 
@@ -50,5 +50,5 @@ public interface Callback extends Remote {
 
     void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException;
 
-    void pushQuit(HashSet<String> quit) throws RemoteException;
+    void pushModel(Model m) throws RemoteException;
 }

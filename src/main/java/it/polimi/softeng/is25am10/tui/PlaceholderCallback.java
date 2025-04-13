@@ -16,8 +16,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class PlaceholderCallback implements Callback {
+
     @Override
-    public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
+    public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
 
     }
 
@@ -102,7 +103,7 @@ public class PlaceholderCallback implements Callback {
     }
 
     @Override
-    public void pushQuit(HashSet<String> quit) throws RemoteException {
+    public void pushModel(Model m) throws RemoteException {
 
     }
 }

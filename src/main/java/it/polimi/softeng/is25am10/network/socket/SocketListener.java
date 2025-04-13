@@ -136,8 +136,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void setPlayers(HashMap<String, FlightBoard.Pawn> players) {
-        call(players);
+    public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
+        call(players, quid, disconnected);
     }
 
     @Override
@@ -221,7 +221,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushQuit(HashSet<String> quit) throws RemoteException {
-        call(quit);
+    public void pushModel(Model m) throws RemoteException {
+        call(m);
     }
+
 }

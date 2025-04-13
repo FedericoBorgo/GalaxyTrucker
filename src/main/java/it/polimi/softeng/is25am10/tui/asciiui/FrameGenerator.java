@@ -16,6 +16,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
@@ -89,7 +90,6 @@ public class FrameGenerator {
 
         drawTile(new Coordinate(3, 2), new Tile(Tile.Type.C_HOUSE, "uuuu"), Tile.Rotation.NONE);
         drawFlight();
-        drawPlayersName();
     }
 
     private TerminalPosition coordToTerminalPosition(Coordinate coord){
@@ -266,20 +266,21 @@ public class FrameGenerator {
         refresh();
     }
 
-    public synchronized void drawSecondsLeft(){
+    public synchronized void drawSecondsLeft(int secondsLeft){
         graphics.putString(new TerminalPosition(122, 30), "                     ");
-        graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(game.secondsLeft));
+        graphics.putString(new TerminalPosition(122+ game.flight.getTimer()*10, 30), String.valueOf(secondsLeft));
         refresh();
     }
 
-    public synchronized void drawPlayersName() {
+    public synchronized void drawPlayersName(Map<String, FlightBoard.Pawn> players, Set<String> quit, Set<String> dis) {
         AtomicInteger pos = new AtomicInteger(34);
         try{
-            game.players.forEach((name, pawn) -> {
+            players.forEach((name, pawn) -> {
                 graphics.setForegroundColor(pawn.getColor());
                 graphics.putString(new TerminalPosition(0, pos.get()), "#" + name +
                         (name.equals(game.server.getPlayerName())? "*" : "") +
-                        (game.quit.contains(name)? "fuori" : "     "));
+                        (quit.contains(name)? "fuori" : "") +
+                        (dis.contains(name)? "(disconnesso)" : "             "));
                 pos.getAndIncrement();
             });
 
@@ -439,20 +440,7 @@ public class FrameGenerator {
         return box.getInt();
     }
 
-    public void dialog(String message){
-        pauseRender = true;
-        WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
-        Window window = new BasicWindow("Dialog");
-        textGUI.addWindow(window);
-
-        MessageDialog.showMessageDialog(textGUI, "Message", message, MessageDialogButton.OK);
-        window.close();
-
-        textGUI.waitForWindowToClose(window);
-        screen.clear();
-        pauseRender = false;
-    }
-
+    /*
     public void drawCardData(){
         if(game.cardDataStr == null || game.state != Model.State.Type.WAITING_INPUT)
             return;
@@ -487,6 +475,6 @@ public class FrameGenerator {
     public void drawCash(){
         graphics.putString(new TerminalPosition(3, 3), "SOLDI");
         graphics.putString(new TerminalPosition(3, 4), ""+ game.cash);
-    }
+    }*/
 
 }

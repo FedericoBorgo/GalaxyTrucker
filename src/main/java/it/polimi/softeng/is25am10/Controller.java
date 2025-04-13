@@ -48,7 +48,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     /**
      * Store the disconnected players
      */
-    private final Map<Model, Set<String>> disconnected = new ConcurrentHashMap<>();
+    private final Map<Model, HashSet<String>> disconnected = new ConcurrentHashMap<>();
 
     /**
      * Method to call when the game state changed.
@@ -91,7 +91,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
             pushState(m);
             pushFlight(m);
-            pushQuit(m);
+            pushPlayers(m);
 
             if(state == Model.State.Type.DRAW_CARD && m.getChanges() != null)
                 pushCardChanges(m);
@@ -162,6 +162,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param callback to call
      */
     public synchronized void setCallback(String name, Callback callback) {
+        Model m = games.getOrDefault(name, null);
+
+        if(m != null)
+            if(!disconnected.get(m).contains(name))
+                return;
+
         callbacks.put(name, callback);
     }
 
@@ -174,36 +180,15 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     private void rejoined(String name) {
         try {
             Model m = getModel(name);
-            Callback callback = callbacks.get(name);
 
-            // push the current state of the game
-            callback.pushFlight(m.getFlight());
-            callback.pushBoard(m.ship(name));
-            callback.pushState(m.getState());
-            callback.setPlayers(m.getPlayers());
-            callback.pushDropped(m.getRemoved(name));
-            callback.pushCannons(m.getCannonsToUse(name));
-
+            callbacks.get(name).pushModel(m);
             disconnected.get(m).remove(name);
+            pushPlayers(m);
 
             if(m.nPlayers - disconnected.get(m).size() >= 2
                     && m.getState() == Model.State.Type.PAUSED)
                 m.resume();
 
-            if(m.getState() == Model.State.Type.WAITING_INPUT) {
-                callback.waitFor(m.getNextToPlay());
-                callback.pushCardData(m.getCardData());
-            }
-
-            if(m.getState() == Model.State.Type.BUILDING){
-                m.getSeenTiles().forEach(t -> {
-                    try {
-                        callback.gaveTile(t);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -217,9 +202,16 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     public synchronized Result<FlightBoard.Pawn> join(String name){
         //in case of disconnected player
         if(games.containsKey(name)) {
+            Model m = games.get(name);
+
+            if(!disconnected.get(m).contains(name)) {
+                Logger.serverLog("rifiutato: " +name + ", giocatore già connesso");
+                return Result.err("giocatore già connesso");
+            }
+
             rejoined(name);
-            Logger.playerLog(getModel(name).hashCode(), name, "reconnected");
-            return Result.ok(getModel(name).get(name).getPawn());
+            Logger.playerLog(m.hashCode(), name, "reconnected");
+            return Result.ok(m.get(name).getPawn());
         }
 
         // no game is starting
@@ -234,7 +226,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         Result<FlightBoard.Pawn> pawn = starting.addPlayer(name);
 
         if(pawn.isOk())
-            setPlayers(temp);
+            pushPlayers(temp);
 
         return pawn;
     }
@@ -344,17 +336,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         notifyPlayers(m, null, m.getFlight());
     }
 
-    public void pushQuit(Model m){
-        notifyPlayers(m, null, m.getQuit());
-    }
-
     /**
      * Push the players list to every client.
      *
      * @param m model to notify
      */
-    public void setPlayers(Model m) {
-        notifyPlayers(m, null, m.getPlayers());
+    public void pushPlayers(Model m) {
+        notifyPlayers(m, null, m.getPlayers(), m.getQuit(), disconnected.get(m));
     }
 
     /**
@@ -385,21 +373,27 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     public void ping(){
         for(Model m: games.values()) {
             notifyPlayers(m, (name) -> {
-                disconnected.get(m).add(name);
+                if(!disconnected.get(m).contains(name)) {
+                    disconnected.get(m).add(name);
+                    pushPlayers(m);
+                }
 
                 if (disconnected.get(m).size() >= m.nPlayers - 1)
                     m.pause();
-                else {
-                    if (m.getState() == Model.State.Type.ALIEN_INPUT) {
-                        if (m.init(name, Optional.empty(), Optional.empty()).isOk())
-                            Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
-                    } else if (m.getState() == Model.State.Type.WAITING_INPUT &&
-                            name.equals(m.getNextToPlay())) {
-                        Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
-                        setInput(name, CardInput.disconnected());
-                    }
-                }
+                else
+                    handleAutomaticInput(m, name);
             });
+        }
+    }
+
+    private void handleAutomaticInput(Model m, String name){
+        if (m.getState() == Model.State.Type.ALIEN_INPUT) {
+            if (m.init(name, Optional.empty(), Optional.empty()).isOk())
+                Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
+        } else if (m.getState() == Model.State.Type.WAITING_INPUT &&
+                name.equals(m.getNextToPlay())) {
+            Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
+            setInput(name, CardInput.disconnected());
         }
     }
 
