@@ -259,19 +259,35 @@ public class TilesBoard implements Serializable {
         marked[c.x()][c.y()] = true;
 
         try {
-            mark(marked, c.left());
+            Coordinate left = c.left();
+
+            if(Tile.getSide(get(c), getRotation(c), Tile.Side.LEFT).isConnector() &&
+                Tile.getSide(get(left), getRotation(left), Tile.Side.RIGHT).isConnector())
+                mark(marked, left);
         } catch (IOException _) {
         }
         try {
-            mark(marked, c.right());
+            Coordinate right = c.right();
+
+            if(Tile.getSide(get(c), getRotation(c), Tile.Side.RIGHT).isConnector() &&
+                    Tile.getSide(get(right), getRotation(right), Tile.Side.LEFT).isConnector())
+                mark(marked, right);
         } catch (IOException _) {
         }
         try {
-            mark(marked, c.up());
+            Coordinate up = c.up();
+
+            if(Tile.getSide(get(c), getRotation(c), Tile.Side.UP).isConnector() &&
+                    Tile.getSide(get(up), getRotation(up), Tile.Side.DOWN).isConnector())
+                mark(marked, up);
         } catch (IOException _) {
         }
         try {
-            mark(marked, c.down());
+            Coordinate down = c.down();
+
+            if(Tile.getSide(get(c), getRotation(c), Tile.Side.DOWN).isConnector() &&
+                    Tile.getSide(get(down), getRotation(down), Tile.Side.UP).isConnector())
+                mark(marked, down);
         } catch (IOException _) {
         }
     }

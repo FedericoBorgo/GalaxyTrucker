@@ -44,7 +44,7 @@ public class AlienBoard extends ElementsBoard{
      * @param c central coordinate
      * @return true if an adjacent tile contains an addon of the specified type, false otherwise
      */
-    private boolean thereIsAddon(Coordinate c){
+    public static boolean thereIsAddon(Coordinate c, TilesBoard tiles, Tile.Type type){
         List<Result<Tile>> adjacent = new ArrayList<>();
 
         // get the adjacent tile (if possible).
@@ -76,7 +76,7 @@ public class AlienBoard extends ElementsBoard{
     @Override
     public boolean cantPlace(Coordinate c, int qty) {
         return tiles.getTile(c).getData().getType() != Tile.Type.HOUSE
-                || !thereIsAddon(c) || qty > 1 || (get(c) + qty > 1) || total + qty > 1;
+                || !thereIsAddon(c, tiles, type) || qty > 1 || (get(c) + qty > 1) || total + qty > 1;
     }
 
     /**

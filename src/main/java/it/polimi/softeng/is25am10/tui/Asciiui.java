@@ -5,25 +5,19 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.TilesCollection;
+import it.polimi.softeng.is25am10.model.boards.AlienBoard;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
-import it.polimi.softeng.is25am10.network.rmi.RMIInterface;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
-import it.polimi.softeng.is25am10.network.socket.SocketListener;
-import it.polimi.softeng.is25am10.tui.asciiui.Config;
 import it.polimi.softeng.is25am10.tui.asciiui.Game;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.random.RandomGenerator;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Asciiui {
     static Random rmd = new Random();
@@ -63,24 +57,62 @@ public class Asciiui {
 
     static void genRandomShip(Game game) {
         TilesBoard board = new TilesBoard();
-        AtomicInteger piazzate = new AtomicInteger(0);
 
-        while(piazzate.get() < 50){
+        while(true){
             Coordinate c = genRandomCoord();
             Tile t = genRandomTile();
-            Tile.Rotation r = genRandomOri();
+
+            Tile.Rotation r = Tile.engine(t) ? Tile.Rotation.NONE : genRandomOri();
 
             board.setTile(c, t, r).ifPresent(_ -> {
                 if(!board.isOK().isEmpty())
                     board.remove(c);
                 else {
-                    piazzate.incrementAndGet();
                     String coord = "" + c.x() + c.y();
                     game.currentTile = t;
                     game.execute("piazza 2 " + coord +" " + getOri(r));
                 }
             });
         }
+    }
+
+    static void placeAlien(Game game){
+        AtomicReference<Optional<Coordinate>> purple = new AtomicReference<>(Optional.empty());
+        AtomicReference<Optional<Coordinate>> brown = new AtomicReference<>(Optional.empty());
+
+        TilesBoard board = game.board.getTiles();
+
+        Coordinate.forEach(c -> {
+            Result<Tile> res = board.getTile(c);
+
+            if(res.isErr())
+                return;
+
+            Tile t = res.getData();
+
+            if(t.getType() == Tile.Type.HOUSE){
+                if(AlienBoard.thereIsAddon(c, board, Tile.Type.P_ADDON) && purple.get().isEmpty())
+                    purple.set(Optional.of(c));
+
+                if(AlienBoard.thereIsAddon(c, board, Tile.Type.B_ADDON) && brown.get().isEmpty())
+                    brown.set(Optional.of(c));
+            }
+        });
+        StringBuilder cmd = new StringBuilder();
+        cmd.append("alieni");
+
+        brown.get().ifPresent(c -> {
+            cmd.append(" m").append(c.x()).append(c.y());
+        });
+
+        purple.get().ifPresent(c -> {
+            cmd.append(" v").append(c.x()).append(c.y());
+        });
+
+        if(purple.get().isEmpty() && brown.get().isEmpty())
+            cmd.append(" no");
+
+        game.execute(cmd.toString());
     }
 
     static void placeRandom(Game game, int timeout){
@@ -107,13 +139,19 @@ public class Asciiui {
 
         Game game = new Game(client);
 
-        //new SocketClient("npc", "localhost", 1235, 1236).join(new PlaceholderCallback());
+        new SocketClient("npc", "localhost", 1235, 1236).join(new PlaceholderCallback());
 
         while(game.state != Model.State.Type.BUILDING)
             Thread.sleep(100);
 
-        placeRandom(game, 5);
+        placeRandom(game, 1);
 
         game.execute("clessidra");
+        game.execute("clessidra");
+
+        while(game.state != Model.State.Type.ALIEN_INPUT)
+            Thread.sleep(100);
+
+        placeAlien(game);
     }
 }

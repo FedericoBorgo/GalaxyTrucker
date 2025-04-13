@@ -27,7 +27,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     ClientInterface server;
 
-    ShipBoard board = new ShipBoard();
+    public ShipBoard board = new ShipBoard();
     FlightBoard flight = new FlightBoard();
     ArrayList<Tile> openTiles = new ArrayList<>();
 

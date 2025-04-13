@@ -257,6 +257,10 @@ public class Tile implements Serializable {
 
             return this == TWO_PIPE && other == TWO_PIPE;
         }
+
+        public boolean isConnector(){
+            return this != SMOOTH;
+        }
     }
 
     /**

@@ -171,12 +171,14 @@ public class FrameGenerator {
     private void drawErrors(Set<Coordinate> errors){
         graphics.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
 
+        graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "              ");
+
         Coordinate.forEach(c -> {
             graphics.putString(coordToTerminalPosition(c).plus(new TerminalPosition(2, 1)), "   ");
         });
 
         if(errors.contains(new Coordinate(0, 0))) {
-            graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "SEP");
+            graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "NAVE SEPARATA");
             return;
         }
 
