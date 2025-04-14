@@ -90,6 +90,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         stateEvent = (m, state) -> {
             Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
             pushState(m);
+
+
             pushFlight(m);
             pushPlayers(m);
 
@@ -253,7 +255,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param error consumer to call in ase of errors while calling the player
      * @param args arguments gave to the player
      */
-    private void notifyPlayers(Model m, Consumer<String> error , Object... args){
+    private synchronized void notifyPlayers(Model m, Consumer<String> error , Object... args){
         Method method;
 
         // get the method name-arguments
@@ -582,6 +584,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     @Override
     public Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c) {
         return getModel(name).placeReward(name, t, c);
+    }
+
+    @Override
+    public Result<String> dropReward(String name){
+        return getModel(name).dropReward(name);
     }
 
     @Override

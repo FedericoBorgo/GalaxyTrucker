@@ -17,6 +17,15 @@ public class Tile implements Serializable {
     public enum Side{
         UP, RIGHT, DOWN, LEFT;
         public static final Side[] order = {UP, RIGHT, DOWN, LEFT};
+
+        public String getName(){
+            return switch (this){
+                case UP -> "Sopra";
+                case RIGHT -> "Destra";
+                case DOWN -> "Sotto";
+                case LEFT -> "Sinistra";
+            };
+        }
     }
 
     public enum Rotation{

@@ -18,6 +18,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.CardData;
@@ -254,7 +255,7 @@ public class FrameGenerator {
         for(int i = 0; i < order.size(); i++){
             int a = leader + offset.get(i);
             if(a < 0)
-                a = 24 - a;
+                a = 24 + a;
             String pos = textures.getJSONObject("FLIGHT")
                     .getString(String.valueOf(a));
 
@@ -302,8 +303,9 @@ public class FrameGenerator {
     }
 
     public synchronized void drawState(){
-        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);graphics.putString(new TerminalPosition(93, 2), "            ");
-        graphics.putString(new TerminalPosition(93, 2), game.state.name());
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        graphics.putString(new TerminalPosition(93, 2), "                       ");
+        graphics.putString(new TerminalPosition(93, 2), game.state.getName());
         refresh();
     }
 
@@ -350,7 +352,7 @@ public class FrameGenerator {
     }
 
     synchronized void drawInput(){
-        graphics.putString(new TerminalPosition(29, 34), "                              ");
+        graphics.putString(new TerminalPosition(29, 34), "                                ");
         graphics.setForegroundColor(isOkCommand? TextColor.ANSI.WHITE_BRIGHT : TextColor.ANSI.RED_BRIGHT);
 
         for(int i = 0; i < command.size(); i++){
@@ -360,7 +362,7 @@ public class FrameGenerator {
         screen.setCursorPosition(new TerminalPosition(29+ cursor, 34));
 
         graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-        graphics.putString(new TerminalPosition(29, 36), response);
+        graphics.putString(new TerminalPosition(29, 36), response+ "                                 ");
 
         refresh();
     }
@@ -580,6 +582,22 @@ public class FrameGenerator {
             }
         }
 
+        refresh();
+    }
+
+    public synchronized void drawGoods(List<GoodsBoard.Type> reward){
+        graphics.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        graphics.putString(new TerminalPosition(161, 17), "SCATOLE");
+
+        for (int i = 0; i < 6; i++) {
+            graphics.putString(new TerminalPosition(161, 18+i), "        ");
+        }
+
+
+        for (int i = 0; i < reward.size(); i++) {
+            graphics.setForegroundColor(reward.get(i).getColor());
+            graphics.putString(new TerminalPosition(161, 18+i), reward.get(i).getName());
+        }
         refresh();
     }
 }

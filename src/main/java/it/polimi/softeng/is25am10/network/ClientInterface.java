@@ -77,6 +77,10 @@ public abstract class ClientInterface extends Thread{
         return call(name, t, c);
     }
 
+    public Result<String> dropReward(){
+        return call(name);
+    }
+
     public int getCash() {
         return call(name);
     }

@@ -40,9 +40,11 @@ public class ShipBoard implements Serializable {
         brown.setOthers(Arrays.asList(purple, astronaut));
 
         Arrays.stream(GoodsBoard.Type.values()).forEach(type -> {
-            List<ElementsBoard> other = new ArrayList<>(goods.values());
-            other.remove(goods.get(type));
-            goods.get(type).setOthers(other);
+            goods.get(type).setOthers(goods.values()
+                                            .stream()
+                                            .filter(b -> ((GoodsBoard)b).type != type)
+                                            .toList()
+                                        );
         });
 
         boards = new ArrayList<>(List.of(astronaut, purple, brown, battery));

@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.model.cards;
 
 import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Pirates extends Card {
     private final Map<Player, List<Integer>> useBattery = new HashMap<>();
-    private final List<Projectile> projectiles = new ArrayList<>();
+    private final List<Projectile> projectiles;
 
     private Result<Player> rewarded = Result.err();
     private boolean defeated = false;
@@ -32,13 +33,13 @@ public class Pirates extends Card {
         this.days = days;
         this.cash = cash;
 
-        AtomicInteger counter = new AtomicInteger();
-        counter.set(0);
-        fire.forEach(type -> {
-            int number = rollDice() + rollDice();
-            Projectile p = new Projectile(type, Tile.Side.UP, number, counter.getAndIncrement());
-            projectiles.add(p);
+        List<Pair<Tile.Side, Projectile.Type>> proj = new ArrayList<>();
+
+        fire.forEach((p) -> {
+            proj.add(new Pair<>(Tile.Side.UP, p));
         });
+
+        projectiles = Meteors.genProjectiles(proj);
     }
 
     @Override

@@ -30,11 +30,25 @@ public class CardData implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(type).append("\n");
-        builder.append("id: ").append(id).append("\n");
+        String cardName = switch(type){
+            case EPIDEMIC -> "Epidemia";
+            case METEORS -> "Pioggia di meteoriti";
+            case PLANETS -> "Pianeti";
+            case AB_SHIP -> "Nave abbandonata";
+            case OPEN_SPACE -> "Spazio aperto";
+            case STARDUST -> "Polvere stellare";
+            case STATION -> "Stazione abbandonata";
+            case PIRATES -> "Pirati";
+            case SMUGGLERS -> "Contrabbandieri";
+            case SLAVERS -> "Schiavisti";
+            case WAR_ZONE -> "Zona di guerra";
+        };
+
+        builder.append(cardName).append("\n");
+        builder.append("ID: ").append(id).append("\n");
 
         if(projectiles != null){
-            builder.append("projectiles:\n");
+            builder.append("Proiettili:\n");
 
             projectiles.forEach((p) -> {
                 builder.append("  ").append(p).append("\n");
@@ -42,44 +56,46 @@ public class CardData implements Serializable {
         }
 
         if(planets != null){
-            builder.append("planets:\n");
+            builder.append("Pianeti:\n");
 
             planets.forEach((p, goods) -> {
                 if(chosenPlanets.contains(p))
                     return;
-                builder.append("  ").append(p).append(": ");
-                goods.forEach(e -> builder.append(e).append(", "));
+                builder.append("  ").append(p.getID()).append(": ");
+                goods.forEach(e -> builder.append(e.getName()).append(", "));
                 builder.append("\n");
             });
+
+            builder.append("  ").append(Planets.Planet.NOPLANET.getID()).append(": Non atterrare\n");
         }
 
         if(declaredPower != null){
-            builder.append("declared power: \n");
+            builder.append("Potenza giocatori: \n");
             declaredPower.forEach((name, v) -> {
                 builder.append("  ").append(name).append(": ").append(v).append("\n");
             });
         }
 
         if(rewards != null){
-            builder.append("rewards:\n ");
-            rewards.forEach((p) -> {builder.append(p).append(", ");});
+            builder.append("Ricompensa:\n ");
+            rewards.forEach((p) -> {builder.append(p.getName()).append(", ");});
             builder.append("\n");
         }
 
         if(cash != 0)
-            builder.append("cash: ").append(cash).append("\n");
+            builder.append("Soldi: ").append(cash).append("\n");
 
         if(days != 0)
-            builder.append("days: ").append(days).append("\n");
+            builder.append("Giorni di volo: ").append(days).append("\n");
 
         if(crew != 0)
-            builder.append("crew: ").append(crew).append("\n");
+            builder.append("Membri equipaggio: ").append(crew).append("\n");
 
         if(goods != 0)
-            builder.append("goods: ").append(goods).append("\n");
+            builder.append("Scatole: ").append(goods).append("\n");
 
         if(power != 0)
-            builder.append("power: ").append(power).append("\n");
+            builder.append("Potenza nemico: ").append(power).append("\n");
 
         return builder.toString();
     }

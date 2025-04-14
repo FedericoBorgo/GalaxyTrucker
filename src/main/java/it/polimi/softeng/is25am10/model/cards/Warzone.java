@@ -17,7 +17,7 @@ public class Warzone extends Card {
         LEAST_GUYS, LEAST_ENGINE, LEAST_CANNON
     }
 
-    private final List<Projectile> fire = new ArrayList<>();
+    private final List<Projectile> fire;
     private final int days, goods, guys;
     private final Map<Player, List<Integer>> useBattery = new HashMap<>();
     private final Map<Player, Map<LeastTypes, Double>> declaredPower = new HashMap<>();
@@ -29,7 +29,7 @@ public class Warzone extends Card {
 
     private Warzone(Model model, FlightBoard board, int id,
                    Map<LeastTypes, MalusTypes> malusTypes,
-                   List<Pair<Projectile.Type, Tile.Side>> fire,
+                   List<Pair<Tile.Side, Projectile.Type>> fire,
                    int days, int goods, int guys) {
         super(model, true, board, id, Type.WAR_ZONE);
         this.days = days;
@@ -37,14 +37,7 @@ public class Warzone extends Card {
         this.guys = guys;
         this.malusTypes = malusTypes;
         
-        AtomicInteger counter = new AtomicInteger(0);
-
-        fire.forEach(pair -> this.fire.add(new Projectile(
-                pair.getKey(),
-                pair.getValue(),
-                rollDice() + rollDice(),
-                counter.getAndIncrement()
-        )));
+        this.fire = Meteors.genProjectiles(fire);
     }
 
     @Override
@@ -138,7 +131,7 @@ public class Warzone extends Card {
 
         jsonCards.forEach(obj -> {
             Map<LeastTypes, MalusTypes> malusTypes = new HashMap<>();
-            List<Pair<Projectile.Type, Tile.Side>> fire = new ArrayList<>();
+            List<Pair<Tile.Side, Projectile.Type>> fire = new ArrayList<>();
             JSONObject item = (JSONObject) obj;
             JSONArray jsonProjectiles = item.getJSONArray("FIRE");
             int id = item.getInt("id");
@@ -154,7 +147,7 @@ public class Warzone extends Card {
                 JSONObject projectile = (JSONObject) objectProjectile;
                 Projectile.Type type = Projectile.Type.valueOf(projectile.getString("type"));
                 Tile.Side side = Tile.Side.valueOf(projectile.getString("side"));
-                fire.add(new Pair<>(type, side));
+                fire.add(new Pair<>(side, type));
             });
 
             cards.add(new Warzone(model, board, id, malusTypes, fire, days, goods, guys));

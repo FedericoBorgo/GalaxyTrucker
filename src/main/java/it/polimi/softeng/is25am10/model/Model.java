@@ -105,9 +105,25 @@ public class Model implements Serializable {
             DRAW_CARD,
             //waiting player input
             WAITING_INPUT,
+            PLACE_REWARD,
             ENDED,
             PAUSED,
-            PAY_DEBT
+            PAY_DEBT;
+
+            public String getName(){
+                return switch (this){
+                    case JOINING -> "Aspettare giocatori";
+                    case BUILDING -> "Assemblare";
+                    case CHECKING -> "Controllare connettori";
+                    case ALIEN_INPUT -> "Piazzare equipaggio";
+                    case DRAW_CARD -> "Pescare carta";
+                    case WAITING_INPUT -> "Dichiarare scelte";
+                    case PLACE_REWARD -> "Piazzare scatole";
+                    case ENDED -> "Terminata";
+                    case PAUSED -> "In pausa";
+                    case PAY_DEBT -> "Gettare elementi";
+                };
+            }
         }
         private Type prev;
         private Type curr;
@@ -393,8 +409,12 @@ public class Model implements Serializable {
         if(allShipOk()){
             if(state.getPrev() == State.Type.BUILDING)
                 state.next(State.Type.ALIEN_INPUT);
-            else if(state.getPrev() == State.Type.WAITING_INPUT)
-                state.next(State.Type.DRAW_CARD);
+            else if(state.getPrev() == State.Type.WAITING_INPUT) {
+                if(hasReward())
+                    state.next(State.Type.PLACE_REWARD);
+                else
+                    state.next(State.Type.DRAW_CARD);
+            }
         }
 
         return Result.ok("");
@@ -437,13 +457,32 @@ public class Model implements Serializable {
         return Result.ok("");
     }
 
-    //TODO reward state
     public synchronized List<GoodsBoard.Type> getReward(String name){
         return get(name).getGoodsReward();
     }
 
     public synchronized Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c){
-        return get(name).placeReward(t, c);
+        if(state.curr != State.Type.PLACE_REWARD)
+            return Result.err("not place reward state");
+
+        Result<Integer> res = get(name).placeReward(t, c);
+
+        if(!hasReward())
+            state.next(State.Type.DRAW_CARD);
+
+        return res;
+    }
+
+    public synchronized Result<String> dropReward(String name){
+        if(state.curr != State.Type.PLACE_REWARD)
+            return Result.err("not place reward state");
+
+        get(name).setGoodsReward(new ArrayList<>());
+
+        if(!hasReward())
+            state.next(State.Type.DRAW_CARD);
+
+        return Result.ok("");
     }
 
     public int getCash(String name){
@@ -731,13 +770,27 @@ public class Model implements Serializable {
                 }
             });
 
-            if(allShipOk())
-                state.next(State.Type.DRAW_CARD);
+            if(allShipOk()) {
+                if(hasReward())
+                    state.next(State.Type.PLACE_REWARD);
+                else
+                    state.next(State.Type.DRAW_CARD);
+            }
             else
                 state.next(State.Type.CHECKING);
         }
 
         return res;
+    }
+
+    private boolean hasReward(){
+        AtomicBoolean hasReward = new AtomicBoolean(false);
+        players.values().forEach(p -> {
+            if(p.getGoodsReward().isEmpty())
+                return;
+            hasReward.set(true);
+        });
+        return hasReward.get();
     }
 
     public synchronized Result<Card[][]> getVisible(){

@@ -6,6 +6,7 @@ import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +18,7 @@ public class Player implements Serializable {
     private final FlightBoard.Pawn pawn;
     private int cash;
     private final ShipBoard board = new ShipBoard();
-    private List<GoodsBoard.Type> goodsReward;
+    private List<GoodsBoard.Type> goodsReward = new ArrayList<>();
     private final String name;
 
     /**

@@ -30,7 +30,7 @@ public record Projectile(Type type, Tile.Side side, int where,
             case BIG_FIRE -> "Grande fuoco";
         };
 
-        return side + ":" + where +
+        return side.getName() + ":" + where +
                 " ID:" + ID + " " + t;
     }
 

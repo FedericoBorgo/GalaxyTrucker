@@ -158,7 +158,7 @@ Questo comando dichiara solo stato di pronto.
 ### Pianeti
 > invia {_pianeta_}
 
-{_pianeta_}: 0-4 indica su quale pianeta si vuole atterrare, 4 sta per _nessun pianeta_
+{_pianeta_}: 1-5 indica su quale pianeta si vuole atterrare, 5 sta per _nessun pianeta_
 
 ### Meteoriti, Zona di guerra
 > invia _mult_{_id asteroidi_}
@@ -174,6 +174,12 @@ Indica l'intenzione di voler scendere sulla nave o stazione.
 > invia {**si/no**} _mult_{_id asteroidi_}
 
 Comunica se si vuole ottenere la ricompensa e da quali asteroidi difendersi.
+
+## Scatole
+> scatola _opt_{**no**} {**g/v/r/b**} {_dove_}
+
+Piazza la scatola del colore indicato nella cella.
+Se si possono scartare le scatole usando _no_.
 
 # Esci
 > esci

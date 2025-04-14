@@ -45,6 +45,8 @@ public interface RMIInterface extends Remote {
 
     Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c) throws RemoteException;
 
+    Result<String> dropReward(String name) throws RemoteException;
+
     int getCash(String name) throws RemoteException;
 
     Result<Integer> drop(String name, Coordinate c) throws RemoteException;

@@ -12,23 +12,43 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Meteors extends Card {
     private final Map<Player, List<Integer>> useBattery = new HashMap<>();
-    private final List<Projectile> projectiles = new ArrayList<>();
+    private final List<Projectile> projectiles;
+
+    public static List<Projectile> genProjectiles(List<Pair<Tile.Side, Projectile.Type>> proj) {
+        Map<Tile.Side, Set<Integer>> explored = new HashMap<>();
+        List<Projectile> result = new ArrayList<>();
+        AtomicInteger counter = new AtomicInteger(0);
+
+        for (int i = 0; i < Tile.Side.values().length; i++)
+            explored.put(Tile.Side.values()[i], new HashSet<>());
+
+        proj.forEach(p -> {
+            Tile.Side side = p.getKey();
+            Projectile.Type type = p.getValue();
+            int where;
+
+            do {
+                where = rollDice();
+            }while (explored.get(side).contains(where));
+
+           explored.get(side).add(where);
+
+           result.add(new Projectile(type, side, where, counter.getAndIncrement()));
+        });
+
+        return result;
+    }
+
+
 
     public static int rollDice() {
-        return new Random().nextInt(6) + 1;
+        return new Random().nextInt(6) + 1 + new Random().nextInt(6) + 1;
     }
 
     private Meteors(Model m, FlightBoard board, List<Pair<Tile.Side, Projectile.Type>> meteors, int id) {
         super(m, true, board, id, Card.Type.METEORS);
-        
-        AtomicInteger counter = new AtomicInteger(0);
 
-        meteors.forEach(pair -> projectiles.add(new Projectile(
-                pair.getValue(),
-                pair.getKey(),
-                rollDice() + rollDice(),
-                counter.getAndIncrement()
-        )));
+        projectiles = genProjectiles(meteors);
     }
 
 

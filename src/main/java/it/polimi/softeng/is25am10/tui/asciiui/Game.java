@@ -28,6 +28,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     FlightBoard flight = new FlightBoard();
     ArrayList<Tile> openTiles = new ArrayList<>();
 
+    List<GoodsBoard.Type> goodsReward = new ArrayList<>();
     CardData cardData = null;
     int cash = 0;
     public Tile currentTile = null;
@@ -54,6 +55,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         executors.put("cannoni", cannons);
         executors.put("invia", send);
         executors.put("abbandona", quit);
+        executors.put("scatola", placeGoods);
 
         checkers.put("alieni", checkAlien);
         checkers.put("piazza", checkPlace);
@@ -67,6 +69,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         checkers.put("cannoni", checkCannons);
         checkers.put("invia", checkSend);
         checkers.put("abbandona", checkQuit);
+        checkers.put("scatola", checkPlaceGoods);
 
         this.server = server;
 
@@ -461,6 +464,65 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     Predicate<String> checkQuit = (cmd) -> state == Model.State.Type.DRAW_CARD;
 
+    Function<String, String> placeGoods = (cmd) -> {
+        String[] args = cmd.split(" ");
+        Result<?> res;
+
+        if(args[0].equals("no")){
+            res = server.dropReward();
+            goodsReward = new ArrayList<>();
+            frame.drawGoods(goodsReward);
+        }
+        else{
+            GoodsBoard.Type type = switch(args[0].charAt(0)){
+                case 'r' -> GoodsBoard.Type.RED;
+                case 'b' -> GoodsBoard.Type.BLUE;
+                case 'v' -> GoodsBoard.Type.GREEN;
+                case 'g' -> GoodsBoard.Type.YELLOW;
+                default -> throw new IllegalStateException("Unexpected value: " + args[0]);
+            };
+
+            Coordinate c = new Coordinate(args[1].charAt(0) - '0', args[1].charAt(1) - '0');
+
+            res = server.placeReward(type, c);
+
+            res.ifPresent(_ -> {
+                goodsReward.remove(type);
+                board.getGoods(type).put(c, 1);
+                frame.drawElements();
+                frame.drawGoods(goodsReward);
+            });
+        }
+
+        return res.unwrap("fatto");
+    };
+
+    Predicate<String> checkPlaceGoods = (cmd) -> {
+        if(state != Model.State.Type.PLACE_REWARD)
+            return false;
+
+        String[] args = cmd.split(" ");
+
+        if(args[0].equals("no"))
+            return true;
+
+        GoodsBoard.Type type = switch(args[0].charAt(0)){
+            case 'r' -> GoodsBoard.Type.RED;
+            case 'b' -> GoodsBoard.Type.BLUE;
+            case 'v' -> GoodsBoard.Type.GREEN;
+            case 'g' -> GoodsBoard.Type.YELLOW;
+            default -> throw new IllegalStateException("Unexpected value: " + args[0]);
+        };
+
+        if(!goodsReward.contains(type))
+            return false;
+
+        int x = args[1].charAt(0) - '0';
+        int y = args[1].charAt(1) - '0';
+
+        return !Coordinate.isInvalid(x, y);
+    };
+
     public String execute(String cmd) {
         Pair<String, String> request = convert(cmd);
         return executors.get(request.getKey()).apply(request.getValue());
@@ -536,9 +598,11 @@ public class Game extends UnicastRemoteObject implements Callback {
             frame.drawErrors(board.getTiles().isOK());
         }
 
+        goodsReward = output.rewards.getOrDefault(server.getPlayerName(), new ArrayList<>());
         cash += output.cash.getOrDefault(server.getPlayerName(), 0);
         frame.drawCash(cash);
         frame.clearProjectile();
+        frame.drawGoods(goodsReward);
     }
 
     @Override
@@ -620,7 +684,5 @@ public class Game extends UnicastRemoteObject implements Callback {
                 throw new RuntimeException(e);
             }
         });
-
-
     }
 }

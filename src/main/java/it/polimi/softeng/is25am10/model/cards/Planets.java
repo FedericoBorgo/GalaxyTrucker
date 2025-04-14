@@ -17,7 +17,17 @@ public class Planets extends Card{
     private boolean ready = false;
 
     public enum Planet{
-        PLANET1, PLANET2, PLANET3, PLANET4, NOPLANET
+        PLANET1, PLANET2, PLANET3, PLANET4, NOPLANET;
+
+        int getID(){
+            return switch (this){
+                case PLANET1 -> 1;
+                case PLANET2 -> 2;
+                case PLANET3 -> 3;
+                case PLANET4 -> 4;
+                case NOPLANET -> 5;
+            };
+        }
     }
 
     private Planets(FlightBoard board, Map<Planet, List<GoodsBoard.Type>> goodsType, int id, int days) {

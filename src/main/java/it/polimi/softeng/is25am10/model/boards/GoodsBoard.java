@@ -18,12 +18,31 @@ public class GoodsBoard extends ElementsBoard{
     private static final List<Tile.Type> YELLOW_BOX;
     private static final List<Tile.Type> GREEN_BOX;
     private static final Map<Tile.Type, Integer> MAX_VALUE;
+    public final Type type;
 
     /**
      * Type of the box container layout.
      */
     public enum Type{
-        BLUE, RED, YELLOW, GREEN
+        BLUE, RED, YELLOW, GREEN;
+
+        public TextColor.ANSI getColor(){
+            return switch (this){
+                case BLUE ->TextColor.ANSI.BLUE_BRIGHT;
+                case RED -> TextColor.ANSI.RED_BRIGHT;
+                case YELLOW -> TextColor.ANSI.YELLOW_BRIGHT;
+                case GREEN -> TextColor.ANSI.GREEN_BRIGHT;
+            };
+        }
+
+        public String getName(){
+            return switch (this){
+                case BLUE -> "Blu";
+                case RED -> "Rosso";
+                case YELLOW -> "Giallo";
+                case GREEN -> "Verde";
+            };
+        }
     }
 
     /**
@@ -62,6 +81,7 @@ public class GoodsBoard extends ElementsBoard{
 
     public GoodsBoard(TilesBoard board, Type color) {
         super(board, true);
+        type = color;
         this.box = switch (color){
             case RED -> RED_BOX;
             case YELLOW -> YELLOW_BOX;
