@@ -4,10 +4,7 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.*;
-import it.polimi.softeng.is25am10.model.cards.CardData;
-import it.polimi.softeng.is25am10.model.cards.CardInput;
-import it.polimi.softeng.is25am10.model.cards.CardOutput;
-import it.polimi.softeng.is25am10.model.cards.Planets;
+import it.polimi.softeng.is25am10.model.cards.*;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.util.Pair;
@@ -37,6 +34,8 @@ public class Game extends UnicastRemoteObject implements Callback {
     boolean notReady = true;
     public Model.State.Type state = Model.State.Type.JOINING;
 
+    public FlightBoard.Pawn myPawn;
+
 
     public Game(ClientInterface server) throws IOException {
         super();
@@ -54,6 +53,7 @@ public class Game extends UnicastRemoteObject implements Callback {
         executors.put("getta", drop);
         executors.put("cannoni", cannons);
         executors.put("invia", send);
+        executors.put("abbandona", quit);
 
         checkers.put("alieni", checkAlien);
         checkers.put("piazza", checkPlace);
@@ -66,13 +66,18 @@ public class Game extends UnicastRemoteObject implements Callback {
         checkers.put("getta", checkDrop);
         checkers.put("cannoni", checkCannons);
         checkers.put("invia", checkSend);
+        checkers.put("abbandona", checkQuit);
 
         this.server = server;
 
-        server.join(this).ifNotPresent(() -> {
+        Result<FlightBoard.Pawn> res = server.join(this);
+
+        res.ifNotPresent(() -> {
             System.out.println("unable to join");
             System.exit(1);
         });
+
+        myPawn = res.getData();
     }
 
     Function<String, String> alien = (cmd) -> {
@@ -256,7 +261,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     Predicate<String> checkDraw = (cmd) -> {
         if (state == Model.State.Type.BUILDING && notReady)
             return true;
-        return state == Model.State.Type.DRAW_CARD;
+        return state == Model.State.Type.DRAW_CARD && flight.getOrder().getFirst() == myPawn;
     };
 
     Function<String, String> ready = (cmd) -> {
@@ -322,6 +327,8 @@ public class Game extends UnicastRemoteObject implements Callback {
 
             if(type != null)
                 board.getGoods(type).remove(c, 1);
+
+            frame.drawElements();
         });
 
         return res.unwrap("rimosso");
@@ -447,11 +454,12 @@ public class Game extends UnicastRemoteObject implements Callback {
                         return false;
                 return true;
         }
-
-
-
         return false;
     };
+
+    Function<String, String> quit = (cmd) -> server.quit().unwrap("abbandonato");
+
+    Predicate<String> checkQuit = (cmd) -> state == Model.State.Type.DRAW_CARD;
 
     public String execute(String cmd) {
         Pair<String, String> request = convert(cmd);
@@ -488,36 +496,54 @@ public class Game extends UnicastRemoteObject implements Callback {
     public synchronized void pushState(Model.State.Type state) throws RemoteException {
         this.state = state;
 
-        if(state == Model.State.Type.ALIEN_INPUT)
+        if(state == Model.State.Type.DRAW_CARD) {
             frame.clearUnusedSpace();
+            frame.clearCardData();
+        }
+
+        if(state == Model.State.Type.CHECKING)
+            frame.drawErrors(board.getTiles().isOK());
 
         frame.drawState();
     }
 
     @Override
     public synchronized void pushCardData(CardData card) throws RemoteException {
-        //cardDataStr = card.toString().split("\n");
         cardData = card;
+        frame.drawCardData(card);
+        frame.drawProjectile(card.projectiles);
     }
 
     @Override
     public synchronized void pushCardChanges(CardOutput output) throws RemoteException {
         List<Coordinate> remove = output.killedCrew.getOrDefault(server.getPlayerName(), null);
 
-        if(remove != null)
-            remove.forEach(c -> {board.removeSomeone(c);});
+        if(remove != null) {
+            remove.forEach(c -> {
+                board.removeSomeone(c);
+            });
+            frame.drawElements();
+        }
 
         remove = output.removed.getOrDefault(server.getPlayerName(), null);
 
-        if(remove != null)
-            remove.forEach(c -> {board.getTiles().remove(c);});
+        if(remove != null) {
+            remove.forEach(c -> {
+                board.getTiles().remove(c);
+                frame.destroyed(c);
+            });
+            board.removeIllegals();
+            frame.drawErrors(board.getTiles().isOK());
+        }
 
         cash += output.cash.getOrDefault(server.getPlayerName(), 0);
+        frame.drawCash(cash);
+        frame.clearProjectile();
     }
 
     @Override
-    public synchronized void waitFor(String name) throws RemoteException {
-        //this.waitFor = name;
+    public synchronized void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
+        frame.drawWaitFor(name, pawn);
     }
 
     @Override
@@ -568,15 +594,18 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public synchronized void removed(Coordinate c) throws RemoteException{
         board.getTiles().remove(c);
-        frame.clearTile(c);
+        board.removeIllegals();
+        frame.destroyed(c);
     }
 
     @Override
     public synchronized void pushDropped(Model.Removed dropped) throws RemoteException {
+        frame.drawDroppedItems(dropped);
     }
 
     @Override
     public synchronized void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
+        frame.drawCannonsToUse(cannons);
     }
 
     @Override

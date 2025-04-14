@@ -48,7 +48,7 @@ public class PlaceholderCallback implements Callback {
     }
 
     @Override
-    public void waitFor(String name) throws RemoteException {
+    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
 
     }
 

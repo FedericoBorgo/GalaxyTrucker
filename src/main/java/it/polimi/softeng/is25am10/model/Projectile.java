@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model;
 
+import com.googlecode.lanterna.TextColor;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -22,13 +23,24 @@ public record Projectile(Type type, Tile.Side side, int where,
      */
     @Override
     public String toString() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", type.toString());
-        jsonObject.put("side", side.toString());
-        jsonObject.put("where", where);
-        jsonObject.put("ID", ID);
-        return jsonObject.toString();
+        String t = switch (type){
+            case SMALL_ASTEROID -> "Piccolo asteroide";
+            case BIG_ASTEROID -> "Grande asteroide";
+            case SMALL_FIRE -> "Piccolo fuoco";
+            case BIG_FIRE -> "Grande fuoco";
+        };
+
+        return side + ":" + where +
+                " ID:" + ID + " " + t;
     }
+
+    public TextColor.ANSI getColor(){
+        return switch(type){
+            case SMALL_ASTEROID, BIG_ASTEROID -> TextColor.ANSI.RED_BRIGHT;
+            case SMALL_FIRE, BIG_FIRE -> TextColor.ANSI.YELLOW_BRIGHT;
+        };
+    }
+
 
     /**
      * Type of asteroid.

@@ -64,7 +64,16 @@ public class Model implements Serializable {
             this.goods = 0;
         }
 
-        public boolean isDebt(){
+        public boolean isDebt(ShipBoard p){
+            if(p.getBattery().getTotal() + battery < 0)
+                battery = p.getBattery().getTotal();
+
+            if(p.getAstronaut().getTotal() + guys < 0)
+                guys = p.getAstronaut().getTotal();
+
+            if(p.getTotalGoods() + goods < 0)
+                goods = p.getTotalGoods();
+
             return battery < 0 || guys < 0 || goods < 0;
         }
 
@@ -141,6 +150,7 @@ public class Model implements Serializable {
     private final Map<Player, Removed> removed = new ConcurrentHashMap<>();
     private final Map<Player, HashMap<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
     private final Map<String, Player> quitters = new ConcurrentHashMap<>();
+    private final HashMap<String, Pawn> allPlayers = new HashMap<>();
 
     //Current state of the game
     private final State state;
@@ -227,6 +237,7 @@ public class Model implements Serializable {
         //associate player -> removed items
         removed.put(get(name), new Removed());
         cannonsToUse.put(players.get(name), generateCannons());
+        allPlayers.put(name, get(name).getPawn());
 
         if(countPlayers == nPlayers){
             // start the game
@@ -240,10 +251,14 @@ public class Model implements Serializable {
 
     /// name -> player
     public Player get(String name){
+        if(quitters.containsKey(name))
+            return quitters.get(name);
         return players.get(name);
     }
     /// name -> player -> ship
     public ShipBoard ship(String name){
+        if(quitters.containsKey(name))
+            return quitters.get(name).getBoard();
         return get(name).getBoard();
     }
 
@@ -685,8 +700,8 @@ public class Model implements Serializable {
     private boolean someoneDebt(){
         AtomicBoolean debt = new AtomicBoolean(false);
 
-        removed.values().forEach(rm -> {
-            if(rm.isDebt())
+        removed.forEach((p, rm) -> {
+            if(rm.isDebt(p.getBoard()))
                 debt.set(true);
         });
 
@@ -750,9 +765,6 @@ public class Model implements Serializable {
     }
 
     public HashMap<String, Pawn> getPlayers(){
-        HashMap<String, Pawn> p = new HashMap<>();
-        players.forEach((name, player) -> p.put(name, player.getPawn()));
-
-        return p;
+        return allPlayers;
     }
 }

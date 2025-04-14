@@ -28,6 +28,13 @@ public class Asciiui {
 
         //new SocketClient("npc", "localhost", 1235, 1236).join(new PlaceholderCallback());
 
+        /*
+        TODO carte non funzionanti
+        EPIDEMIC
+
+
+         */
+
         AutoBuilder.initGame(game);
     }
 }

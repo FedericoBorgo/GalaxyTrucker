@@ -166,8 +166,8 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void waitFor(String name) throws RemoteException {
-        call(name);
+    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
+        call(name, pawn);
     }
 
     @Override

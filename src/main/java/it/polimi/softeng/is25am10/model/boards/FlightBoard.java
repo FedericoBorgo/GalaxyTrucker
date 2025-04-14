@@ -84,6 +84,8 @@ public class FlightBoard implements Serializable {
         int shift = offset.getFirst();
         offset.replaceAll(val -> val - shift);
         leaderPosition += shift;
+        if(leaderPosition < 0)
+            leaderPosition = 24 - leaderPosition;
         leaderPosition %= 24;
     }
 

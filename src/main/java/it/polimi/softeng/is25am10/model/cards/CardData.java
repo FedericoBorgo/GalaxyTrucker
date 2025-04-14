@@ -30,8 +30,7 @@ public class CardData implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Card\n");
-        builder.append("type: ").append(type).append("\n");
+        builder.append(type).append("\n");
         builder.append("id: ").append(id).append("\n");
 
         if(projectiles != null){

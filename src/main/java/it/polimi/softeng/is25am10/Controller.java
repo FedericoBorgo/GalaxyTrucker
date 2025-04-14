@@ -93,11 +93,16 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             pushFlight(m);
             pushPlayers(m);
 
-            if(state == Model.State.Type.DRAW_CARD && m.getChanges() != null)
-                pushCardChanges(m);
+            if(state == Model.State.Type.DRAW_CARD) {
+                pushDropped(m);
+                pushCannons(m);
+            }
 
             if(state == Model.State.Type.BUILDING)
                 starting = null;
+
+            if(state == Model.State.Type.PAY_DEBT)
+                pushDropped(m);
         };
     }
 
@@ -305,7 +310,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * Notify the player to give the card input
      */
     public void waitFor(Model m) {
-        notifyPlayers(m, null, m.getNextToPlay());
+        notifyPlayers(m, null, m.getNextToPlay(), m.getPlayers().get(m.getNextToPlay()));
     }
 
     /**
@@ -365,6 +370,28 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     public void pushSecondsLeft(Model m) {
         notifyPlayers(m, null, m.getSecondsLeft());
+    }
+
+    public void pushDropped(Model m){
+        m.getPlayers().forEach((name, _) -> {
+            if(disconnected.get(m).contains(name))
+                return;
+
+            try {
+                callbacks.get(name).pushDropped(m.getRemoved(name));
+            } catch (Exception _) {}
+        });
+    }
+
+    public void pushCannons(Model m){
+        m.getPlayers().forEach((name, _) -> {
+            if(disconnected.get(m).contains(name))
+                return;
+
+            try {
+                callbacks.get(name).pushCannons(m.getCannonsToUse(name));
+            } catch (Exception _) {}
+        });
     }
 
     /**
@@ -463,7 +490,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<String> quit(String name) {
-        return getModel(name).quit(name);
+        Result<String> res = getModel(name).quit(name);
+        if(res.isOk()) {
+            pushPlayers(getModel(name));
+            pushFlight(getModel(name));
+        }
+        return res;
     }
 
     @Override
@@ -670,9 +702,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         //TODO stardust meteors
         Result<CardInput> res = getModel(name).setInput(name, input);
 
-        if(res.isOk() && getModel(name).getChanges() == null) {
-            waitFor(getModel(name));
-            pushCardData(getModel(name));
+        if(res.isOk()) {
+            if(getModel(name).getChanges() == null){
+                pushCardData(getModel(name));
+                waitFor(getModel(name));
+            }
+            else
+                pushCardChanges(getModel(name));
+
         }
 
         return res;

@@ -15,14 +15,12 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Player;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.Card;
+import it.polimi.softeng.is25am10.model.cards.CardData;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -41,6 +39,7 @@ public class FrameGenerator {
     int cursor = 0;
 
     String response = "";
+    private boolean cleared = false;
 
     public FrameGenerator(Game game) throws IOException {
         screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal());
@@ -90,6 +89,7 @@ public class FrameGenerator {
 
         drawTile(new Coordinate(3, 2), new Tile(Tile.Type.C_HOUSE, "uuuu"), Tile.Rotation.NONE);
         drawFlight();
+        drawCash(0);
     }
 
     private TerminalPosition coordToTerminalPosition(Coordinate coord){
@@ -163,12 +163,20 @@ public class FrameGenerator {
         drawErrors(game.board.getTiles().isOK());
     }
 
+    public synchronized void destroyed(Coordinate coord){
+        clearTile(coord);
+
+        graphics.setForegroundColor(TextColor.ANSI.RED);
+        graphics.putString(coordToTerminalPosition(coord).plus(new TerminalPosition(6, 2)), "D");
+        refresh();
+    }
+
     public synchronized void clearTile(TerminalPosition pos){
         graphics.fillRectangle(pos, new TerminalSize(15, 5), ' ');
         refresh();
     }
 
-    private void drawErrors(Set<Coordinate> errors){
+    public void drawErrors(Set<Coordinate> errors){
         graphics.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
 
         graphics.putString(coordToTerminalPosition(new Coordinate(0, 0)), "              ");
@@ -244,8 +252,11 @@ public class FrameGenerator {
         }
 
         for(int i = 0; i < order.size(); i++){
+            int a = leader + offset.get(i);
+            if(a < 0)
+                a = 24 - a;
             String pos = textures.getJSONObject("FLIGHT")
-                    .getString(String.valueOf(leader + offset.get(i)));
+                    .getString(String.valueOf(a));
 
             int x = Integer.parseInt(pos.substring(0, pos.indexOf(' ')));
             int y = Integer.parseInt(pos.substring(pos.indexOf(' ')+1));
@@ -281,8 +292,8 @@ public class FrameGenerator {
                 graphics.setForegroundColor(pawn.getColor());
                 graphics.putString(new TerminalPosition(0, pos.get()), "#" + name +
                         (name.equals(game.server.getPlayerName())? "*" : "") +
-                        (quit.contains(name)? "fuori" : "") +
-                        (dis.contains(name)? "(disconnesso)" : "             "));
+                        (quit.contains(name)? " fuori " : "") +
+                        (dis.contains(name)? " (disc) " : "             "));
                 pos.getAndIncrement();
             });
 
@@ -291,8 +302,8 @@ public class FrameGenerator {
     }
 
     public synchronized void drawState(){
-        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-        graphics.putString(new TerminalPosition(93, 2), game.state.name() + "    ");
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);graphics.putString(new TerminalPosition(93, 2), "            ");
+        graphics.putString(new TerminalPosition(93, 2), game.state.name());
         refresh();
     }
 
@@ -330,6 +341,9 @@ public class FrameGenerator {
     }
 
     public synchronized void clearUnusedSpace(){
+        if(cleared)
+            return;
+        cleared = true;
         graphics.fillRectangle(new TerminalPosition(117, 1), new TerminalSize(109, 16), ' ');
         graphics.fillRectangle(new TerminalPosition(161, 17), new TerminalSize(65, 43), ' ');
         refresh();
@@ -442,41 +456,130 @@ public class FrameGenerator {
         return box.getInt();
     }
 
-    /*
-    public void drawCardData(){
-        if(game.cardDataStr == null || game.state != Model.State.Type.WAITING_INPUT)
-            return;
-
-        for (int i = 0; i < game.cardDataStr.length; i++)
-            graphics.putString(new TerminalPosition(160, 2+i), game.cardDataStr[i]);
+    public void clearCardData(){
+        for (int i = 0; i < 10; i++)
+            graphics.putString(new TerminalPosition(140, 3+i), "                                             ");
+        refresh();
     }
 
-    public void drawDroppedItems(){
-        if(game.state != Model.State.Type.WAITING_INPUT)
-            return;
 
-        graphics.putString(new TerminalPosition(120, 2), "Elementi rimossi");
-        graphics.putString(new TerminalPosition(120, 3), "batterie: " + game.dropped.battery);
-        graphics.putString(new TerminalPosition(120, 4), "membri: " + game.dropped.guys);
-        graphics.putString(new TerminalPosition(120, 5), "scatole: " + game.dropped.goods);
+    public void drawCardData(CardData data){
+        graphics.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        graphics.putString(new TerminalPosition(140, 2), "DATI CARTA");
+        graphics.setForegroundColor(TextColor.ANSI.YELLOW);
+
+        clearCardData();
+
+        String[] str = data.toString().split("\n");
+
+        for (int i = 0; i < str.length; i++)
+            graphics.putString(new TerminalPosition(140, 3+i), str[i]);
+
+        refresh();
     }
 
-    public void drawCannonsToUse(){
-        if(game.state != Model.State.Type.WAITING_INPUT)
-            return;
+    public void drawDroppedItems(Model.Removed rm){
+        graphics.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 2), "RIMOSSI");
+        graphics.setForegroundColor(TextColor.ANSI.GREEN_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 3), "batterie: " + rm.battery + "  ");
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 4), "membri: " + rm.guys + "  ");
+        graphics.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 5), "scatole: " + rm.goods + "  ");
 
-        graphics.putString(new TerminalPosition(93, 4), "turno di " + game.waitFor);
-
-        graphics.putString(new TerminalPosition(120, 7), "Cannoni");
-        graphics.putString(new TerminalPosition(120, 8), "sorpa: " + game.cannonsToUse.get(Tile.Rotation.NONE));
-        graphics.putString(new TerminalPosition(120, 9),"destra: " + game.cannonsToUse.get(Tile.Rotation.CLOCK));
-        graphics.putString(new TerminalPosition(120, 10), "sotto: " + game.cannonsToUse.get(Tile.Rotation.DOUBLE));
-        graphics.putString(new TerminalPosition(120, 11), "sinistra: " + game.cannonsToUse.get(Tile.Rotation.INV));
+        refresh();
     }
 
-    public void drawCash(){
-        graphics.putString(new TerminalPosition(3, 3), "SOLDI");
-        graphics.putString(new TerminalPosition(3, 4), ""+ game.cash);
-    }*/
+    public void drawCannonsToUse(Map<Tile.Rotation, Integer> cannons){
+        graphics.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 7), "CANNONI DA USARE");
+        graphics.setForegroundColor(TextColor.ANSI.MAGENTA_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 8), "sorpa: " + cannons.get(Tile.Rotation.NONE) + "  ");
+        graphics.putString(new TerminalPosition(120, 9),"destra: " + cannons.get(Tile.Rotation.CLOCK) + "  ");
+        graphics.putString(new TerminalPosition(120, 10), "sotto: " + cannons.get(Tile.Rotation.DOUBLE) + "  ");
+        graphics.putString(new TerminalPosition(120, 11), "sinistra: " + cannons.get(Tile.Rotation.INV) + "  ");
 
+        refresh();
+    }
+
+
+    public synchronized void drawCash(int cash){
+        graphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        graphics.putString(new TerminalPosition(93, 4), ""+ cash);
+        refresh();
+    }
+
+    public synchronized void drawWaitFor(String name, FlightBoard.Pawn pawn){
+        graphics.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        graphics.putString(new TerminalPosition(120, 13), "TURNO DI");
+        graphics.setForegroundColor(pawn.getColor());
+        graphics.putString(new TerminalPosition(120, 14), name + "    ");
+        refresh();
+    }
+
+    public synchronized void drawProjectile(List<Projectile> proj){
+        if(proj == null)
+            return;
+
+        proj.forEach(p -> {
+            graphics.setForegroundColor(p.getColor());
+
+            String type = switch(p.type()){
+                case SMALL_ASTEROID, SMALL_FIRE -> "p ";
+                case BIG_ASTEROID, BIG_FIRE -> "g ";
+            };
+
+            type += p.ID();
+
+            if(p.side() == Tile.Side.UP || p.side() == Tile.Side.DOWN) {
+                if (p.where() < 4 || p.where() > 10)
+                    return;
+
+                Coordinate c = new Coordinate(p.where()-4, p.side() == Tile.Side.UP? 0 : 4);
+                TerminalPosition pos = coordToTerminalPosition(c);
+
+                pos = pos.plus(new TerminalPosition(2, p.side() == Tile.Side.UP ? -2: 6));
+
+                graphics.putString(pos, type);
+            }
+            else {
+                if (p.where() < 5 || p.where() > 9)
+                    return;
+
+
+                Coordinate c = new Coordinate(p.side() == Tile.Side.LEFT? 0 : 6, p.where()-5);
+                TerminalPosition pos = coordToTerminalPosition(c);
+
+                pos = pos.plus(new TerminalPosition(p.side() == Tile.Side.LEFT ? -2: 16, 1));
+
+                for (int i = 0; i < type.length(); i++)
+                    graphics.putString(pos.plus(new TerminalPosition(0, i)), "" + type.charAt(i));
+            }
+        });
+
+        refresh();
+    }
+
+    public synchronized void clearProjectile(){
+        for (int i = 0; i < TilesBoard.BOARD_WIDTH; i++) {
+            TerminalPosition pos = coordToTerminalPosition(new Coordinate(i, 0)).plus(new TerminalPosition(2, -2));
+            graphics.putString(pos, "    ");
+            pos = coordToTerminalPosition(new Coordinate(i, TilesBoard.BOARD_HEIGHT-1)).plus(new TerminalPosition(2, 6));
+            graphics.putString(pos, "    ");
+        }
+
+        for(int i = 0; i < TilesBoard.BOARD_HEIGHT; i++){
+            TerminalPosition pos = coordToTerminalPosition(new Coordinate(0, i)).plus(new TerminalPosition(-2, 1));
+            TerminalPosition pos2 = coordToTerminalPosition(new Coordinate(TilesBoard.BOARD_WIDTH-1, i)).plus(new TerminalPosition(16, 1));
+
+
+            for (int j = 0; j < 3; j++) {
+                graphics.putString(pos.plus(new TerminalPosition(0, j)), " ");
+                graphics.putString(pos2.plus(new TerminalPosition(0, j)), " ");
+            }
+        }
+
+        refresh();
+    }
 }

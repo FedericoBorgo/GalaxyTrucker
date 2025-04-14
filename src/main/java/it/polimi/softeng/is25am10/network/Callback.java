@@ -28,7 +28,7 @@ public interface Callback extends Remote {
 
     void pushCardChanges(CardOutput output) throws RemoteException;
 
-    void waitFor(String name) throws RemoteException;
+    void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException;
 
     void gaveTile(Tile t) throws RemoteException;
 
