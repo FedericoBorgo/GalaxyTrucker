@@ -69,6 +69,7 @@ public class Smugglers extends Card {
         data.goods = goods;
         data.days = days;
         data.power = enemyPower;
+        data.rewards = goodsGained;
         return data;
     }
 

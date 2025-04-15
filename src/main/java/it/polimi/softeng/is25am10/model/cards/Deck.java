@@ -44,30 +44,19 @@ public class Deck extends Card implements Serializable {
         selectedCard = null;
         flightBoard = board;
 
-        /* TESTED
+
         cards.addAll(Stardust.construct(board));
         cards.addAll(Epidemic.construct(board));
         cards.addAll(Planets.construct(board));
         cards.addAll(Space.construct(model, board));
         cards.addAll(Meteors.construct(model, board));
         cards.addAll(AbandonedShip.construct(model, board));
-        */
-
         cards.addAll(Station.construct(board));
-        cards.addAll(Station.construct(board));
-        cards.addAll(Station.construct(board));
-        cards.addAll(Station.construct(board));
-        cards.addAll(Station.construct(board));
-        cards.addAll(Station.construct(board));
-        cards.addAll(Station.construct(board));
-
-
-        /*
-        TODO test
-        cards.addAll(Pirates.construct(model,board));
         cards.addAll(Slavers.construct(model,board));
         cards.addAll(Smugglers.construct(model,board));
-        cards.addAll(Warzone.construct(model,board));*/
+        cards.addAll(Pirates.construct(model,board));
+        cards.addAll(Warzone.construct(model,board));
+
 
         Collections.shuffle(cards);
 

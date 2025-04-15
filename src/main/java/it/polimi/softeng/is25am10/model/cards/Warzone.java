@@ -10,11 +10,28 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Warzone extends Card {
-    private enum MalusTypes {
-        DAYS, GUYS, FIRE, GOODS
+    public enum MalusTypes {
+        DAYS, GUYS, FIRE, GOODS;
+
+        public String getName(){
+            return switch (this){
+                case DAYS -> "giorni di volo peri";
+                case GUYS -> "equipaggio perso";
+                case FIRE -> "fuoco";
+                case GOODS -> "merci perse";
+            };
+        }
     }
-    private enum LeastTypes {
-        LEAST_GUYS, LEAST_ENGINE, LEAST_CANNON
+    public enum LeastTypes {
+        LEAST_GUYS, LEAST_ENGINE, LEAST_CANNON;
+
+        public String getName(){
+            return switch (this){
+                case LEAST_GUYS -> "astronauti";
+                case LEAST_ENGINE -> "potenza motrice";
+                case LEAST_CANNON -> "potenza cannoni";
+            };
+        }
     }
 
     private final List<Projectile> fire;
@@ -23,9 +40,6 @@ public class Warzone extends Card {
     private final Map<Player, Map<LeastTypes, Double>> declaredPower = new HashMap<>();
     private final Map<LeastTypes, MalusTypes> malusTypes;
 
-    public static int rollDice() {
-        return new Random().nextInt(6) + 1;
-    }
 
     private Warzone(Model model, FlightBoard board, int id,
                    Map<LeastTypes, MalusTypes> malusTypes,
@@ -122,7 +136,13 @@ public class Warzone extends Card {
 
     @Override
     public CardData getData() {
-        return new CardData(type, id);
+        CardData data = new CardData(type, id);
+        data.projectiles = fire;
+        data.malusTypes = malusTypes;
+        data.crew = guys;
+        data.days = days;
+        data.goods = goods;
+        return data;
     }
 
     public static List<Card> construct(Model model, FlightBoard board){

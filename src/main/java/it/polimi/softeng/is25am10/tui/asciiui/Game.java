@@ -391,9 +391,6 @@ public class Game extends UnicastRemoteObject implements Callback {
             case EPIDEMIC:
             case STARDUST:
             case OPEN_SPACE:
-            case SLAVERS:
-            case SMUGGLERS:
-                break;
             case PLANETS:
                 input.planet = Planets.Planet.values()[Integer.parseInt(args[0])-1];
                 break;
@@ -405,6 +402,8 @@ public class Game extends UnicastRemoteObject implements Callback {
                 break;
             case AB_SHIP:
             case STATION:
+            case SLAVERS:
+            case SMUGGLERS:
                 input.accept = args[0].equals("si");
                 break;
             case PIRATES:
@@ -429,9 +428,6 @@ public class Game extends UnicastRemoteObject implements Callback {
             case EPIDEMIC:
             case STARDUST:
             case OPEN_SPACE:
-            case SLAVERS:
-            case SMUGGLERS:
-                return true;
             case PLANETS:
                 Planets.Planet chosen = Planets.Planet.values()[Integer.parseInt(args[0])-1];
 
@@ -447,6 +443,8 @@ public class Game extends UnicastRemoteObject implements Callback {
                 return true;
             case AB_SHIP:
             case STATION:
+            case SLAVERS:
+            case SMUGGLERS:
                 return args[0].equals("si") || args[0].equals("no");
             case PIRATES:
                 if(!(args[0].equals("si") || args[0].equals("no")))

@@ -19,6 +19,7 @@ public class CardData implements Serializable {
     public List<Planets.Planet> chosenPlanets = new ArrayList<>();
     public Map<String, Integer> declaredPower = null;
     public List<GoodsBoard.Type> rewards = null;
+    public Map<Warzone.LeastTypes, Warzone.MalusTypes> malusTypes = null;
 
     public int cash = 0, days = 0, power = 0, crew = 0, goods = 0;
 
@@ -82,20 +83,34 @@ public class CardData implements Serializable {
             builder.append("\n");
         }
 
-        if(cash != 0)
-            builder.append("Soldi: ").append(cash).append("\n");
+        if(malusTypes != null){
+            malusTypes.forEach((least, malus) -> {
+                String out = switch (malus){
+                    case DAYS -> days;
+                    case GUYS -> crew;
+                    case FIRE -> "";
+                    case GOODS -> goods;
+                } + " "  + malus.getName();
 
-        if(days != 0)
-            builder.append("Giorni di volo: ").append(days).append("\n");
+                builder.append(" -").append(least.getName()).append(": ").append(out).append("\n");
+            });
+        }
+        else{
+            if(cash != 0)
+                builder.append("Soldi: ").append(cash).append("\n");
 
-        if(crew != 0)
-            builder.append("Membri equipaggio: ").append(crew).append("\n");
+            if(days != 0)
+                builder.append("Giorni di volo: ").append(days).append("\n");
 
-        if(goods != 0)
-            builder.append("Scatole: ").append(goods).append("\n");
+            if(crew != 0)
+                builder.append("Membri equipaggio: ").append(crew).append("\n");
 
-        if(power != 0)
-            builder.append("Potenza nemico: ").append(power).append("\n");
+            if(goods != 0)
+                builder.append("Scatole: ").append(goods).append("\n");
+
+            if(power != 0)
+                builder.append("Potenza nemico: ").append(power).append("\n");
+        }
 
         return builder.toString();
     }

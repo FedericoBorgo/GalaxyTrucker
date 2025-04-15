@@ -506,7 +506,7 @@ public class Model implements Serializable {
         if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
             return Result.err("not WAITING state");
 
-        if(deck.getRegistered().contains(get(name)))
+        if(deck.getRegistered().contains(get(name)) && state.get() != State.Type.PAY_DEBT)
             return Result.err("player already registered");
 
         ShipBoard ship = ship(name);
@@ -548,7 +548,7 @@ public class Model implements Serializable {
         if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
             return Result.err("not WAITING state");
 
-        if(deck.getRegistered().contains(get(name)))
+        if(deck.getRegistered().contains(get(name)) && state.get() != State.Type.PAY_DEBT)
             return Result.err("player already registered");
 
         Result<Integer> res = ship(name).getGoods(t).remove(c, 1);

@@ -149,11 +149,16 @@ Aumenta o diminuisce la potenza di fuoco dei cannoni.
 
 # Input per le carte
 
-### Epidemia, Polvere stellare, Spazio aperto, Schiavisti, Contrabbandieri
+### Epidemia, Polvere stellare, Spazio aperto
 > invia
 
 Non richiedono alcun input oltre ai comandi _getta_ e _cannoni_.
 Questo comando dichiara solo stato di pronto.
+
+### Schiavisti, Contrabbandieri
+> invia {**si/**no}
+
+Dichiara se si vuole ottenere il premio in caso di vittoria.
 
 ### Pianeti
 > invia {_pianeta_}
