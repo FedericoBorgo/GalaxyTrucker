@@ -126,7 +126,7 @@ public class AutoBuilder {
 
         placeRandom(game, 5);
 
-        game.execute("clessidra");
+        //game.execute("clessidra");
         //game.execute("clessidra");
 
         while(game.state != Model.State.Type.ALIEN_INPUT) {
@@ -146,8 +146,6 @@ public class AutoBuilder {
                 throw new RuntimeException(e);
             }
         }
-
-        game.execute("pesca");
 
         while(game.state == Model.State.Type.WAITING_INPUT) {
             try {

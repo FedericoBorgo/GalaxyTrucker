@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.jar.Attributes;
 
 /**
  * This class gives an interface between the model and the view. It shows available methods to the clients
@@ -140,7 +141,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                //backup();
+                backup();
             }
         }, 0, 5000);
 
@@ -168,14 +169,16 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param name of the player associated to the callback
      * @param callback to call
      */
-    public synchronized void setCallback(String name, Callback callback) {
-        Model m = games.getOrDefault(name, null);
+    public void setCallback(String name, Callback callback) {
+        synchronized (callback){
+            Model m = games.getOrDefault(name, null);
 
-        if(m != null)
-            if(!disconnected.get(m).contains(name))
-                return;
+            if(m != null)
+                if(!disconnected.get(m).contains(name))
+                    return;
 
-        callbacks.put(name, callback);
+            callbacks.put(name, callback);
+        }
     }
 
     /**
@@ -206,36 +209,38 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param name of the player calling the method
      * @return pawn assigned to the player
      */
-    public synchronized Result<FlightBoard.Pawn> join(String name){
-        //in case of disconnected player
-        if(games.containsKey(name)) {
-            Model m = games.get(name);
+    public Result<FlightBoard.Pawn> join(String name){
+        synchronized (games){
+            //in case of disconnected player
+            if(games.containsKey(name)) {
+                Model m = games.get(name);
 
-            if(!disconnected.get(m).contains(name)) {
-                Logger.serverLog("rifiutato: " +name + ", giocatore già connesso");
-                return Result.err("giocatore già connesso");
+                if(!disconnected.get(m).contains(name)) {
+                    Logger.serverLog("rifiutato: " +name + ", giocatore già connesso");
+                    return Result.err("giocatore già connesso");
+                }
+
+                rejoined(name);
+                Logger.playerLog(m.hashCode(), name, "reconnected");
+                return Result.ok(m.get(name).getPawn());
             }
 
-            rejoined(name);
-            Logger.playerLog(m.hashCode(), name, "reconnected");
-            return Result.ok(m.get(name).getPawn());
+            // no game is starting
+            if(starting == null) {
+                starting = new Model(askHowManyPlayers(name), stateEvent);
+                disconnected.put(starting, new HashSet<>());
+            }
+
+            Model temp = starting;
+            games.put(name, starting);
+            Logger.playerLog(starting.hashCode(), name, "joined");
+            Result<FlightBoard.Pawn> pawn = starting.addPlayer(name);
+
+            if(pawn.isOk())
+                pushPlayers(temp);
+
+            return pawn;
         }
-
-        // no game is starting
-        if(starting == null) {
-            starting = new Model(askHowManyPlayers(name), stateEvent);
-            disconnected.put(starting, new HashSet<>());
-        }
-
-        Model temp = starting;
-        games.put(name, starting);
-        Logger.playerLog(starting.hashCode(), name, "joined");
-        Result<FlightBoard.Pawn> pawn = starting.addPlayer(name);
-
-        if(pawn.isOk())
-            pushPlayers(temp);
-
-        return pawn;
     }
 
     /*
@@ -255,33 +260,35 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param error consumer to call in ase of errors while calling the player
      * @param args arguments gave to the player
      */
-    private synchronized void notifyPlayers(Model m, Consumer<String> error , Object... args){
-        Method method;
+    private void notifyPlayers(Model m, Consumer<String> error , Object... args){
+        synchronized (callbacks) {
+            Method method;
 
-        // get the method name-arguments
-        try {
-            method = Callback.class.getMethod(ClientInterface.getCallerName(), ClientInterface.getClasses(args));
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
-        Set<String> dis = disconnected.get(m);
-
-        // call the event for every player connected to this model
-        m.getPlayers().forEach((name, _) -> {
-            if(dis.contains(name))
-                return;
-
+            // get the method name-arguments
             try {
-                method.invoke(callbacks.get(name), args);
-            } catch (IllegalAccessException e) {
+                method = Callback.class.getMethod(ClientInterface.getCallerName(), ClientInterface.getClasses(args));
+            } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
-            }catch(InvocationTargetException | NullPointerException e){
-                // the player is unreachable
-                if(error != null)
-                    error.accept(name);
             }
-        });
+
+            Set<String> dis = disconnected.get(m);
+
+            // call the event for every player connected to this model
+            m.getPlayers().forEach((name, _) -> {
+                if(dis.contains(name))
+                    return;
+
+                try {
+                    method.invoke(callbacks.get(name), args);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException | NullPointerException e) {
+                    // the player is unreachable
+                    if (error != null)
+                        error.accept(name);
+                }
+            });
+        }
     }
 
     /**
@@ -424,6 +431,10 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 name.equals(m.getNextToPlay())) {
             Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
             setInput(name, CardInput.disconnected());
+        }
+        else if(m.getState() == Model.State.Type.DRAW_CARD &&
+            m.getFlight().getOrder().getFirst().equals(m.getPlayers().get(name))) {
+            drawCard(name);
         }
     }
 

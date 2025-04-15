@@ -44,7 +44,6 @@ public class Deck extends Card implements Serializable {
         selectedCard = null;
         flightBoard = board;
 
-
         cards.addAll(Stardust.construct(board));
         cards.addAll(Epidemic.construct(board));
         cards.addAll(Planets.construct(board));
@@ -127,6 +126,8 @@ public class Deck extends Card implements Serializable {
 
     @Override
     public CardData getData(){
+        if(selectedCard == null)
+            return null;
         return selectedCard.getData();
     }
 

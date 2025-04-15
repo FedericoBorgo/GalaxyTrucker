@@ -391,6 +391,7 @@ public class Game extends UnicastRemoteObject implements Callback {
             case EPIDEMIC:
             case STARDUST:
             case OPEN_SPACE:
+                break;
             case PLANETS:
                 input.planet = Planets.Planet.values()[Integer.parseInt(args[0])-1];
                 break;
@@ -428,6 +429,7 @@ public class Game extends UnicastRemoteObject implements Callback {
             case EPIDEMIC:
             case STARDUST:
             case OPEN_SPACE:
+                return true;
             case PLANETS:
                 Planets.Planet chosen = Planets.Planet.values()[Integer.parseInt(args[0])-1];
 
@@ -544,7 +546,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     @Override
     public synchronized int askHowManyPlayers() throws RemoteException {
-        return 2;//frame.askHowManyPlayer();
+        return frame.askHowManyPlayer();
     }
 
     @Override
@@ -572,6 +574,9 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     @Override
     public synchronized void pushCardData(CardData card) throws RemoteException {
+        if(card == null)
+            return;
+        
         cardData = card;
         frame.drawCardData(card);
         frame.drawProjectile(card.projectiles);
@@ -676,7 +681,20 @@ public class Game extends UnicastRemoteObject implements Callback {
     @Override
     public synchronized void pushModel(Model m) throws RemoteException {
         pushBoard(m.ship(server.getPlayerName()));
+        pushFlight(m.getFlight());
         pushState(m.getState());
+        
+        CardData c = m.getCardData();
+        
+        if(c != null){
+            frame.clearUnusedSpace();
+            pushDropped(m.getRemoved(server.getPlayerName()));
+            pushCannons(m.getCannonsToUse(server.getPlayerName()));
+            pushCardData(m.getCardData());
+            String next = m.getNextToPlay();
+            if(next != null)
+                waitFor(next, m.getPlayers().get(next));
+        }
 
         m.getSeenTiles().forEach(t -> {
             try {

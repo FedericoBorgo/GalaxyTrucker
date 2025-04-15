@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SocketListener {
     private final ServerSocket methodInvoker;
@@ -75,7 +77,7 @@ class MethodInvoker extends Thread {
     private final String address;
 
     public MethodInvoker(Controller controller, Socket socket) throws IOException {
-        super();
+        super("PLAYER_LISTENER");
         output = new ObjectOutputStream(socket.getOutputStream());
         input = new ObjectInputStream(socket.getInputStream());
         output.flush();
@@ -122,15 +124,21 @@ class EventInvoker implements Callback {
         }
     }
 
-    private synchronized <T> T call(Object... args){
+    private final Lock lock = new ReentrantLock();
+
+    private <T> T call(Object... args){
         try {
+            lock.lock();
             output.reset();
             output.writeObject(new Request(ClientInterface.getCallerName(), ClientInterface.getClasses(args), args));
             output.flush();
-
             return (T) input.readObject();
+
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("unable to call", e);
+        }
+        finally {
+            lock.unlock();
         }
     }
 

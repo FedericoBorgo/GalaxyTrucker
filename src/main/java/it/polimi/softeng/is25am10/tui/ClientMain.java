@@ -25,7 +25,6 @@ public class ClientMain {
 
 
         Thread.sleep(2000);
-        client.moveTimer();
 
     }
 }

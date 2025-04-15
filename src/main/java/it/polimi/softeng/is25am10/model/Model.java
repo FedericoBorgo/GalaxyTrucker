@@ -166,7 +166,7 @@ public class Model implements Serializable {
     private final Map<Player, Removed> removed = new ConcurrentHashMap<>();
     private final Map<Player, HashMap<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
     private final Map<String, Player> quitters = new ConcurrentHashMap<>();
-    private final HashMap<String, Pawn> allPlayers = new HashMap<>();
+    private final Map<String, Pawn> allPlayers = new ConcurrentHashMap<>();
 
     //Current state of the game
     private final State state;
@@ -405,7 +405,7 @@ public class Model implements Serializable {
         ship(name).getTiles().remove(c);
         ship(name).removeIllegals();
 
-        if(ship(name).getAstronaut().getTotal() <= 0)
+        if(ship(name).getAstronaut().getTotal() <= 0 && state.prev != State.Type.BUILDING)
             quitIgnore(name);
 
         //if every board is ok, move the state
@@ -717,18 +717,22 @@ public class Model implements Serializable {
     }
 
     public String getNextToPlay(){
-        List<Pawn> order = new ArrayList<>(flight.getOrder());
-        order.removeAll(deck.getRegistered()
-                .stream()
-                .map(Player::getPawn)
-                .toList());
-        Pawn next = order.getFirst();
-        AtomicReference<String> nextToPlay = new AtomicReference<>("");
-        players.forEach((name, player) -> {
-            if(player.getPawn() == next)
-                nextToPlay.set(name);
-        });
-        return nextToPlay.get();
+        try{
+            List<Pawn> order = new ArrayList<>(flight.getOrder());
+            order.removeAll(deck.getRegistered()
+                    .stream()
+                    .map(Player::getPawn)
+                    .toList());
+            Pawn next = order.getFirst();
+            AtomicReference<String> nextToPlay = new AtomicReference<>("");
+            players.forEach((name, player) -> {
+                if(player.getPawn() == next)
+                    nextToPlay.set(name);
+            });
+            return nextToPlay.get();
+        }catch (Exception _){
+            return null;
+        }
     }
 
     /**
@@ -821,6 +825,6 @@ public class Model implements Serializable {
     }
 
     public HashMap<String, Pawn> getPlayers(){
-        return allPlayers;
+        return new HashMap<>(allPlayers);
     }
 }
