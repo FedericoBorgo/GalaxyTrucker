@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AutoBuilder {
@@ -140,6 +141,16 @@ public class AutoBuilder {
         placeAlien(game);
 
         while(game.state == Model.State.Type.ALIEN_INPUT) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        game.execute("pesca");
+
+        while(game.state == Model.State.Type.WAITING_INPUT) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

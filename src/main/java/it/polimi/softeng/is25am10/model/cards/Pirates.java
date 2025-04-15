@@ -90,6 +90,9 @@ public class Pirates extends Card {
          .hit(proj, useBattery.get(p).contains(proj.ID()))
          .ifPresent(c -> output.addDestroyed(p.getName(), c))));
 
+
+        shotPlayers.forEach(p -> p.getBoard().removeIllegals());
+
         // does the player want to be rewarded?
         rewarded.ifPresent(p -> {
             p.giveCash(cash);

@@ -405,6 +405,9 @@ public class Model implements Serializable {
         ship(name).getTiles().remove(c);
         ship(name).removeIllegals();
 
+        if(ship(name).getAstronaut().getTotal() <= 0)
+            quitIgnore(name);
+
         //if every board is ok, move the state
         if(allShipOk()){
             if(state.getPrev() == State.Type.BUILDING)

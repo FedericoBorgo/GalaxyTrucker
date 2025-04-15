@@ -83,6 +83,8 @@ public class Meteors extends Card {
          .hit(proj, useBattery.get(p).contains(proj.ID()))
          .ifPresent(c -> output.addDestroyed(p.getName(), c))));
 
+        registered.forEach((_, p) -> p.getBoard().removeIllegals());
+
         return Result.ok(output);
     }
 

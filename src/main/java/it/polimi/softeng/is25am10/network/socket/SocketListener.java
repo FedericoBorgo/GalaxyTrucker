@@ -95,7 +95,6 @@ class MethodInvoker extends Thread {
                 output.flush();
             } catch (IOException | ClassNotFoundException | NoSuchMethodException |
                      IllegalAccessException e) {
-                Logger.serverLog("[" +  address + "]disconnected");
                 return;
             }
             catch (InvocationTargetException e){

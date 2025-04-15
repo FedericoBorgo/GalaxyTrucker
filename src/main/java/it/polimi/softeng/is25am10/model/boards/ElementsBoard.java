@@ -16,7 +16,6 @@ import java.util.*;
 public abstract class ElementsBoard implements Serializable {
     // the coordinate-(how many entries) pair
     protected final Map<Coordinate, Integer> positions = new HashMap<>();
-    protected int total = 0;
     // The matrix containing all the tiles (including empty spaces); board is associated with a specific player
     protected final TilesBoard tiles;
     // List of other boards containing units which interact with the units we are working on
@@ -56,7 +55,7 @@ public abstract class ElementsBoard implements Serializable {
      * @return {@code total}
      */
     public int getTotal() {
-        return total;
+        return positions.values().stream().mapToInt(p -> p).sum();
     }
 
     /**
@@ -77,8 +76,6 @@ public abstract class ElementsBoard implements Serializable {
      * @param value the new number of units on the tile
      */
     protected void set(Coordinate c, int value) {
-        total += (value - get(c));
-
         if(value == 0)
             positions.remove(c);
 
@@ -177,6 +174,6 @@ public abstract class ElementsBoard implements Serializable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ElementsBoard that = (ElementsBoard) o;
-        return total == that.total && Objects.equals(positions, that.positions);
+        return getTotal() == that.getTotal() && Objects.equals(positions, that.positions);
     }
 }

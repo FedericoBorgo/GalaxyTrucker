@@ -130,16 +130,33 @@ public class ShipBoard implements Serializable {
             brown.remove(c, 1);
     }
 
-    private void toRemove(boolean[][] marked, Coordinate c){
-        if(marked[c.x()][c.y()] || !thereIsSomeone(c))
-            return;
+    private boolean toKill(Coordinate c){
+        if(!thereIsSomeone(c))
+            return false;
 
-        marked[c.x()][c.y()] = true;
+        boolean kill = false;
 
-        try {toRemove(marked, c.left());} catch (IOException _) {}
-        try {toRemove(marked, c.right());} catch (IOException _) {}
-        try {toRemove(marked, c.up());} catch (IOException _) {}
-        try {toRemove(marked, c.down());} catch (IOException _) {}
+        try {
+            if(thereIsSomeone(c.left()))
+                return true;
+        } catch (IOException _) {}
+
+        try {
+            if(thereIsSomeone(c.right()))
+                return true;
+        } catch (IOException _) {}
+
+        try {
+            if(thereIsSomeone(c.up()))
+                return true;
+        } catch (IOException _) {}
+
+        try {
+            if(thereIsSomeone(c.down()))
+                return true;
+        } catch (IOException _) {}
+
+        return false;
     }
 
     /**
@@ -148,16 +165,10 @@ public class ShipBoard implements Serializable {
      * @return the list of the positions of killed members
      */
     public List<Coordinate> epidemic(){
-        boolean[][] marked = new boolean[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
         List<Coordinate> removed = new ArrayList<>();
 
-        for(boolean[] b: marked)
-            Arrays.fill(b, false);
-
-        Coordinate.forEach(c -> toRemove(marked, c));
-
         Coordinate.forEach(c -> {
-            if(marked[c.x()][c.y()]) {
+            if(toKill(c)) {
                 removeSomeone(c);
                 removed.add(c);
             }

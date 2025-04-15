@@ -405,6 +405,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 if(!disconnected.get(m).contains(name)) {
                     disconnected.get(m).add(name);
                     pushPlayers(m);
+                    Logger.playerLog(m.hashCode(), name, "disconnected");
                 }
 
                 if (disconnected.get(m).size() >= m.nPlayers - 1)

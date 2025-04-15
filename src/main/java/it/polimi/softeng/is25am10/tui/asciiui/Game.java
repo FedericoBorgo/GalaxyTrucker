@@ -566,6 +566,9 @@ public class Game extends UnicastRemoteObject implements Callback {
         if(state == Model.State.Type.CHECKING)
             frame.drawErrors(board.getTiles().isOK());
 
+        if(state == Model.State.Type.WAITING_INPUT)
+            frame.clearDestroyed();
+
         frame.drawState();
     }
 

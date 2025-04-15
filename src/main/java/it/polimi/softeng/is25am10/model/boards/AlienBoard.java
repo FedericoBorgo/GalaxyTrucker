@@ -76,7 +76,7 @@ public class AlienBoard extends ElementsBoard{
     @Override
     public boolean cantPlace(Coordinate c, int qty) {
         return tiles.getTile(c).getData().getType() != Tile.Type.HOUSE
-                || !thereIsAddon(c, tiles, type) || qty > 1 || (get(c) + qty > 1) || total + qty > 1;
+                || !thereIsAddon(c, tiles, type) || qty > 1 || (get(c) + qty > 1) || getTotal() + qty > 1;
     }
 
     /**

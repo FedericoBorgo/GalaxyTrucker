@@ -600,4 +600,20 @@ public class FrameGenerator {
         }
         refresh();
     }
+
+    public synchronized void clearDestroyed(){
+        Coordinate.forEach(c -> {
+            Result<Tile> res = game.board.getTiles().getTile(c);
+
+            if(res.isErr())
+                return;
+
+            Tile t = res.getData();
+
+            if(!Tile.real(t))
+                graphics.putString(coordToTerminalPosition(c).plus(new TerminalPosition(6, 2)), " ");
+        });
+
+        refresh();
+    }
 }

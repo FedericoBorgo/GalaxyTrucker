@@ -106,6 +106,7 @@ public class Warzone extends Card {
                     fire.forEach(proj -> players.forEach(p -> p.getBoard()
                             .hit(proj, useBattery.get(p).contains(proj.ID()))
                             .ifPresent(c -> output.addDestroyed(p.getName(), c))));
+                    players.forEach(p -> p.getBoard().removeIllegals());
                 }
                 case GOODS -> players.forEach(p -> model.getRemoved(p).goods -= goods);
             }
