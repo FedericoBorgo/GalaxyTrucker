@@ -130,7 +130,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         ping();
 
         // ping the player every 500ms
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        new Timer("PING_TIMER").scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 ping();
@@ -138,7 +138,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         }, 0, 500);
 
         // run a controller backup every 5s
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        new Timer("BACKUP_TIMER").scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 backup();
@@ -146,7 +146,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         }, 0, 5000);
 
         // notify the clock for every game and player every 500ms
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        new Timer("PUSH_SECONDS_TIMER").scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 games.values().forEach(m -> {
@@ -155,6 +155,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 });
             }
         }, 0, 500);
+
+        new Timer("AUTOMATIC_INPUT_TIMER").scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                handleAutomaticInput();
+            }
+        }, 0, 2000);
     }
 
     private Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
@@ -194,6 +201,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             callbacks.get(name).pushModel(m);
             disconnected.get(m).remove(name);
             pushPlayers(m);
+            m.removeIgnore(name);
 
             if(m.nPlayers - disconnected.get(m).size() >= 2
                     && m.getState() == Model.State.Type.PAUSED)
@@ -411,31 +419,35 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             notifyPlayers(m, (name) -> {
                 if(!disconnected.get(m).contains(name)) {
                     disconnected.get(m).add(name);
+                    m.ignoreCheck(name);
                     pushPlayers(m);
                     Logger.playerLog(m.hashCode(), name, "disconnected");
                 }
 
                 if (disconnected.get(m).size() >= m.nPlayers - 1)
                     m.pause();
-                else
-                    handleAutomaticInput(m, name);
             });
         }
     }
 
-    private void handleAutomaticInput(Model m, String name){
-        if (m.getState() == Model.State.Type.ALIEN_INPUT) {
-            if (m.init(name, Optional.empty(), Optional.empty()).isOk())
-                Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
-        } else if (m.getState() == Model.State.Type.WAITING_INPUT &&
-                name.equals(m.getNextToPlay())) {
-            Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
-            setInput(name, CardInput.disconnected());
-        }
-        else if(m.getState() == Model.State.Type.DRAW_CARD &&
-            m.getFlight().getOrder().getFirst().equals(m.getPlayers().get(name))) {
-            drawCard(name);
-        }
+    private void handleAutomaticInput(){
+        games.values().forEach(m -> {
+            disconnected.get(m).forEach(name -> {
+                if (m.getState() == Model.State.Type.ALIEN_INPUT) {
+                    if (m.init(name, Optional.empty(), Optional.empty()).isOk())
+                        Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
+                } else if (m.getState() == Model.State.Type.WAITING_INPUT &&
+                        name.equals(m.getNextToPlay())) {
+                    Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
+                    setInput(name, CardInput.disconnected());
+                }
+                else if(m.getState() == Model.State.Type.DRAW_CARD &&
+                        m.getFlight().getOrder().getFirst().equals(m.getPlayers().get(name))) {
+                    drawCard(name);
+                }
+            });
+        });
+
     }
 
     /**

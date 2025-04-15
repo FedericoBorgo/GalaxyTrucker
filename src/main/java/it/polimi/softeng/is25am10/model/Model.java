@@ -167,6 +167,7 @@ public class Model implements Serializable {
     private final Map<Player, HashMap<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
     private final Map<String, Player> quitters = new ConcurrentHashMap<>();
     private final Map<String, Pawn> allPlayers = new ConcurrentHashMap<>();
+    private final Set<String> ignoreChecks = new HashSet<>();
 
     //Current state of the game
     private final State state;
@@ -198,7 +199,7 @@ public class Model implements Serializable {
     }
 
     public void loadTimer(){
-        timer = new Timer();
+        timer = new Timer("CLOCK_TIMER");
         task = new TimerTask() {
             public void run() {
                 if(state.curr != State.Type.BUILDING)
@@ -432,11 +433,28 @@ public class Model implements Serializable {
         ok.set(true);
 
         players.forEach((_, p) -> {
-            if(!p.getBoard().getTiles().isOK().isEmpty())
+            if(!ignoreChecks.contains(p.getName()) && !p.getBoard().getTiles().isOK().isEmpty())
                 ok.set(false);
         });
 
         return ok.get();
+    }
+
+    /**
+     * Ignore the checks of a player.
+     * @param name
+     */
+    public synchronized void ignoreCheck(String name){
+        ignoreChecks.add(name);
+    }
+
+    /**
+     * Remove th ignore checks of the player.
+     * @param name
+     */
+    public synchronized void removeIgnore(String name){
+        if(ignoreChecks.contains(name))
+            ignoreChecks.remove(name);
     }
     /**
      * The player declare where to put the aliens.
