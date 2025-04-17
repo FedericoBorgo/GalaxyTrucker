@@ -18,13 +18,13 @@ class TilesCollectionTest {
     void testDraw() {
         Tile tile1 = tilesCollection.getNew();
         assertNotNull(tile1);
-        assertNotSame(Tile.EMPTY_TILE, tile1);
+        assertNotSame(Tile.Type.EMPTY, tile1.getType());
     }
 
     @Test
     void testSeen(){
         Tile tile1 = tilesCollection.getFromSeen(new Tile(Tile.Type.HOUSE, "uuuu"));
-        assertEquals(Tile.EMPTY_TILE, tile1);
+        assertEquals(Tile.Type.EMPTY, tile1.getType());
         tilesCollection.give(tile1);
         assertEquals(tile1, tilesCollection.getSeen().getFirst());
         assertEquals(tile1, tilesCollection.getFromSeen(tile1));
