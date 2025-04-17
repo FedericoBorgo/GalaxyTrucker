@@ -12,11 +12,19 @@ import it.polimi.softeng.is25am10.network.Callback;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class CallbackImpl implements Callback, Serializable {
+
+    /**
+     * @param players
+     * @param quid
+     * @param disconnected
+     * @throws RemoteException
+     */
     @Override
-    public void setPlayers(HashMap<String, FlightBoard.Pawn> players) throws RemoteException {
-        System.out.println("Giocatori: " + players);
+    public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
+
     }
 
     @Override
@@ -38,8 +46,15 @@ public class CallbackImpl implements Callback, Serializable {
     @Override
     public void pushCardChanges(CardOutput output) throws RemoteException {}
 
+    /**
+     * @param name
+     * @param pawn
+     * @throws RemoteException
+     */
     @Override
-    public void askForInput() throws RemoteException {}
+    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
+
+    }
 
     @Override
     public void gaveTile(Tile t) throws RemoteException {
@@ -68,4 +83,31 @@ public class CallbackImpl implements Callback, Serializable {
 
     @Override
     public void removed(Coordinate c) throws RemoteException {}
+
+    /**
+     * @param dropped
+     * @throws RemoteException
+     */
+    @Override
+    public void pushDropped(Model.Removed dropped) throws RemoteException {
+
+    }
+
+    /**
+     * @param cannons
+     * @throws RemoteException
+     */
+    @Override
+    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
+
+    }
+
+    /**
+     * @param m
+     * @throws RemoteException
+     */
+    @Override
+    public void pushModel(Model m) throws RemoteException {
+
+    }
 }

@@ -141,7 +141,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         new Timer("BACKUP_TIMER").scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                backup();
+                //backup();
             }
         }, 0, 5000);
 
