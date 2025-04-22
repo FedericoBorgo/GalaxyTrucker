@@ -58,6 +58,7 @@ public class HomeController {
 
     @FXML
     private void handleJoin() {
+        // do we have to set a maximum number of characters for the name?
         String username = usernameField.getText().trim();
         String ip = ipAddressField.getText().trim();
 
