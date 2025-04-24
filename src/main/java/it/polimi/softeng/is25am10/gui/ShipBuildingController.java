@@ -11,16 +11,24 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ShipBuildingController {
+    //metodo setPrimaryStage in HShipBuildingController: Questo metodo permette di salvare il riferimento al primaryStage
+    private Stage primaryStage;
+
+
     @FXML private GridPane shipBoard;
     @FXML private GridPane tilePile;
     @FXML private Pane bookedTile1, bookedTile2, drawnTile;
     @FXML private ImageView bookedImage1, bookedImage2, drawnImage;
-    @FXML private Pane pileTile0, pileTile1, pileTile2, pileTile3; // Extend to pileTile19
+    @FXML private Pane pileTile0, pileTile1, pileTile2, pileTile3, pileTile4, pileTile5,
+            pileTile6, pileTile7, pileTile8, pileTile9, pileTile10, pileTile11, pileTile12,
+            pileTile13, pileTile14, pileTile15, pileTile16, pileTile17, pileTile18, pileTile19; // Extend to pileTile19
     @FXML private ImageView pileImage0, pileImage1, pileImage2, pileImage3; // Extend to pileImage19
     // Add ImageViews for shipboard tiles, e.g., image_0_2, image_1_1, etc.
 
@@ -33,6 +41,10 @@ public class ShipBuildingController {
     private int selectedRotation; // Rotation state (0, 90, 180, 270 degrees)
     private List<Pane> pilePanes; // List of pile tile panes
 
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
     @FXML
     private void initialize() {
         // Initialize tile images (replace with actual PNG paths)
@@ -44,10 +56,12 @@ public class ShipBuildingController {
 
         // Initialize pile panes
         pilePanes = new ArrayList<>();
-        pilePanes.add(pileTile0);
-        pilePanes.add(pileTile1);
-        pilePanes.add(pileTile2);
+
+       pilePanes.add(pileTile2);
         pilePanes.add(pileTile3);
+
+
+
         // Add remaining pile tiles up to pileTile19
 
         // Set up drag-and-drop for shipboard tiles
