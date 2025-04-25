@@ -1,13 +1,18 @@
 package it.polimi.softeng.is25am10.gui;
 
+import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.GridPane;
@@ -20,19 +25,28 @@ import java.util.Random;
 public class ShipBuildingController {
     //metodo setPrimaryStage in HShipBuildingController: Questo metodo permette di salvare il riferimento al primaryStage
     private Stage primaryStage;
+    // metodo setPlayer
+    private ClientInterface player;
 
 
-    @FXML private GridPane shipBoard;
-    @FXML private GridPane tilePile;
-    @FXML private Pane bookedTile1, bookedTile2, drawnTile;
-    @FXML private ImageView bookedImage1, bookedImage2, drawnImage;
-    @FXML private Pane pileTile0, pileTile1, pileTile2, pileTile3, pileTile4, pileTile5,
+    @FXML
+    private GridPane shipBoard;
+    @FXML
+    private GridPane tilePile;
+    @FXML
+    private Pane bookedTile1, bookedTile2, drawnTile;
+    @FXML
+    private ImageView bookedImage1, bookedImage2, drawnImage;
+    @FXML
+    private Pane pileTile0, pileTile1, pileTile2, pileTile3, pileTile4, pileTile5,
             pileTile6, pileTile7, pileTile8, pileTile9, pileTile10, pileTile11, pileTile12,
             pileTile13, pileTile14, pileTile15, pileTile16, pileTile17, pileTile18, pileTile19; // Extend to pileTile19
-    @FXML private ImageView pileImage0, pileImage1, pileImage2, pileImage3; // Extend to pileImage19
+    @FXML
+    private ImageView pileImage0, pileImage1, pileImage2, pileImage3; // Extend to pileImage19
     // Add ImageViews for shipboard tiles, e.g., image_0_2, image_1_1, etc.
 
-    @FXML private ListView<String> playerList;
+    @FXML
+    private ListView<String> playerList;
 
     private ObservableList<String> players; // List of player names
 
@@ -41,8 +55,15 @@ public class ShipBuildingController {
     private int selectedRotation; // Rotation state (0, 90, 180, 270 degrees)
     private List<Pane> pilePanes; // List of pile tile panes
 
+    // Attributi per loadTiles
+    private static final String TILES_FOLDER = "/tiles/";
+
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+
+    public void setPlayer(ClientInterface player) {
+        this.player = player;
     }
 
     @FXML
@@ -57,9 +78,8 @@ public class ShipBuildingController {
         // Initialize pile panes
         pilePanes = new ArrayList<>();
 
-       pilePanes.add(pileTile2);
+        pilePanes.add(pileTile2);
         pilePanes.add(pileTile3);
-
 
 
         // Add remaining pile tiles up to pileTile19
@@ -152,7 +172,7 @@ public class ShipBuildingController {
         // Allow booking by clicking
         //it's probably better to drag the image to book to the booked section
         //this section will be rewritten
-        pane.setOnMouseClicked(event -> {
+        /*pane.setOnMouseClicked(event -> {
             if (imageView.getImage() != null && (pane == drawnTile || pilePanes.contains(pane))) {
                 if (bookedImage1.getImage() == null) {
                     bookedImage1.setImage(imageView.getImage());
@@ -166,41 +186,93 @@ public class ShipBuildingController {
             }
             selectedTile = imageView;
             selectedRotation = (int) imageView.getRotate();
-        });
+        });*/
     }
 
     @FXML
-    private void drawTile() {
-        if (drawnImage.getImage() == null) {
-            Random rand = new Random();
-            Image tileImage = tileImages.get(rand.nextInt(tileImages.size()));
-            drawnImage.setImage(tileImage);
-            drawnImage.setRotate(0);
+    protected void loadRandomImage() {
+        // Richiede una tile al server tramite il client del primo giocatore
+        String tileFromServer = getTileFromServer();
+        if (tileFromServer != null && !tileFromServer.isEmpty()) {
+            String fullPath = TILES_FOLDER + tileFromServer;
+            Image image = loadImage(fullPath);
+            if (image != null) {
+                drawnImage.setImage(image);
+                drawnImage.setRotate(0);
+            } else {
+                System.err.println("Immagine non trovata: " + fullPath);
+            }
         } else {
-            // Move drawn tile to pile
-            for (Pane pilePane : pilePanes) {
-                ImageView pileImageView = (ImageView) pilePane.getChildren().get(0);
-                if (pileImageView.getImage() == null) {
-                    pileImageView.setImage(drawnImage.getImage());
-                    pileImageView.setRotate(drawnImage.getRotate());
-                    drawnImage.setImage(null);
-                    // Draw new tile
-                    Random rand = new Random();
-                    Image tileImage = tileImages.get(rand.nextInt(tileImages.size()));
-                    drawnImage.setImage(tileImage);
-                    drawnImage.setRotate(0);
+            System.err.println("Nessuna tile ricevuta dal server");
+        }
+    }
+
+    // Ottiene il percorso di una tile dal server tramite il client del primo giocatore
+    private String getTileFromServer() {
+        if (player == null) {
+            System.err.println("Giocatore non connesso");
+            return null;
+        }
+        try {
+            Result<Tile> res = player.drawTile();
+            if (res.isOk()) {
+                Tile t = res.getData();
+                String folder = t.getType().toString();
+                String file = getImageFileName(t);
+                String path = folder + "/" + file + ".jpg";
+                System.out.println("Tile ricevuta: " + path);
+                return path;
+            } else {
+                System.err.println("Errore dal server: " + res.getReason());
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Errore drawTile: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Converte i connettori della tile nella stringa numerica che identifica la texture della tile
+    private String getImageFileName(Tile tile) {
+        StringBuilder fileName = new StringBuilder();
+        Tile.ConnectorType[] connectors = new Tile.ConnectorType[]{
+                tile.getConnectors().get(Tile.Side.UP),
+                tile.getConnectors().get(Tile.Side.RIGHT),
+                tile.getConnectors().get(Tile.Side.DOWN),
+                tile.getConnectors().get(Tile.Side.LEFT)
+        };
+        for (Tile.ConnectorType connector : connectors) {
+            switch (connector) {
+                case UNIVERSAL:
+                    fileName.append("3");
                     break;
-                }
+                case TWO_PIPE:
+                    fileName.append("2");
+                    break;
+                case ONE_PIPE:
+                    fileName.append("1");
+                    break;
+                case SMOOTH:
+                    fileName.append("0");
+                    break;
             }
         }
+        return fileName.toString();
+    }
+
+    // Carica un'immagine dal percorso specificato
+    private Image loadImage(String path) {
+        try {
+            return new Image(getClass().getResource(path).toExternalForm());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @FXML
-    private void rotateTile() {
-        if (selectedTile != null && selectedTile.getImage() != null) {
-            selectedRotation = (selectedRotation + 90) % 360;
-            selectedTile.setRotate(selectedRotation);
-        }
+    protected void rotateImage() {
+        drawnImage.setRotate(drawnImage.getRotate() + 90);
     }
 
     @FXML
@@ -235,4 +307,9 @@ public class ShipBuildingController {
             }
         }
     }
+
+    public void bookTile(ActionEvent actionEvent) {
+        System.out.println("Temp!");
+    }
+
 }

@@ -73,7 +73,11 @@ public class HomeController {
 
     @FXML
     private void handleJoin() {
-        // do we have to set a maximum number of characters for the name?
+        // Creo un altro giocatore fittizio (necessario per iniziare la partita)
+        ClientInterface secondPlayer = new RMIClient("secondPName", "localhost", 1234);
+        secondPlayer.join(new CallbackImpl());
+        System.out.println("Giocatore 2 (" + "secondPName" + ") connesso");
+
         String username = usernameField.getText().trim();
         String ip = ipAddressField.getText().trim();
 
@@ -94,7 +98,7 @@ public class HomeController {
             try {
                 player = new RMIClient(username, ip, Integer.parseInt(port));
                 player.join(new CallbackImpl());
-                //qui ci vorrebbe un if, in base alla logica di gioco parte da 0 oppure dalla partita salvata
+                System.out.println("Giocatore (" + username + ") connesso");
                 switchToNext("/gui/ShipBuilding.fxml");
             } catch (Exception e) {
                 showAlert("Errore di connessione RMI: " + e.getMessage());
@@ -109,9 +113,8 @@ public class HomeController {
             try {
                 player = new SocketClient(username, ip, Integer.parseInt(port1), Integer.parseInt(port2));
                 player.join(new CallbackImpl());
-                //qui ci vorrebbe un if
+                System.out.println("Giocatore (" + username + ") connesso");
                 switchToNext("/gui/ShipBuilding.fxml");
-
             } catch (Exception e) {
                 showAlert("Errore di connessione Socket: " + e.getMessage());
             }
@@ -139,9 +142,10 @@ public class HomeController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ShipBuilding.fxml"));
             Parent root = loader.load();
 
-            //passa primarystage
+            //passa primarystage e player
             ShipBuildingController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);
+            controller.setPlayer(player);
 
             // Set the scene
             Scene scene = new Scene(root);

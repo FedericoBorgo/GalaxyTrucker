@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class AppLauncher extends Application {
 
-    // Lo lancia correttamente e carica la home!
     @Override
     public void start(Stage primaryStage) {
         try {

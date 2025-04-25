@@ -224,6 +224,7 @@ class TilesBoardTest {
         assertEquals(3, tilesBoard.countEnginePower(1));
     }
 
+    // Non più necessario
     @Test
     void testHit(){
         tilesBoard.setTile(new Coordinate(3, 1), new Tile(Tile.Type.CANNON, "sstu"), Tile.Rotation.INV);
