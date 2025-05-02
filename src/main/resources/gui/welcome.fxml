@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="333.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Welcome">
+   <children>
+      <ImageView fitHeight="400.0" fitWidth="600.0" preserveRatio="true">
+         <image>
+            <Image url="@welcome.png" />
+         </image>
+      </ImageView>
+      <Button layoutY="227.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="52.0" prefWidth="326.0" text="Button" />
+   </children>
+</AnchorPane>

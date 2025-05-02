@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="335.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Login">
+   <children>
+      <ImageView fitHeight="341.0" fitWidth="600.0" preserveRatio="true">
+         <image>
+            <Image url="@login.png" />
+         </image>
+      </ImageView>
+      <Button layoutX="261.0" layoutY="242.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="30.0" prefWidth="97.0" text="Button" />
+      <TextField fx:id="usernameField" layoutX="247.0" layoutY="34.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" />
+      <TextField fx:id="addressField" layoutX="247.0" layoutY="90.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" text="local host">
+         <font>
+            <Font name="Shree Devanagari 714" size="13.0" />
+         </font></TextField>
+      <SplitMenuButton fx:id="connectionMenu" layoutX="246.0" layoutY="143.0" mnemonicParsing="false" opacity="0.75" prefHeight="26.0" prefWidth="254.0" text="SOCKET" wrapText="true">
+        <items>
+          <MenuItem fx:id="socketMenu" mnemonicParsing="false" onAction="#socket" text="SOCKET" />
+          <MenuItem fx:id="rmiMenu" mnemonicParsing="false" onAction="#rmi" text="RMI" />
+        </items>
+      </SplitMenuButton>
+      <TextField fx:id="port1" layoutX="208.0" layoutY="187.0" opacity="0.75" prefHeight="26.0" prefWidth="56.0" text="1235" />
+      <TextField fx:id="port2" layoutX="458.0" layoutY="187.0" opacity="0.75" prefHeight="15.0" prefWidth="56.0" text="1236" />
+      <Label fx:id="errLabel" layoutX="175.0" layoutY="278.0" prefHeight="26.0" prefWidth="287.0" textAlignment="CENTER" textFill="#e40505">
+         <font>
+            <Font name="Sinhala Sangam MN" size="21.0" />
+         </font>
+         <effect>
+            <Glow level="0.52" />
+         </effect>
+      </Label>
+   </children>
+</AnchorPane>
