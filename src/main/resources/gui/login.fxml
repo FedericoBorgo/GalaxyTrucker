@@ -6,16 +6,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="335.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Login">
+<AnchorPane prefHeight="324.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Login">
    <children>
-      <ImageView fitHeight="341.0" fitWidth="600.0" preserveRatio="true">
+      <ImageView fitHeight="338.0" fitWidth="600.0" preserveRatio="true">
          <image>
             <Image url="@login.png" />
          </image>
       </ImageView>
       <Button layoutX="261.0" layoutY="242.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="30.0" prefWidth="97.0" text="Button" />
       <TextField fx:id="usernameField" layoutX="247.0" layoutY="34.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" />
-      <TextField fx:id="addressField" layoutX="247.0" layoutY="90.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" text="local host">
+      <TextField fx:id="addressField" layoutX="247.0" layoutY="90.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" text="localhost">
          <font>
             <Font name="Shree Devanagari 714" size="13.0" />
          </font></TextField>

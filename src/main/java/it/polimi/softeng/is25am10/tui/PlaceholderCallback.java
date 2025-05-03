@@ -9,6 +9,7 @@ import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;

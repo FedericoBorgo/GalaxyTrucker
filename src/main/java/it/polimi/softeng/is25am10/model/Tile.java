@@ -109,6 +109,13 @@ public class Tile implements Serializable {
         return connectors;
     }
 
+    public String connectorsToInt(){
+        return "" + connectors.get(Side.UP).toInt() +
+                connectors.get(Side.RIGHT).toInt()+
+                connectors.get(Side.DOWN).toInt()+
+                connectors.get(Side.LEFT).toInt();
+    }
+
     /**
      * Get the side of a tile rotated clockwise n times.
      *
@@ -238,6 +245,15 @@ public class Tile implements Serializable {
                 case TWO_PIPE -> 't';
                 case UNIVERSAL -> 'u';
                 case SMOOTH -> 's';
+            };
+        }
+
+        public int toInt(){
+            return switch (this){
+                case ONE_PIPE -> 1;
+                case TWO_PIPE -> 2;
+                case UNIVERSAL -> 3;
+                case SMOOTH -> 0;
             };
         }
 

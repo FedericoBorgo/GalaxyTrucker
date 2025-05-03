@@ -1,5 +1,10 @@
 package it.polimi.softeng.is25am10.gui;
 
+import it.polimi.softeng.is25am10.Controller;
+import it.polimi.softeng.is25am10.network.ClientInterface;
+import it.polimi.softeng.is25am10.network.rmi.RMIClient;
+import it.polimi.softeng.is25am10.network.socket.SocketClient;
+import it.polimi.softeng.is25am10.tui.PlaceholderCallback;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,7 +15,13 @@ import java.io.IOException;
 
 public class Launcher extends Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        Controller.main(new String[]{"false"});
+
+        ClientInterface bot = new SocketClient("bot", "localhost", 1235, 1236);
+
+        bot.join(new PlaceholderCallback());
+
         launch(args);
     }
 

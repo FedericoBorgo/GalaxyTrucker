@@ -20,6 +20,7 @@ public class Welcome {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/login.fxml"));
         Parent root = loader.load();
         Login login = loader.getController();
+        login.setStage(stage);
         stage.setScene(new Scene(root));
     }
 }

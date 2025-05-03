@@ -4,13 +4,17 @@ import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 public class Login {
+    private Stage stage;
 
     @FXML
     TextField usernameField;
@@ -30,9 +34,13 @@ public class Login {
     @FXML
     Label errLabel;
 
+    public void setStage(Stage stage){
+        this.stage = stage;
+    }
+
     @FXML
     private void join(){
-        ClientInterface client;
+        ClientInterface server;
         String name = usernameField.getText();
         String address = addressField.getText();
 
@@ -49,9 +57,15 @@ public class Login {
 
         try{
             if(connectionMenu.getText().equals("RMI"))
-                client = new RMIClient(name, address, port1);
+                server = new RMIClient(name, address, port1);
             else
-                client = new SocketClient(name, address, port1, port2);
+                server = new SocketClient(name, address, port1, port2);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/building.fxml"));
+            Parent root = loader.load();
+            Building building = loader.getController();
+            stage.setScene(new Scene(root));
+            building.setServer(server);
         }catch (Exception _){
             errLabel.setText("Impossibile connettersi al server");
             errLabel.setAlignment(Pos.CENTER);
