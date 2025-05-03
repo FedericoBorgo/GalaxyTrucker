@@ -7,16 +7,10 @@
 
 <AnchorPane prefHeight="337.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building">
     <children>
-        <ImageView fitHeight="338.0" fitWidth="600.0" preserveRatio="true">
-            <image>
-                <Image url="@building.png" />
-            </image>
-        </ImageView>
       <Button layoutX="73.0" layoutY="305.0" mnemonicParsing="false" onAction="#playerReady" opacity="0.0" prefHeight="26.0" prefWidth="159.0" text="Button" />
       <Button layoutX="528.0" layoutY="176.0" mnemonicParsing="false" onAction="#moveClock" opacity="0.0" prefHeight="17.0" prefWidth="58.0" text="Button" />
       <Button layoutX="330.0" layoutY="119.0" mnemonicParsing="false" onAction="#drawTile" opacity="0.0" prefHeight="16.0" prefWidth="78.0" text="Button" />
       <Button layoutX="330.0" layoutY="145.0" mnemonicParsing="false" onAction="#rotateTile" opacity="0.0" prefHeight="26.0" prefWidth="78.0" text="Button" />
-      <Button layoutX="330.0" layoutY="171.0" mnemonicParsing="false" onAction="#bookTile" opacity="0.0" prefHeight="26.0" prefWidth="78.0" text="Button" />
       <GridPane fx:id="shipPane" layoutX="39.0" layoutY="48.0" prefHeight="170.0" prefWidth="244.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -36,10 +30,11 @@
         </rowConstraints>
       </GridPane>
       <Pane fx:id="drawTilePane" layoutX="330.0" layoutY="39.0" prefHeight="77.0" prefWidth="77.0" />
-      <ScrollPane id=" background.jpg" fx:id="seenScrollPane" layoutX="444.0" layoutY="39.0" prefHeight="86.0" prefWidth="147.0" style="-fx-background-color: #0B0C2A;">
+      <ScrollPane id=" background.jpg" fx:id="seenScrollPane" layoutX="444.0" layoutY="39.0" prefHeight="86.0" prefWidth="147.0" style="-fx-background-color: transparent">
          <content>
-            <AnchorPane prefHeight="87.0" prefWidth="151.0" />
-         </content></ScrollPane>
+            <AnchorPane prefHeight="87.0" prefWidth="151.0" style="-fx-background-color: #0B0C2A;" />
+         </content>
+      </ScrollPane>
       <ImageView fx:id="clock1" fitHeight="32.0" fitWidth="43.0" layoutX="501.0" layoutY="211.0" preserveRatio="true" rotate="23.6">
          <image>
             <Image url="@clock.png" />
@@ -62,34 +57,41 @@
       </Label>
       <Label fx:id="stateLabel" layoutX="185.0" layoutY="1.0" prefHeight="26.0" prefWidth="77.0" textFill="WHITE">
          <font>
-            <Font name="Courier New Bold" size="14.0" />
+            <Font name="Monospaced Regular" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="nameLabel" layoutX="475.0" layoutY="6.0" prefHeight="17.0" prefWidth="84.0" textFill="WHITE">
+      <Label fx:id="nameLabel" layoutX="489.0" layoutY="6.0" prefHeight="17.0" prefWidth="70.0" textFill="WHITE">
          <font>
-            <Font name="Courier New Bold" size="14.0" />
+            <Font name="Monospaced Regular" size="14.0" />
          </font>
       </Label>
       <Label fx:id="redLabel" layoutX="288.0" layoutY="241.0" prefHeight="17.0" prefWidth="77.0" textFill="#e80404">
          <font>
-            <Font name="Courier New Bold" size="14.0" />
+            <Font name="Monospaced Bold" size="14.0" />
          </font>
       </Label>
         <Label fx:id="blueLabel" layoutX="288.0" layoutY="265.0" prefHeight="17.0" prefWidth="77.0" textFill="#056ee5">
             <font>
-                <Font name="Courier New Bold" size="14.0" />
+                <Font name="Monospaced Bold" size="14.0" />
             </font>
         </Label>
         <Label fx:id="greenLabel" layoutX="288.0" layoutY="290.0" prefHeight="17.0" prefWidth="77.0" textFill="#48a41a">
             <font>
-                <Font name="Courier New Bold" size="14.0" />
+                <Font name="Monospaced Bold" size="14.0" />
             </font>
         </Label>
         <Label fx:id="yellowLabel" layoutX="288.0" layoutY="312.0" prefHeight="17.0" prefWidth="77.0" textFill="#e1d312">
             <font>
-                <Font name="Courier New Bold" size="14.0" />
+                <Font name="Monospaced Bold" size="14.0" />
             </font>
         </Label>
-
+        <ImageView fitHeight="338.0" fitWidth="600.0" preserveRatio="true">
+            <image>
+                <Image url="@building.png" />
+            </image>
+        </ImageView>
+     <!-- <Pane fx:id="bookedPanel1" layoutX="316.0" layoutY="177.0" prefHeight="44.0" prefWidth="47.0" />
+      <Pane fx:id="bookedPanel2" layoutX="374.0" layoutY="177.0" prefHeight="44.0" prefWidth="39.0" />
+-->
     </children>
 </AnchorPane>

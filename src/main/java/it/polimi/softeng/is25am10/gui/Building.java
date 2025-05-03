@@ -12,11 +12,19 @@ import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
+import javafx.scene.transform.Rotate;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -24,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Building implements Callback{
-
     ClientInterface server;
 
     Tile drawnTile = null;
@@ -68,11 +75,106 @@ public class Building implements Callback{
 
         clock2.setVisible(false);
         clock3.setVisible(false);
+
+        drawnTileView = new ImageView();
+        drawTilePane.getChildren().add(drawnTileView);
+
+        drawnTileView.setOnDragDetected(event -> {
+            if(drawnTileView.getImage() == null)
+                return;
+
+            Dragboard db = drawnTileView.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString(drawnTile.toString());
+            db.setContent(content);
+            db.setDragView(getRotatedImage(drawnTileView.getImage(), rotation*90));
+            event.consume();
+        });
+
+        shipPane.setOnDragOver(event -> {
+            if (event.getGestureSource() != shipPane && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
+
+
+        shipPane.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+
+            if(db.hasString()){
+                Tile t = new Tile(db.getString());
+                boolean isFromSeen = false;
+
+                if(seenTileViews.contains(event.getGestureSource())){
+                    if(server.getTileFromSeen(t).isErr())
+                        return;
+                    isFromSeen = true;
+                }
+
+                int col = (int)(event.getX() / (shipPane.getWidth() / 7));
+                int row = (int)(event.getY() / (shipPane.getHeight() / 5));
+
+                System.out.println("x: " + col + " y: " + row);
+
+
+                if(Coordinate.isInvalid(col, row))
+                    return;
+
+                if(server.setTile(new Coordinate(col, row), t, Tile.Rotation.fromInt(rotation)).isOk()){
+                    if(event.getGestureSource() == drawnTileView) {
+                        drawnTileView.setImage(null);
+                        drawnTile = null;
+                    }
+                }
+                else{
+                    if(isFromSeen)
+                        server.giveTile(t);
+                }
+
+                success = true;
+            }
+
+            event.setDropCompleted(success);
+            event.consume();
+        });
+    }
+
+    public Image getRotatedImage(Image original, double angleDegrees) {
+        double size = drawTilePane.getHeight()/3;
+
+        Canvas canvas = new Canvas(size, size);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        gc.save();
+        Rotate r = new Rotate(angleDegrees, size/2, size/2);
+        gc.transform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+        gc.drawImage(original, 0, 0, size, size);
+        gc.restore();
+
+        WritableImage rotatedImage = new WritableImage((int) size, (int) size);
+        canvas.snapshot(null, rotatedImage);
+
+        return rotatedImage;
     }
 
     public void setServer(ClientInterface server){
         this.server = server;
-        server.join(this);
+        server.join(this).ifPresent(pawn -> {
+            String path = "/tiles/C_HOUSE/3333_" + switch(pawn){
+                case YELLOW -> "yellow";
+                case GREEN -> "green";
+                case BLUE -> "blue";
+                case RED -> "red";
+            } + ".jpg";
+
+            Image image = new Image(getClass().getResource(path).toExternalForm());
+            ImageView view = new ImageView(image);
+            view.setFitHeight(shipPane.getHeight()/5);
+            view.setFitWidth(shipPane.getWidth()/7);
+            shipPane.add(view, 3, 2);
+        });
     }
 
     public void setPlayerName(String name){
@@ -89,14 +191,11 @@ public class Building implements Callback{
         server.drawTile().ifPresent(t -> {
             if(drawnTile != null)
                 server.giveTile(drawnTile);
-
+            rotation = 0;
             drawnTile = t;
-
-            drawnTileView = new ImageView(getImage(t));
+            drawnTileView.setImage(getImage(t));
             drawnTileView.setFitWidth(drawTilePane.getWidth());
             drawnTileView.setFitHeight(drawTilePane.getHeight());
-
-            drawTilePane.getChildren().add(drawnTileView);
         });
     }
 
@@ -107,11 +206,8 @@ public class Building implements Callback{
 
         rotation = (rotation + 1) % 4;
         drawnTileView.setRotate(rotation*90);
-    }
 
-    @FXML
-    private void bookTile(){
-
+        seenTileViews.forEach(tileView -> tileView.setRotate(rotation*90));
     }
 
     @FXML
@@ -124,8 +220,6 @@ public class Building implements Callback{
     private Image getImage(Tile t){
         return new Image(getClass().getResource("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg").toExternalForm());
     }
-
-
 
 
 
@@ -192,6 +286,16 @@ public class Building implements Callback{
             tileView.setFitHeight(seenScrollPane.getHeight());
             seenTileViews.addLast(tileView);
             seenImages.getChildren().add(tileView);
+
+            tileView.setOnDragDetected(event -> {
+                System.out.println("Drag da viste");
+                Dragboard db = tileView.startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putString(t.toString());
+                db.setContent(content);
+                db.setDragView(getRotatedImage(tileView.getImage(), rotation*90));
+                event.consume();
+            });
         });
     }
 
@@ -239,7 +343,14 @@ public class Building implements Callback{
 
     @Override
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
+        Platform.runLater(() -> {
+            ImageView view = new ImageView(getImage(t));
+            view.setFitHeight(shipPane.getHeight() / 5);
+            view.setFitWidth(shipPane.getWidth() / 7);
+            view.setRotate(r.toInt()*90);
 
+            shipPane.add(view, c.x(), c.y());
+        });
     }
 
     @Override

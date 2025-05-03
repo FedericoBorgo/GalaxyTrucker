@@ -39,6 +39,25 @@ public class Tile implements Serializable {
                 case NONE -> Side.UP;
             };
         }
+
+        static public Rotation fromInt(int x){
+            return switch(x){
+                case 0 -> NONE;
+                case 1 -> CLOCK;
+                case 2 -> DOUBLE;
+                case 3 -> INV;
+                default -> throw new IllegalStateException();
+            };
+        }
+
+        public int toInt(){
+            return switch (this){
+                case NONE -> 0;
+                case CLOCK -> 1;
+                case DOUBLE -> 2;
+                case INV -> 3;
+            };
+        }
     }
 
     /**
@@ -79,6 +98,13 @@ public class Tile implements Serializable {
         Arrays.stream(Side.order).forEach(side -> map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal()))));
 
         this.connectors = Collections.unmodifiableMap(map);
+    }
+
+    public Tile(String s) {
+        Type t = Type.valueOf(s.substring(0, s.indexOf(" ")));
+        String c = s.substring(s.indexOf(" ")+1);
+
+        this(t, c);
     }
 
     /**
@@ -307,6 +333,11 @@ public class Tile implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Tile tile = (Tile) o;
         return type == tile.type && Objects.equals(connectors, tile.connectors);
+    }
+
+    @Override
+    public String toString(){
+        return type.name() + " " + connectorsToInt();
     }
 }
 

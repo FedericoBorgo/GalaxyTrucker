@@ -112,6 +112,7 @@ public class ShipBuildingController {
 
     private void setupShipBoardDragAndDrop() {
         // For each shipboard tile pane (e.g., tile_0_2, tile_1_1, etc.)
+
         for (var node : shipBoard.getChildren()) {
             Pane pane = (Pane) node;
             ImageView imageView = (ImageView) pane.getChildren().get(0);
