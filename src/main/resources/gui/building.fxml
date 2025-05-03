@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="337.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building">
+<AnchorPane prefHeight="601.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building">
     <children>
-      <Button layoutX="73.0" layoutY="305.0" mnemonicParsing="false" onAction="#playerReady" opacity="0.0" prefHeight="26.0" prefWidth="159.0" text="Button" />
-      <Button layoutX="528.0" layoutY="176.0" mnemonicParsing="false" onAction="#moveClock" opacity="0.0" prefHeight="17.0" prefWidth="58.0" text="Button" />
-      <Button layoutX="330.0" layoutY="119.0" mnemonicParsing="false" onAction="#drawTile" opacity="0.0" prefHeight="16.0" prefWidth="78.0" text="Button" />
-      <Button layoutX="330.0" layoutY="145.0" mnemonicParsing="false" onAction="#rotateTile" opacity="0.0" prefHeight="26.0" prefWidth="78.0" text="Button" />
-      <GridPane fx:id="shipPane" layoutX="39.0" layoutY="48.0" prefHeight="170.0" prefWidth="244.0">
+        <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
+            <image>
+                <Image url="@building.png" />
+            </image>
+        </ImageView>
+      <Button layoutX="122.0" layoutY="548.0" mnemonicParsing="false" onAction="#playerReady" opacity="0.0" prefHeight="46.0" prefWidth="306.0" text="end" />
+      <Button layoutX="953.0" layoutY="323.0" mnemonicParsing="false" onAction="#moveClock" opacity="0.0" prefHeight="38.0" prefWidth="110.0" text="clock" />
+      <Button layoutX="540.0" layoutY="58.0" mnemonicParsing="false" onAction="#drawTile" opacity="0.0" prefHeight="46.0" prefWidth="154.0" text="draw" />
+      <Button layoutX="540.0" layoutY="116.0" mnemonicParsing="false" onAction="#rotateTile" opacity="0.0" prefHeight="46.0" prefWidth="154.0" text="rotate" />
+      <GridPane fx:id="shipPane" layoutX="69.0" layoutY="83.0" prefHeight="313.0" prefWidth="439.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -29,67 +41,62 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
-      <Pane fx:id="drawTilePane" layoutX="330.0" layoutY="39.0" prefHeight="77.0" prefWidth="77.0" />
-      <ScrollPane id=" background.jpg" fx:id="seenScrollPane" layoutX="444.0" layoutY="39.0" prefHeight="86.0" prefWidth="147.0" style="-fx-background-color: transparent">
+      <Pane fx:id="drawTilePane" layoutX="559.0" layoutY="196.0" onDragDetected="#drawnTileDragDetected" prefHeight="125.0" prefWidth="126.0" />
+      <ScrollPane id=" background.jpg" fx:id="seenScrollPane" layoutX="863.0" layoutY="73.0" prefHeight="250.0" prefWidth="126.0" style="-fx-background-color: transparent">
          <content>
-            <AnchorPane prefHeight="87.0" prefWidth="151.0" style="-fx-background-color: #0B0C2A;" />
+            <AnchorPane prefHeight="248.0" prefWidth="125.0" style="-fx-background-color: #0B0C2A;" />
          </content>
       </ScrollPane>
-      <ImageView fx:id="clock1" fitHeight="32.0" fitWidth="43.0" layoutX="501.0" layoutY="211.0" preserveRatio="true" rotate="23.6">
+      <ImageView fx:id="clock1" fitHeight="54.0" fitWidth="64.0" layoutX="905.0" layoutY="378.0" preserveRatio="true" rotate="23.6">
          <image>
             <Image url="@clock.png" />
          </image>
       </ImageView>
-        <ImageView fx:id="clock2" fitHeight="32.0" fitWidth="43.0" layoutX="517.0" layoutY="220.0" preserveRatio="true" rotate="38.7">
+        <ImageView fx:id="clock2" fitHeight="53.0" fitWidth="64.0" layoutX="936.0" layoutY="402.0" preserveRatio="true" rotate="38.7">
             <image>
                 <Image url="@clock.png" />
             </image>
         </ImageView>
-        <ImageView fx:id="clock3" fitHeight="32.0" fitWidth="43.0" layoutX="530.0" layoutY="235.0" preserveRatio="true" rotate="45.0">
+        <ImageView fx:id="clock3" fitHeight="69.0" fitWidth="70.0" layoutX="954.0" layoutY="421.0" preserveRatio="true" rotate="45.0">
             <image>
                 <Image url="@clock.png" />
             </image>
         </ImageView>
-      <Label fx:id="secondsLabel" layoutX="561.0" layoutY="257.0" prefHeight="44.0" prefWidth="39.0" text="00" textFill="#f5f3f3">
+      <Label fx:id="secondsLabel" layoutX="1000.0" layoutY="470.0" prefHeight="97.0" prefWidth="80.0" text="00" textFill="#f5f3f3">
          <font>
-            <Font name="System Bold" size="26.0" />
+            <Font name="System Bold" size="68.0" />
          </font>
       </Label>
-      <Label fx:id="stateLabel" layoutX="185.0" layoutY="1.0" prefHeight="26.0" prefWidth="77.0" textFill="WHITE">
+      <Label fx:id="stateLabel" layoutX="333.0" layoutY="2.0" prefHeight="38.0" prefWidth="207.0" text="JOINING" textFill="WHITE">
          <font>
-            <Font name="Monospaced Regular" size="14.0" />
+            <Font name="Monospaced Regular" size="33.0" />
          </font>
       </Label>
-      <Label fx:id="nameLabel" layoutX="489.0" layoutY="6.0" prefHeight="17.0" prefWidth="70.0" textFill="WHITE">
+      <Label fx:id="nameLabel" layoutX="800.0" layoutY="4.0" prefHeight="38.0" prefWidth="222.0" text="PLAYER" textFill="WHITE">
          <font>
-            <Font name="Monospaced Regular" size="14.0" />
+            <Font name="Monospaced Regular" size="33.0" />
          </font>
       </Label>
-      <Label fx:id="redLabel" layoutX="288.0" layoutY="241.0" prefHeight="17.0" prefWidth="77.0" textFill="#e80404">
-         <font>
-            <Font name="Monospaced Bold" size="14.0" />
-         </font>
-      </Label>
-        <Label fx:id="blueLabel" layoutX="288.0" layoutY="265.0" prefHeight="17.0" prefWidth="77.0" textFill="#056ee5">
+        <Label fx:id="blueLabel" layoutX="514.0" layoutY="469.0" prefHeight="38.0" prefWidth="145.0" textFill="#1a07e3">
             <font>
-                <Font name="Monospaced Bold" size="14.0" />
+                <Font name="Monospaced Bold" size="20.0" />
             </font>
         </Label>
-        <Label fx:id="greenLabel" layoutX="288.0" layoutY="290.0" prefHeight="17.0" prefWidth="77.0" textFill="#48a41a">
-            <font>
-                <Font name="Monospaced Bold" size="14.0" />
-            </font>
-        </Label>
-        <Label fx:id="yellowLabel" layoutX="288.0" layoutY="312.0" prefHeight="17.0" prefWidth="77.0" textFill="#e1d312">
-            <font>
-                <Font name="Monospaced Bold" size="14.0" />
-            </font>
-        </Label>
-        <ImageView fitHeight="338.0" fitWidth="600.0" preserveRatio="true">
-            <image>
-                <Image url="@building.png" />
-            </image>
-        </ImageView>
+      <Label fx:id="greenLabel" layoutX="514.0" layoutY="518.0" prefHeight="38.0" prefWidth="145.0" textFill="#2ae309">
+         <font>
+            <Font name="Monospaced Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="yellowLabel" layoutX="514.0" layoutY="556.0" prefHeight="38.0" prefWidth="145.0" textFill="#d0e309">
+         <font>
+            <Font name="Monospaced Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="redLabel" layoutX="514.0" layoutY="423.0" prefHeight="38.0" prefWidth="145.0" textFill="#d71a1a">
+         <font>
+            <Font name="Monospaced Bold" size="20.0" />
+         </font>
+      </Label>
      <!-- <Pane fx:id="bookedPanel1" layoutX="316.0" layoutY="177.0" prefHeight="44.0" prefWidth="47.0" />
       <Pane fx:id="bookedPanel2" layoutX="374.0" layoutY="177.0" prefHeight="44.0" prefWidth="39.0" />
 -->

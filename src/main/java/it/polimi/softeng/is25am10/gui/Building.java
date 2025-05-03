@@ -65,39 +65,29 @@ public class Building implements Callback{
     @FXML
     Label redLabel, blueLabel, yellowLabel, greenLabel;
 
-    HBox seenImages = new HBox();
+    VBox seenImages = new VBox();
 
     @FXML
     private void initialize(){
-        seenScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        seenScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        //configure scrollable panel
+        seenScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        seenScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         seenScrollPane.setContent(seenImages);
 
+        //configure clocks
         clock2.setVisible(false);
         clock3.setVisible(false);
 
+        //configure drawn tiles
         drawnTileView = new ImageView();
         drawTilePane.getChildren().add(drawnTileView);
 
-        drawnTileView.setOnDragDetected(event -> {
-            if(drawnTileView.getImage() == null)
-                return;
-
-            Dragboard db = drawnTileView.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content = new ClipboardContent();
-            content.putString(drawnTile.toString());
-            db.setContent(content);
-            db.setDragView(getRotatedImage(drawnTileView.getImage(), rotation*90));
-            event.consume();
-        });
 
         shipPane.setOnDragOver(event -> {
-            if (event.getGestureSource() != shipPane && event.getDragboard().hasString()) {
+            if (event.getGestureSource() != shipPane && event.getDragboard().hasString())
                 event.acceptTransferModes(TransferMode.MOVE);
-            }
             event.consume();
         });
-
 
         shipPane.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
@@ -141,24 +131,6 @@ public class Building implements Callback{
         });
     }
 
-    public Image getRotatedImage(Image original, double angleDegrees) {
-        double size = drawTilePane.getHeight()/3;
-
-        Canvas canvas = new Canvas(size, size);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        gc.save();
-        Rotate r = new Rotate(angleDegrees, size/2, size/2);
-        gc.transform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
-        gc.drawImage(original, 0, 0, size, size);
-        gc.restore();
-
-        WritableImage rotatedImage = new WritableImage((int) size, (int) size);
-        canvas.snapshot(null, rotatedImage);
-
-        return rotatedImage;
-    }
-
     public void setServer(ClientInterface server){
         this.server = server;
         server.join(this).ifPresent(pawn -> {
@@ -191,13 +163,26 @@ public class Building implements Callback{
         server.drawTile().ifPresent(t -> {
             if(drawnTile != null)
                 server.giveTile(drawnTile);
-            rotation = 0;
             drawnTile = t;
             drawnTileView.setImage(getImage(t));
+            drawnTileView.setRotate(rotation*90);
             drawnTileView.setFitWidth(drawTilePane.getWidth());
             drawnTileView.setFitHeight(drawTilePane.getHeight());
         });
     }
+
+    @FXML
+    private void drawnTileDragDetected(){
+        if(drawnTileView.getImage() == null)
+            return;
+
+        Dragboard db = drawnTileView.startDragAndDrop(TransferMode.MOVE);
+        ClipboardContent content = new ClipboardContent();
+        content.putString(drawnTile.toString());
+        db.setContent(content);
+        db.setDragView(getRotatedImage(drawnTileView.getImage(), rotation*90));
+    }
+
 
     @FXML
     private void rotateTile(){
@@ -206,7 +191,6 @@ public class Building implements Callback{
 
         rotation = (rotation + 1) % 4;
         drawnTileView.setRotate(rotation*90);
-
         seenTileViews.forEach(tileView -> tileView.setRotate(rotation*90));
     }
 
@@ -214,13 +198,6 @@ public class Building implements Callback{
     private void moveClock(){
         server.moveTimer();
     }
-
-
-
-    private Image getImage(Tile t){
-        return new Image(getClass().getResource("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg").toExternalForm());
-    }
-
 
 
 
@@ -282,8 +259,8 @@ public class Building implements Callback{
         Platform.runLater(() -> {
             seenTiles.addLast(t);
             ImageView tileView = new ImageView(getImage(t));
-            tileView.setFitWidth(seenScrollPane.getHeight());
-            tileView.setFitHeight(seenScrollPane.getHeight());
+            tileView.setFitWidth(seenScrollPane.getWidth());
+            tileView.setFitHeight(seenScrollPane.getWidth());
             seenTileViews.addLast(tileView);
             seenImages.getChildren().add(tileView);
 
@@ -376,5 +353,27 @@ public class Building implements Callback{
     @Override
     public void pushModel(Model m) throws RemoteException {
 
+    }
+
+    static public Image getRotatedImage(Image original, double angleDegrees) {
+        double size = 70;
+
+        Canvas canvas = new Canvas(size, size);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        gc.save();
+        Rotate r = new Rotate(angleDegrees, size/2, size/2);
+        gc.transform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+        gc.drawImage(original, 0, 0, size, size);
+        gc.restore();
+
+        WritableImage rotatedImage = new WritableImage((int) size, (int) size);
+        canvas.snapshot(null, rotatedImage);
+
+        return rotatedImage;
+    }
+
+    private Image getImage(Tile t){
+        return new Image(getClass().getResource("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg").toExternalForm());
     }
 }
