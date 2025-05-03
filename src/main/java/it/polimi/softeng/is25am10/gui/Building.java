@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.gui;
 
+import com.googlecode.lanterna.gui2.TextBox;
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
@@ -9,15 +10,14 @@ import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 
-import java.awt.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class Building implements Callback{
     ImageView drawnTileView = null;
 
     ArrayList<Tile> seenTiles = new ArrayList<>();
-    int seenTilesIndex = 0;
+    ArrayList<ImageView> seenTileViews = new ArrayList<>();
 
     @FXML
     GridPane shipPane;
@@ -41,11 +41,42 @@ public class Building implements Callback{
     Pane drawTilePane;
 
     @FXML
-    Pane seenTilePane;
+    ScrollPane seenScrollPane;
+
+    @FXML
+    ImageView clock1, clock2, clock3;
+
+    @FXML
+    Label secondsLabel;
+
+    @FXML
+    Label stateLabel;
+
+    @FXML
+    Label nameLabel;
+
+    @FXML
+    Label redLabel, blueLabel, yellowLabel, greenLabel;
+
+    HBox seenImages = new HBox();
+
+    @FXML
+    private void initialize(){
+        seenScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        seenScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        seenScrollPane.setContent(seenImages);
+
+        clock2.setVisible(false);
+        clock3.setVisible(false);
+    }
 
     public void setServer(ClientInterface server){
         this.server = server;
         server.join(this);
+    }
+
+    public void setPlayerName(String name){
+        nameLabel.setText(name);
     }
 
     @FXML
@@ -61,9 +92,7 @@ public class Building implements Callback{
 
             drawnTile = t;
 
-
-            Image image = new Image(getClass().getResource(getPath(t)).toExternalForm());
-            drawnTileView = new ImageView(image);
+            drawnTileView = new ImageView(getImage(t));
             drawnTileView.setFitWidth(drawTilePane.getWidth());
             drawnTileView.setFitHeight(drawTilePane.getHeight());
 
@@ -87,35 +116,13 @@ public class Building implements Callback{
 
     @FXML
     private void moveClock(){
-
+        server.moveTimer();
     }
 
-    @FXML
-    private void leftSeen(){
-        if(seenTilesIndex > 0)
-            seenTilesIndex--;
 
-        drawSeenTile();
-    }
 
-    @FXML
-    private void rightSeen(){
-        if(seenTilesIndex < seenTiles.size()-1)
-            seenTilesIndex++;
-
-        drawSeenTile();
-    }
-
-    private void drawSeenTile(){
-        Image image = new Image(getClass().getResource(getPath(seenTiles.get(seenTilesIndex))).toExternalForm());
-        ImageView view = new ImageView(image);
-        view.setFitHeight(seenTilePane.getHeight());
-        view.setFitWidth(seenTilePane.getWidth());
-        seenTilePane.getChildren().add(view);
-    }
-
-    private String getPath(Tile t){
-        return "/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg";
+    private Image getImage(Tile t){
+        return new Image(getClass().getResource("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg").toExternalForm());
     }
 
 
@@ -127,7 +134,19 @@ public class Building implements Callback{
 
     @Override
     public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
+        Platform.runLater(() -> {
+            players.forEach((name, pawn) -> {
+                String text = name + (disconnected.contains(name)? " (disc)" : "")
+                        + (quid.contains(name)? " (abb)" : "");
 
+                switch (pawn){
+                    case YELLOW -> yellowLabel.setText(text);
+                    case GREEN -> greenLabel.setText(text);
+                    case BLUE -> blueLabel.setText(text);
+                    case RED -> redLabel.setText(text);
+                };
+            });
+        });
     }
 
     @Override
@@ -137,12 +156,16 @@ public class Building implements Callback{
 
     @Override
     public void pushSecondsLeft(Integer seconds) throws RemoteException {
-
+        Platform.runLater(() -> {
+            secondsLabel.setText("" +seconds);
+        });
     }
 
     @Override
     public void pushState(Model.State.Type state) throws RemoteException {
-
+        Platform.runLater(() -> {
+            stateLabel.setText(state.name());
+        });
     }
 
     @Override
@@ -162,22 +185,22 @@ public class Building implements Callback{
 
     @Override
     public void gaveTile(Tile t) throws RemoteException {
-        seenTiles.add(t);
+        Platform.runLater(() -> {
+            seenTiles.addLast(t);
+            ImageView tileView = new ImageView(getImage(t));
+            tileView.setFitWidth(seenScrollPane.getHeight());
+            tileView.setFitHeight(seenScrollPane.getHeight());
+            seenTileViews.addLast(tileView);
+            seenImages.getChildren().add(tileView);
+        });
     }
 
     @Override
     public void gotTile(Tile t) throws RemoteException {
-        seenTiles.remove(t);
-
-        if(seenTilesIndex == seenTiles.size()-1)
-            seenTilesIndex--;
-
-        if(seenTilesIndex == -1){
-            seenTilePane.getChildren().clear();
-            seenTilesIndex = 0;
-        }
-        else
-            drawSeenTile();
+        Platform.runLater(() -> {
+            seenImages.getChildren().remove(seenTileViews.remove(seenTiles.indexOf(t)));
+            seenTiles.remove(t);
+        });
     }
 
     @Override
@@ -187,7 +210,26 @@ public class Building implements Callback{
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
-
+        Platform.runLater(() -> {
+            switch(board.getTimer()){
+                case 0 -> {
+                    clock1.setVisible(true);
+                    clock2.setVisible(false);
+                    clock3.setVisible(false);
+                }
+                case 1 -> {
+                    clock1.setVisible(false);
+                    clock2.setVisible(true);
+                    clock3.setVisible(false);
+                }
+                case 2 -> {
+                    clock1.setVisible(false);
+                    clock2.setVisible(false);
+                    clock3.setVisible(true);
+                }
+                default -> {}
+            }
+        });
     }
 
     @Override

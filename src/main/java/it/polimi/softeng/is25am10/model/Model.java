@@ -173,7 +173,7 @@ public class Model implements Serializable {
     private final State state;
 
     //pawns still not assigned to a player
-    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.values()));
+    private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.RED, Pawn.BLUE, Pawn.GREEN, Pawn.YELLOW));
 
     //number of players
     public final int nPlayers;
@@ -184,7 +184,7 @@ public class Model implements Serializable {
      */
     private transient Timer timer;
     private transient TimerTask task;
-    public static final int TIMER_DELAY = 0;
+    public static final int TIMER_DELAY = 10;
     private int secondsLeft = TIMER_DELAY;
 
     /**

@@ -64,6 +64,7 @@ public class Login {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/building.fxml"));
             Parent root = loader.load();
             Building building = loader.getController();
+            building.setPlayerName(name);
             stage.setScene(new Scene(root));
             building.setServer(server);
         }catch (Exception _){
