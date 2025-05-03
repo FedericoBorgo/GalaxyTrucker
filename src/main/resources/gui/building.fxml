@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="601.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building">
+<AnchorPane prefHeight="601.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building" stylesheets="@style.css">
     <children>
         <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
             <image>
@@ -42,11 +42,6 @@
         </rowConstraints>
       </GridPane>
       <Pane fx:id="drawTilePane" layoutX="559.0" layoutY="196.0" onDragDetected="#drawnTileDragDetected" prefHeight="125.0" prefWidth="126.0" />
-      <ScrollPane id=" background.jpg" fx:id="seenScrollPane" layoutX="863.0" layoutY="73.0" prefHeight="250.0" prefWidth="126.0" style="-fx-background-color: transparent">
-         <content>
-            <AnchorPane prefHeight="248.0" prefWidth="125.0" style="-fx-background-color: #0B0C2A;" />
-         </content>
-      </ScrollPane>
       <ImageView fx:id="clock1" fitHeight="54.0" fitWidth="64.0" layoutX="905.0" layoutY="378.0" preserveRatio="true" rotate="23.6">
          <image>
             <Image url="@clock.png" />
@@ -69,34 +64,39 @@
       </Label>
       <Label fx:id="stateLabel" layoutX="333.0" layoutY="2.0" prefHeight="38.0" prefWidth="207.0" text="JOINING" textFill="WHITE">
          <font>
-            <Font name="Monospaced Regular" size="33.0" />
+            <Font name="Orbitron Medium" size="28.0" />
          </font>
       </Label>
-      <Label fx:id="nameLabel" layoutX="800.0" layoutY="4.0" prefHeight="38.0" prefWidth="222.0" text="PLAYER" textFill="WHITE">
+      <Label fx:id="nameLabel" layoutX="894.0" layoutY="4.0" prefHeight="40.0" prefWidth="126.0" text="PLAYER" textFill="WHITE">
          <font>
-            <Font name="Monospaced Regular" size="33.0" />
+            <Font name="Orbitron Medium" size="25.0" />
          </font>
       </Label>
         <Label fx:id="blueLabel" layoutX="514.0" layoutY="469.0" prefHeight="38.0" prefWidth="145.0" textFill="#1a07e3">
             <font>
-                <Font name="Monospaced Bold" size="20.0" />
+                <Font name="Orbitron Medium" size="20.0" />
             </font>
         </Label>
       <Label fx:id="greenLabel" layoutX="514.0" layoutY="518.0" prefHeight="38.0" prefWidth="145.0" textFill="#2ae309">
          <font>
-            <Font name="Monospaced Bold" size="20.0" />
+            <Font name="Orbitron Medium" size="20.0" />
          </font>
       </Label>
       <Label fx:id="yellowLabel" layoutX="514.0" layoutY="556.0" prefHeight="38.0" prefWidth="145.0" textFill="#d0e309">
          <font>
-            <Font name="Monospaced Bold" size="20.0" />
+            <Font name="Orbitron Medium" size="20.0" />
          </font>
       </Label>
       <Label fx:id="redLabel" layoutX="514.0" layoutY="423.0" prefHeight="38.0" prefWidth="145.0" textFill="#d71a1a">
          <font>
-            <Font name="Monospaced Bold" size="20.0" />
+            <Font name="Orbitron Medium" size="20.0" />
          </font>
       </Label>
+      <ScrollPane fx:id="seenScrollPane" layoutX="863.0" layoutY="71.0" prefHeight="250.0" prefWidth="126.0">
+         <content>
+            <AnchorPane fx:id="seenContent" prefHeight="591.0" prefWidth="787.0" />
+         </content>
+      </ScrollPane>
      <!-- <Pane fx:id="bookedPanel1" layoutX="316.0" layoutY="177.0" prefHeight="44.0" prefWidth="47.0" />
       <Pane fx:id="bookedPanel2" layoutX="374.0" layoutY="177.0" prefHeight="44.0" prefWidth="39.0" />
 -->

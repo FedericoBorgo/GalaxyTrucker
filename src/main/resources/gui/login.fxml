@@ -1,35 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="324.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Login">
+<AnchorPane prefHeight="324.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Login">
    <children>
-      <ImageView fitHeight="338.0" fitWidth="600.0" preserveRatio="true">
+      <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
          <image>
             <Image url="@login.png" />
          </image>
       </ImageView>
-      <Button layoutX="261.0" layoutY="242.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="30.0" prefWidth="97.0" text="Button" />
-      <TextField fx:id="usernameField" layoutX="247.0" layoutY="34.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" />
-      <TextField fx:id="addressField" layoutX="247.0" layoutY="90.0" opacity="0.75" prefHeight="30.0" prefWidth="254.0" text="localhost">
+      <Button layoutX="464.0" layoutY="434.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="60.0" prefWidth="177.0" text="Button" />
+      <TextField fx:id="usernameField" layoutX="489.0" layoutY="68.0" opacity="0.75" prefHeight="48.0" prefWidth="383.0">
          <font>
-            <Font name="Shree Devanagari 714" size="13.0" />
+            <Font name="Orbitron Medium" size="19.0" />
          </font></TextField>
-      <SplitMenuButton fx:id="connectionMenu" layoutX="246.0" layoutY="143.0" mnemonicParsing="false" opacity="0.75" prefHeight="26.0" prefWidth="254.0" text="SOCKET" wrapText="true">
+      <TextField fx:id="addressField" layoutX="489.0" layoutY="157.0" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="localhost">
+         <font>
+            <Font name="Orbitron Medium" size="19.0" />
+         </font></TextField>
+      <SplitMenuButton fx:id="connectionMenu" layoutX="488.0" layoutY="243.0" mnemonicParsing="false" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="SOCKET" wrapText="true">
         <items>
           <MenuItem fx:id="socketMenu" mnemonicParsing="false" onAction="#socket" text="SOCKET" />
           <MenuItem fx:id="rmiMenu" mnemonicParsing="false" onAction="#rmi" text="RMI" />
         </items>
-      </SplitMenuButton>
-      <TextField fx:id="port1" layoutX="208.0" layoutY="187.0" opacity="0.75" prefHeight="26.0" prefWidth="56.0" text="1235" />
-      <TextField fx:id="port2" layoutX="458.0" layoutY="187.0" opacity="0.75" prefHeight="15.0" prefWidth="56.0" text="1236" />
-      <Label fx:id="errLabel" layoutX="175.0" layoutY="278.0" prefHeight="26.0" prefWidth="287.0" textAlignment="CENTER" textFill="#e40505">
          <font>
-            <Font name="Sinhala Sangam MN" size="21.0" />
+            <Font name="Orbitron Medium" size="19.0" />
+         </font>
+      </SplitMenuButton>
+      <TextField fx:id="port1" layoutX="369.0" layoutY="341.0" opacity="0.75" prefHeight="44.0" prefWidth="124.0" text="1235">
+         <font>
+            <Font name="Orbitron Medium" size="19.0" />
+         </font></TextField>
+      <TextField fx:id="port2" layoutX="812.0" layoutY="338.0" opacity="0.75" prefHeight="48.0" prefWidth="123.0" text="1236">
+         <font>
+            <Font name="Orbitron Medium" size="19.0" />
+         </font></TextField>
+      <Label fx:id="errLabel" layoutX="307.0" layoutY="494.0" prefHeight="52.0" prefWidth="516.0" textAlignment="CENTER" textFill="#e40505">
+         <font>
+            <Font name="Sinhala Sangam MN" size="43.0" />
          </font>
          <effect>
             <Glow level="0.52" />
