@@ -11,6 +11,7 @@ import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -178,6 +179,8 @@ public class Building implements Callback {
             if(view.getImage() == null)
                 return;
 
+            view.setCursor(Cursor.CLOSED_HAND);
+
             Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
             content.putString(imgToTile.get(view).toString());
@@ -191,6 +194,14 @@ public class Building implements Callback {
             dragSuccess.set(false);
             event.consume();
         });
+
+        view.setOnMousePressed(event -> {
+            view.setCursor(Cursor.CLOSED_HAND);
+            event.consume();
+        });
+
+        view.setOnMouseEntered(event -> {view.setCursor(Cursor.OPEN_HAND);});
+        view.setOnMouseExited(event -> {view.setCursor(Cursor.DEFAULT);});
     }
 
     public void setPlayerName(String name){
