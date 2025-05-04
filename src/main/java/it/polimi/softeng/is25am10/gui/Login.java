@@ -65,8 +65,10 @@ public class Login {
             Parent root = loader.load();
             Building building = loader.getController();
             building.setPlayerName(name);
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
             building.setServer(server);
+            building.setScene(scene);
         }catch (Exception _){
             errLabel.setText("Impossibile connettersi al server");
             errLabel.setAlignment(Pos.CENTER);

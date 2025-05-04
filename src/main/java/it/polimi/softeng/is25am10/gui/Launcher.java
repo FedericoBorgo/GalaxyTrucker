@@ -40,6 +40,7 @@ public class Launcher extends Application {
 
         stage.setTitle("Galaxy Trucker");
         stage.setScene(scene);
+        stage.centerOnScreen();
         stage.setResizable(false);
         stage.show();
 

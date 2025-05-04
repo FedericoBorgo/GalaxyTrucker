@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="601.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building" stylesheets="@style.css">
@@ -41,7 +42,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
-      <Pane fx:id="drawTilePane" layoutX="559.0" layoutY="196.0" onDragDetected="#drawnTileDragDetected" prefHeight="125.0" prefWidth="126.0" />
+      <Pane fx:id="drawTilePane" layoutX="559.0" layoutY="196.0" prefHeight="125.0" prefWidth="126.0" />
       <ImageView fx:id="clock1" fitHeight="54.0" fitWidth="64.0" layoutX="905.0" layoutY="378.0" preserveRatio="true" rotate="23.6">
          <image>
             <Image url="@clock.png" />
@@ -97,8 +98,7 @@
             <AnchorPane fx:id="seenContent" prefHeight="591.0" prefWidth="787.0" />
          </content>
       </ScrollPane>
-     <!-- <Pane fx:id="bookedPanel1" layoutX="316.0" layoutY="177.0" prefHeight="44.0" prefWidth="47.0" />
-      <Pane fx:id="bookedPanel2" layoutX="374.0" layoutY="177.0" prefHeight="44.0" prefWidth="39.0" />
--->
+      <VBox fx:id="bookedBox" layoutX="717.0" layoutY="73.0" prefHeight="250.0" prefWidth="126.0" />
+
     </children>
 </AnchorPane>
