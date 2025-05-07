@@ -659,7 +659,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     @Override
     public Result<Tile> drawTile(String name) {
-        return getModel(name).drawTile();
+        return getModel(name).drawTile(name);
     }
 
     /**

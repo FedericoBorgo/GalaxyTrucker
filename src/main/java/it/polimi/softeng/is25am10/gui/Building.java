@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -22,6 +23,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.scene.transform.Rotate;
 
 import java.rmi.Remote;
@@ -39,8 +43,14 @@ public class Building implements Callback {
     ImageView tileView = null;
     Map<ImageView, Tile> imgToTile = new HashMap<>();
     VBox seenImages = new VBox();
+    Model.State.Type state = Model.State.Type.JOINING;
+
+    ShipBoard ship = new ShipBoard();
 
     AtomicBoolean dragSuccess = new AtomicBoolean(false);
+
+    Result<Coordinate> purple = Result.err();
+    Result<Coordinate> brown = Result.err();
 
     @FXML
     GridPane shipPane;
@@ -71,16 +81,26 @@ public class Building implements Callback {
     VBox bookedBox;
 
     @FXML
+    Label buildingLabel;
+
+    @FXML
+    ImageView pAlienView, bAlienView;
+
+    @FXML
     private void initialize(){
         //configure scrollable panel
         seenScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         seenScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         seenScrollPane.setContent(seenImages);
+        buildingLabel.setVisible(false);
 
         //configure clocks
         clock2.setVisible(false);
         clock3.setVisible(false);
         clocks = new ImageView[]{clock1, clock2, clock3};
+
+        pAlienView.setVisible(false);
+        bAlienView.setVisible(false);
 
         //configure drawn tiles
         tileView = new ImageView();
@@ -117,21 +137,51 @@ public class Building implements Callback {
             if(!db.hasString())
                 return;
 
-            Tile t = new Tile(db.getString());
-
             int col = (int)(event.getX() / (shipPane.getWidth() / 7));
             int row = (int)(event.getY() / (shipPane.getHeight() / 5));
 
             if(Coordinate.isInvalid(col, row))
                 return;
 
-            Tile.Rotation rot = Tile.Rotation.fromInt(rotation);
             Coordinate c = new Coordinate(col, row);
 
-            if(bookedBox.getChildren().contains(event.getGestureSource()))
-                server.useBookedTile(t, rot, c).ifPresent(_ -> dragSuccess.set(true));
-            else
-                server.setTile(c, t, rot).ifPresent(_ -> dragSuccess.set(true));
+            if(state == Model.State.Type.BUILDING){
+                Tile t = new Tile(db.getString());
+                Tile.Rotation rot = Tile.Rotation.fromInt(rotation);
+
+                if(bookedBox.getChildren().contains(event.getGestureSource()))
+                    server.useBookedTile(t, rot, c).ifPresent(_ -> dragSuccess.set(true));
+                else
+                    server.setTile(c, t, rot).ifPresent(_ -> dragSuccess.set(true));
+
+                if(dragSuccess.get())
+                    ship.getTiles().setTile(c, t, rot);
+            }
+            else if(state == Model.State.Type.ALIEN_INPUT){
+                Circle point = new Circle();
+                point.setRadius(10);
+                point.setCenterX(shipPane.getWidth()/7);
+                point.setCenterY(0);
+
+                if(db.getString().equals("p")){
+                    if(!ship.getPurple().cantPlace(c, 1)){
+                        dragSuccess.set(true);
+                        pAlienView.setVisible(false);
+                        purple = Result.ok(c);
+                        point.setFill(Color.MAGENTA);
+                        shipPane.add(new StackPane(point), col, row);
+                    }
+                }
+                else if(db.getString().equals("b")){
+                    if(!ship.getBrown().cantPlace(c, 1)){
+                        dragSuccess.set(true);
+                        bAlienView.setVisible(false);
+                        brown = Result.ok(c);
+                        point.setFill(Color.GOLD);
+                        shipPane.add(new StackPane(point), col, row);
+                    }
+                }
+            }
         });
     }
 
@@ -210,6 +260,16 @@ public class Building implements Callback {
 
     @FXML
     private void playerReady(){
+        if(state == Model.State.Type.BUILDING)
+            server.setReady().ifPresent(_ -> buildingLabel.setVisible(true));
+        else if(state == Model.State.Type.ALIEN_INPUT)
+            server.init(purple, brown).ifPresent(_ -> {
+                Optional<Coordinate> p = purple.isOk()? Optional.of(purple.getData()): Optional.empty();
+                Optional<Coordinate> b = brown.isOk()? Optional.of(brown.getData()): Optional.empty();
+                buildingLabel.setText("ALIENI ASSEGNATI");
+                buildingLabel.setVisible(true);
+                ship.init(p, b);
+            });
 
     }
 
@@ -273,8 +333,42 @@ public class Building implements Callback {
 
     @Override
     public void pushState(Model.State.Type state) throws RemoteException {
+        this.state = state;
         Platform.runLater(() -> {
             stateLabel.setText(state.name());
+
+            if(state == Model.State.Type.ALIEN_INPUT){
+                pAlienView.setVisible(true);
+                bAlienView.setVisible(true);
+
+                pAlienView.setOnDragDetected(event -> {
+                    event.consume();
+                    if(purple.isOk()) {
+                        pAlienView.setOnDragDetected(null);
+                        return;
+                    }
+                    pAlienView.setCursor(Cursor.CLOSED_HAND);
+                    Dragboard db = pAlienView.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString("p");
+                    db.setContent(content);
+                    db.setDragView(getRotatedImage(getImage("/gui/purple.png"), 0));
+                });
+
+                bAlienView.setOnDragDetected(event -> {
+                    event.consume();
+                    if(brown.isOk()) {
+                        bAlienView.setOnDragDetected(null);
+                        return;
+                    }
+                    bAlienView.setCursor(Cursor.CLOSED_HAND);
+                    Dragboard db = bAlienView.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString("b");
+                    db.setContent(content);
+                    db.setDragView(getRotatedImage(getImage("/gui/brown.png"), 0));
+                });
+            }
         });
     }
 
@@ -388,7 +482,7 @@ public class Building implements Callback {
     }
 
     static public Image getRotatedImage(Image original, double angleDegrees) {
-        double size = 70;
+        double size = 30;
 
         Canvas canvas = new Canvas(size, size);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -406,7 +500,11 @@ public class Building implements Callback {
     }
 
     private Image getImage(Tile t){
-        return new Image(getClass().getResource("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg").toExternalForm());
+        return getImage("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg");
+    }
+
+    private Image getImage(String path){
+        return new Image(getClass().getResource(path).toExternalForm());
     }
 
     private Image getCHouse(FlightBoard.Pawn p){

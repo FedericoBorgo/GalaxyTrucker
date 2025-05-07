@@ -6,8 +6,10 @@ import it.polimi.softeng.is25am10.network.socket.SocketClient;
 import it.polimi.softeng.is25am10.tui.PlaceholderCallback;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 
@@ -43,6 +45,12 @@ public class Launcher extends Application {
         stage.centerOnScreen();
         stage.setResizable(false);
         stage.show();
+
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+        stage.setX(0);
+        stage.setY(bounds.getMinY() + bounds.getHeight() - scene.getHeight());
+
+
 
         scene.getStylesheets().add(getClass().getResource("/gui/style.css").toExternalForm());
 

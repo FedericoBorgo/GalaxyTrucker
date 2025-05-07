@@ -184,7 +184,7 @@ public class Model implements Serializable {
      */
     private transient Timer timer;
     private transient TimerTask task;
-    public static final int TIMER_DELAY = 10;
+    public static final int TIMER_DELAY = 0;
     private int secondsLeft = TIMER_DELAY;
 
     /**
@@ -649,9 +649,11 @@ public class Model implements Serializable {
     }
 
     //tiles section
-    public synchronized Result<Tile> drawTile(){
+    public synchronized Result<Tile> drawTile(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
+        if(flight.getOrder().contains(get(name).getPawn()))
+            return Result.err("player ready");
         return Result.ok(tiles.getNew());
     }
 

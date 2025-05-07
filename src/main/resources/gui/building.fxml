@@ -13,14 +13,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="601.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building" stylesheets="@style.css">
+<AnchorPane prefHeight="601.0" prefWidth="1080.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building">
     <children>
         <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
             <image>
                 <Image url="@building.png" />
             </image>
         </ImageView>
-      <Button layoutX="122.0" layoutY="548.0" mnemonicParsing="false" onAction="#playerReady" opacity="0.0" prefHeight="46.0" prefWidth="306.0" text="end" />
+      <Button layoutX="28.0" layoutY="552.0" mnemonicParsing="false" onAction="#playerReady" opacity="0.0" prefHeight="46.0" prefWidth="145.0" text="end" />
       <Button layoutX="953.0" layoutY="323.0" mnemonicParsing="false" onAction="#moveClock" opacity="0.0" prefHeight="38.0" prefWidth="110.0" text="clock" />
       <Button layoutX="540.0" layoutY="58.0" mnemonicParsing="false" onAction="#drawTile" opacity="0.0" prefHeight="46.0" prefWidth="154.0" text="draw" />
       <Button layoutX="540.0" layoutY="116.0" mnemonicParsing="false" onAction="#rotateTile" opacity="0.0" prefHeight="46.0" prefWidth="154.0" text="rotate" />
@@ -63,7 +63,7 @@
             <Font name="System Bold" size="68.0" />
          </font>
       </Label>
-      <Label fx:id="stateLabel" layoutX="333.0" layoutY="2.0" prefHeight="38.0" prefWidth="207.0" text="JOINING" textFill="WHITE">
+      <Label fx:id="stateLabel" layoutX="315.0" layoutY="4.0" prefHeight="40.0" prefWidth="274.0" text="JOINING" textFill="WHITE">
          <font>
             <Font name="Orbitron Medium" size="28.0" />
          </font>
@@ -99,6 +99,29 @@
          </content>
       </ScrollPane>
       <VBox fx:id="bookedBox" layoutX="717.0" layoutY="73.0" prefHeight="250.0" prefWidth="126.0" />
+      <Label fx:id="buildingLabel" layoutX="179.0" layoutY="559.0" prefHeight="32.0" prefWidth="306.0" text="ASSEMBLAGGIO TERMINATO" textFill="RED">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Pane fx:id="pAlienPane" layoutX="540.0" layoutY="327.0" prefHeight="75.0" prefWidth="72.0">
+         <children>
+            <ImageView fx:id="pAlienView" fitHeight="75.0" fitWidth="82.0" layoutX="-3.0">
+               <image>
+                  <Image url="@purple.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Pane>
+      <Pane fx:id="bAlienPane" layoutX="630.0" layoutY="327.0" prefHeight="75.0" prefWidth="72.0">
+         <children>
+            <ImageView fx:id="bAlienView" fitHeight="75.0" fitWidth="72.0" layoutX="1.0" layoutY="2.0">
+               <image>
+                  <Image url="@brown.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Pane>
 
     </children>
 </AnchorPane>

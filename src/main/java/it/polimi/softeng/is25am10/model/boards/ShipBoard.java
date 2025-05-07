@@ -22,6 +22,7 @@ public class ShipBoard implements Serializable {
     private final ElementsBoard battery;
     private final Map<GoodsBoard.Type, ElementsBoard> goods = new HashMap<>();
     private final List<ElementsBoard> boards;
+    private boolean ready = false;
 
     public ShipBoard(){
         tiles = new TilesBoard();
@@ -227,6 +228,12 @@ public class ShipBoard implements Serializable {
                     battery.put(c, 3);
             }
         });
+
+        ready = true;
+    }
+
+    public boolean isReady(){
+        return ready;
     }
 
     @Override
