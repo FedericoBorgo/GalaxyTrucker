@@ -16,27 +16,28 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.transform.Rotate;
+import javafx.stage.Stage;
+import javafx.util.Pair;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Building implements Callback {
     ClientInterface server;
-    Scene scene;
 
     int rotation = 0;
 
@@ -51,6 +52,8 @@ public class Building implements Callback {
 
     Result<Coordinate> purple = Result.err();
     Result<Coordinate> brown = Result.err();
+
+    Listener listener;
 
     @FXML
     GridPane shipPane;
@@ -85,6 +88,8 @@ public class Building implements Callback {
 
     @FXML
     ImageView pAlienView, bAlienView;
+    private int players = 0;
+    private FlightBoard board;
 
     @FXML
     private void initialize(){
@@ -137,6 +142,7 @@ public class Building implements Callback {
             if(!db.hasString())
                 return;
 
+            // get dropped coordinate
             int col = (int)(event.getX() / (shipPane.getWidth() / 7));
             int row = (int)(event.getY() / (shipPane.getHeight() / 5));
 
@@ -185,8 +191,23 @@ public class Building implements Callback {
         });
     }
 
-    public void setScene(Scene scene){
-        this.scene = scene;
+    public void config(int players, String name, ClientInterface server, Scene scene){
+        this.server = server;
+        nameLabel.setText(name);
+        this.players = players;
+
+        try {
+            listener = new Listener(this);
+            server.join(listener).ifPresent(pawn -> {
+                ImageView view = new ImageView(getCHouse(pawn));
+                view.setFitHeight(shipPane.getHeight()/5);
+                view.setFitWidth(shipPane.getWidth()/7);
+                shipPane.add(view, 3, 2);
+            });
+        } catch (RemoteException e) {
+            throw new RuntimeException("Impossibile connettersi al server", e);
+        }
+
         scene.setOnKeyPressed(event -> {
             if(event.getCode() == KeyCode.A)
                 drawTile();
@@ -203,20 +224,6 @@ public class Building implements Callback {
             else if(event.getCode() == KeyCode.C)
                 moveClock();
         });
-    }
-
-    public void setServer(ClientInterface server){
-        this.server = server;
-        try {
-            server.join(new Listener(this)).ifPresent(pawn -> {
-                ImageView view = new ImageView(getCHouse(pawn));
-                view.setFitHeight(shipPane.getHeight()/5);
-                view.setFitWidth(shipPane.getWidth()/7);
-                shipPane.add(view, 3, 2);
-            });
-        } catch (RemoteException e) {
-            throw new RuntimeException("Impossibile connettersi al server", e);
-        }
     }
 
     private void register(ImageView view, Tile t, Runnable whenDone){
@@ -254,23 +261,16 @@ public class Building implements Callback {
         view.setOnMouseExited(event -> {view.setCursor(Cursor.DEFAULT);});
     }
 
-    public void setPlayerName(String name){
-        nameLabel.setText(name);
-    }
-
     @FXML
     private void playerReady(){
         if(state == Model.State.Type.BUILDING)
             server.setReady().ifPresent(_ -> buildingLabel.setVisible(true));
         else if(state == Model.State.Type.ALIEN_INPUT)
             server.init(purple, brown).ifPresent(_ -> {
-                Optional<Coordinate> p = purple.isOk()? Optional.of(purple.getData()): Optional.empty();
-                Optional<Coordinate> b = brown.isOk()? Optional.of(brown.getData()): Optional.empty();
                 buildingLabel.setText("ALIENI ASSEGNATI");
                 buildingLabel.setVisible(true);
-                ship.init(p, b);
+                ship.init(purple, brown);
             });
-
     }
 
     @FXML
@@ -321,7 +321,7 @@ public class Building implements Callback {
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return 0;
+        return players;
     }
 
     @Override
@@ -368,6 +368,15 @@ public class Building implements Callback {
                     db.setContent(content);
                     db.setDragView(getRotatedImage(getImage("/gui/brown.png"), 0));
                 });
+            }
+            else if(state == Model.State.Type.DRAW_CARD){
+                Pair<CardScene, Scene> handler = Launcher.loadScene("/gui/card.fxml");
+                CardScene cardScene = handler.getKey();
+                cardScene.config(listener, board);
+                cardScene.blueLabel.setText(blueLabel.getText());
+                cardScene.redLabel.setText(redLabel.getText());
+                cardScene.greenLabel.setText(greenLabel.getText());
+                cardScene.yellowLabel.setText(yellowLabel.getText());
             }
         });
     }
@@ -423,6 +432,7 @@ public class Building implements Callback {
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
+        this.board = board;
         Platform.runLater(() -> {
             for (ImageView clock : clocks)
                 clock.setVisible(false);

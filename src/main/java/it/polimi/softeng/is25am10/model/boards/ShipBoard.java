@@ -232,6 +232,13 @@ public class ShipBoard implements Serializable {
         ready = true;
     }
 
+    public void init(Result<Coordinate> purple, Result<Coordinate> brown){
+        Optional<Coordinate> p = purple.isOk()? Optional.of(purple.getData()): Optional.empty();
+        Optional<Coordinate> b = brown.isOk()? Optional.of(brown.getData()): Optional.empty();
+
+        init(p, b);
+    }
+
     public boolean isReady(){
         return ready;
     }

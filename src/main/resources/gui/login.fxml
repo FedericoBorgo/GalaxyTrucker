@@ -18,8 +18,8 @@
             <Image url="@login.png" />
          </image>
       </ImageView>
-      <Button layoutX="464.0" layoutY="434.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="60.0" prefWidth="177.0" text="Button" />
-      <TextField fx:id="usernameField" layoutX="489.0" layoutY="68.0" opacity="0.75" prefHeight="48.0" prefWidth="383.0">
+      <Button layoutX="703.0" layoutY="434.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="60.0" prefWidth="177.0" text="Button" />
+      <TextField fx:id="usernameField" layoutX="489.0" layoutY="68.0" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="chiara">
          <font>
             <Font name="Orbitron Medium" size="19.0" />
          </font></TextField>
@@ -52,5 +52,10 @@
             <Glow level="0.52" />
          </effect>
       </Label>
+      <TextField fx:id="playersField" layoutX="390.0" layoutY="442.0" opacity="0.75" prefHeight="44.0" prefWidth="124.0" text="2">
+         <font>
+            <Font name="Orbitron Medium" size="19.0" />
+         </font>
+      </TextField>
    </children>
 </AnchorPane>

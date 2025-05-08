@@ -12,31 +12,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 public class Login {
-    private Stage stage;
 
     @FXML
-    TextField usernameField;
-
-    @FXML
-    TextField addressField;
+    TextField usernameField, addressField, port1, port2, playersField;
 
     @FXML
     SplitMenuButton connectionMenu;
 
     @FXML
-    TextField port1;
-
-    @FXML
-    TextField port2;
-
-    @FXML
     Label errLabel;
-
-    public void setStage(Stage stage){
-        this.stage = stage;
-    }
 
     @FXML
     private void join(){
@@ -49,11 +36,17 @@ public class Login {
             errLabel.setAlignment(Pos.CENTER);
         }
 
-        errLabel.setText("porta non valida");
+        errLabel.setText("porta/giocatori non valida");
         errLabel.setAlignment(Pos.CENTER);
         int port1 = Integer.parseInt(this.port1.getText());
         int port2 = Integer.parseInt(this.port2.getText());
+        int players = Integer.parseInt(this.playersField.getText());
         errLabel.setText("");
+
+        if(players <= 0 || players > 4){
+            errLabel.setText("Giocatori non validi");
+            return;
+        }
 
         try{
             if(connectionMenu.getText().equals("RMI"))
@@ -61,14 +54,8 @@ public class Login {
             else
                 server = new SocketClient(name, address, port1, port2);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/building.fxml"));
-            Parent root = loader.load();
-            Building building = loader.getController();
-            building.setPlayerName(name);
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            building.setServer(server);
-            building.setScene(scene);
+            Pair<Building, Scene> handler = Launcher.loadScene("/gui/building.fxml");
+            handler.getKey().config(players, name, server, handler.getValue());
         }catch (Exception _){
             errLabel.setText("Impossibile connettersi al server");
             errLabel.setAlignment(Pos.CENTER);

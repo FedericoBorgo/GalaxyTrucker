@@ -27,10 +27,11 @@ public class Asciiui {
                 new SocketClient(name, "localhost", 1235, 1236);*/
 
         ClientInterface client = Config.getControls();
+
         Game game = new Game(client);
 
         //new SocketClient("npc", "localhost", 1235, 1236).join(new PlaceholderCallback());
 
-        AutoBuilder.initGame(game);
+        //AutoBuilder.initGame(game);
     }
 }

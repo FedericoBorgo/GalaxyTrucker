@@ -1,60 +1,57 @@
 package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.Controller;
-import it.polimi.softeng.is25am10.network.ClientInterface;
-import it.polimi.softeng.is25am10.network.socket.SocketClient;
-import it.polimi.softeng.is25am10.tui.PlaceholderCallback;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.text.Font;
+import javafx.util.Pair;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 
 public class Launcher extends Application {
 
+    static Stage stage = null;
+
     public static void main(String[] args) throws IOException {
-        Controller.main(new String[]{"false"});
-
-        Font customFont = Font.loadFont(Launcher.class.getResourceAsStream("/gui/font.ttf"), 12);
-
-        ClientInterface bot = new SocketClient("bot", "localhost", 1235, 1236);
-
-        bot.join(new PlaceholderCallback());
-
+        try{
+            Controller.main(new String[]{"false"});
+        }catch(Exception _){}
         launch(args);
     }
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/welcome.fxml"));
-        Parent root = loader.load();
-        Welcome welcome = loader.getController();
-
-        welcome.setStage(stage);
-        Scene scene = new Scene(root);
+        Launcher.stage = stage;
+        loadScene("/gui/welcome.fxml");
 
         stage.setTitle("Galaxy Trucker");
-        stage.setScene(scene);
-        stage.centerOnScreen();
         stage.setResizable(false);
         stage.show();
 
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
         stage.setX(0);
-        stage.setY(bounds.getMinY() + bounds.getHeight() - scene.getHeight());
+        stage.setY(bounds.getMinY() + bounds.getHeight());
+    }
 
+    static public <T> Pair<T, Scene> loadScene(String path){
+        FXMLLoader loader = new FXMLLoader(Launcher.class.getResource(path));
+        Parent root = null;
 
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        scene.getStylesheets().add(getClass().getResource("/gui/style.css").toExternalForm());
-
-
-
+        T handler = loader.getController();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(Launcher.class.getResource("/gui/style.css").toExternalForm());
+        Launcher.stage.setScene(scene);
+        return new Pair<>(handler, scene);
     }
 }

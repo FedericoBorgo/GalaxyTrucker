@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="601.0" prefWidth="1080.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.CardScene">
+    <children>
+        <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
+            <image>
+                <Image url="@card.png" />
+            </image>
+        </ImageView>
+      <Label fx:id="redLabel" layoutX="55.0" layoutY="443.0" prefHeight="37.0" prefWidth="296.0" textFill="#f80000">
+         <font>
+            <Font name="System Bold" size="28.0" />
+         </font>
+      </Label>
+      <Label fx:id="blueLabel" layoutX="55.0" layoutY="483.0" prefHeight="37.0" prefWidth="296.0" textFill="#0014f7">
+         <font>
+            <Font name="System Bold" size="28.0" />
+         </font>
+      </Label>
+      <Label fx:id="greenLabel" layoutX="55.0" layoutY="523.0" prefHeight="37.0" prefWidth="296.0" textFill="#00a153">
+         <font>
+            <Font name="System Bold" size="28.0" />
+         </font>
+      </Label>
+      <Label fx:id="yellowLabel" layoutX="55.0" layoutY="563.0" prefHeight="37.0" prefWidth="296.0" textFill="#caf700">
+         <font>
+            <Font name="System Bold" size="28.0" />
+         </font>
+      </Label>
+      <ImageView fx:id="posView0" fitHeight="20.0" fitWidth="20.0" layoutX="693.0" layoutY="384.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView1" fitHeight="20.0" fitWidth="20.0" layoutX="726.0" layoutY="374.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView2" fitHeight="20.0" fitWidth="20.0" layoutX="760.0" layoutY="364.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView3" fitHeight="20.0" fitWidth="20.0" layoutX="793.0" layoutY="362.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView4" fitHeight="20.0" fitWidth="20.0" layoutX="828.0" layoutY="361.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView5" fitHeight="20.0" fitWidth="20.0" layoutX="862.0" layoutY="365.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView6" fitHeight="20.0" fitWidth="20.0" layoutX="894.0" layoutY="373.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView7" fitHeight="20.0" fitWidth="20.0" layoutX="928.0" layoutY="384.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView8" fitHeight="20.0" fitWidth="20.0" layoutX="957.0" layoutY="407.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView9" fitHeight="20.0" fitWidth="20.0" layoutX="976.0" layoutY="441.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView10" fitHeight="20.0" fitWidth="20.0" layoutX="974.0" layoutY="479.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView11" fitHeight="20.0" fitWidth="20.0" layoutX="951.0" layoutY="508.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView12" fitHeight="20.0" fitWidth="20.0" layoutX="922.0" layoutY="528.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView13" fitHeight="20.0" fitWidth="20.0" layoutX="887.0" layoutY="540.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView14" fitHeight="20.0" fitWidth="20.0" layoutX="854.0" layoutY="548.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView15" fitHeight="20.0" fitWidth="20.0" layoutX="821.0" layoutY="550.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView16" fitHeight="20.0" fitWidth="20.0" layoutX="787.0" layoutY="549.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView17" fitHeight="20.0" fitWidth="20.0" layoutX="753.0" layoutY="547.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView18" fitHeight="20.0" fitWidth="20.0" layoutX="720.0" layoutY="539.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView19" fitHeight="20.0" fitWidth="20.0" layoutX="689.0" layoutY="525.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView20" fitHeight="20.0" fitWidth="20.0" layoutX="660.0" layoutY="505.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView21" fitHeight="20.0" fitWidth="20.0" layoutX="637.0" layoutY="470.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView22" fitHeight="20.0" fitWidth="20.0" layoutX="641.0" layoutY="433.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="posView23" fitHeight="20.0" fitWidth="20.0" layoutX="664.0" layoutY="404.0" pickOnBounds="true" preserveRatio="true" />
+
+
+    </children>
+</AnchorPane>

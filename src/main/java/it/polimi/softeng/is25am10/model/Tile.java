@@ -11,8 +11,8 @@ import java.util.*;
  */
 
 public class Tile implements Serializable {
-    private final Type type;
-    private final Map<Side, ConnectorType> connectors;
+    private Type type;
+    private Map<Side, ConnectorType> connectors;
 
     public enum Side{
         UP, RIGHT, DOWN, LEFT;
@@ -92,19 +92,23 @@ public class Tile implements Serializable {
      * @param connectors a string of length 4 representing the types of connectors on the tile.
      */
     public Tile(Type type, String connectors) {
-        this.type = type;
-        HashMap<Side, ConnectorType> map = new HashMap<>();
-
-        Arrays.stream(Side.order).forEach(side -> map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal()))));
-
-        this.connectors = Collections.unmodifiableMap(map);
+        load(type, connectors);
     }
 
     public Tile(String s) {
         Type t = Type.valueOf(s.substring(0, s.indexOf(" ")));
         String c = s.substring(s.indexOf(" ")+1);
 
-        this(t, c);
+        load(t, c);
+    }
+
+    private void load(Type type, String connectors){
+        this.type = type;
+        HashMap<Side, ConnectorType> map = new HashMap<>();
+
+        Arrays.stream(Side.order).forEach(side -> map.put(side, ConnectorType.fromChar(connectors.charAt(side.ordinal()))));
+
+        this.connectors = Collections.unmodifiableMap(map);
     }
 
     /**

@@ -68,7 +68,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>it.polimi.softeng.is25am10.tui.Asciiui</mainClass>
+                    <mainClass>it.polimi.softeng.is25am10.gui.Launcher</mainClass>
                 </configuration>
             </plugin>
             <plugin>

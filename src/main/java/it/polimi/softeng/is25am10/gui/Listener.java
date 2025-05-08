@@ -18,6 +18,10 @@ import java.util.HashSet;
 public class Listener extends UnicastRemoteObject implements Remote, Callback {
     Callback callback;
 
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
     protected Listener(Callback callback) throws RemoteException {
         this.callback = callback;
     }
