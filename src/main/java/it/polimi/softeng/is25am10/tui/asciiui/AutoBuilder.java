@@ -20,7 +20,7 @@ public class AutoBuilder {
 
     static TilesCollection collection = new TilesCollection();
 
-    static Tile genRandomTile() {
+    public static Tile genRandomTile() {
         Tile t = collection.getNew();
         if(t == null){
             collection = new TilesCollection();
@@ -29,7 +29,7 @@ public class AutoBuilder {
         return t;
     }
 
-    static Tile.Rotation genRandomOri(){
+    public static Tile.Rotation genRandomOri(){
         return switch(rmd.nextInt(0, 4)){
             case 1 -> Tile.Rotation.CLOCK;
             case 2 -> Tile.Rotation.DOUBLE;
@@ -47,7 +47,7 @@ public class AutoBuilder {
         };
     }
 
-    static Coordinate genRandomCoord(){
+    public static Coordinate genRandomCoord(){
         return new Coordinate(rmd.nextInt(0, TilesBoard.BOARD_WIDTH), rmd.nextInt(0, TilesBoard.BOARD_HEIGHT));
     }
 

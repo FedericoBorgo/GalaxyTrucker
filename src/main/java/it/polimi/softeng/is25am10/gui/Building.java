@@ -33,16 +33,16 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Building implements Callback {
-    ClientInterface server;
+    public ClientInterface server;
 
     int rotation = 0;
 
     ImageView tileView = null;
     Map<ImageView, Tile> imgToTile = new HashMap<>();
     VBox seenImages = new VBox();
-    Model.State.Type state = Model.State.Type.JOINING;
+    public Model.State.Type state = Model.State.Type.JOINING;
 
-    ShipBoard ship = new ShipBoard();
+    public ShipBoard ship = new ShipBoard();
 
     AtomicBoolean dragSuccess = new AtomicBoolean(false);
 
@@ -199,6 +199,8 @@ public class Building implements Callback {
                 }
             }
         });
+
+        new AutoBuilder(this);
     }
 
     public void config(int players, String name, ClientInterface server, Scene scene){
@@ -275,12 +277,13 @@ public class Building implements Callback {
     private void playerReady(){
         if(state == Model.State.Type.BUILDING)
             server.setReady().ifPresent(_ -> buildingLabel.setVisible(true));
-        else if(state == Model.State.Type.ALIEN_INPUT)
+        else if(state == Model.State.Type.ALIEN_INPUT){
+            ship.init(purple, brown);
             server.init(purple, brown).ifPresent(_ -> {
                 buildingLabel.setText("ALIENI ASSEGNATI");
                 buildingLabel.setVisible(true);
-                ship.init(purple, brown);
             });
+        }
     }
 
     @FXML

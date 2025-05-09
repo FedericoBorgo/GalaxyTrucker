@@ -27,7 +27,7 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Launcher.stage = stage;
-        loadScene("/gui/welcome.fxml");
+        loadScene("/gui/login.fxml");
 
         stage.setTitle("Galaxy Trucker");
         stage.setResizable(false);
