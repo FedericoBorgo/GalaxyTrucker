@@ -63,7 +63,7 @@
             <Font name="System Bold" size="68.0" />
          </font>
       </Label>
-      <Label fx:id="stateLabel" layoutX="315.0" layoutY="4.0" prefHeight="40.0" prefWidth="274.0" text="JOINING" textFill="WHITE">
+      <Label fx:id="stateLabel" layoutX="315.0" layoutY="4.0" prefHeight="40.0" prefWidth="432.0" text="Aspettare giocatori" textFill="WHITE">
          <font>
             <Font name="Orbitron Medium" size="28.0" />
          </font>

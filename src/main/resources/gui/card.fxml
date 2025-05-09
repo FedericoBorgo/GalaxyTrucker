@@ -4,6 +4,10 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="601.0" prefWidth="1080.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.CardScene">
@@ -33,30 +37,58 @@
             <Font name="System Bold" size="28.0" />
          </font>
       </Label>
-      <ImageView fx:id="posView0" fitHeight="20.0" fitWidth="20.0" layoutX="693.0" layoutY="384.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView1" fitHeight="20.0" fitWidth="20.0" layoutX="726.0" layoutY="374.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView2" fitHeight="20.0" fitWidth="20.0" layoutX="760.0" layoutY="364.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView3" fitHeight="20.0" fitWidth="20.0" layoutX="793.0" layoutY="362.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView4" fitHeight="20.0" fitWidth="20.0" layoutX="828.0" layoutY="361.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView5" fitHeight="20.0" fitWidth="20.0" layoutX="862.0" layoutY="365.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView6" fitHeight="20.0" fitWidth="20.0" layoutX="894.0" layoutY="373.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView7" fitHeight="20.0" fitWidth="20.0" layoutX="928.0" layoutY="384.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView8" fitHeight="20.0" fitWidth="20.0" layoutX="957.0" layoutY="407.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView9" fitHeight="20.0" fitWidth="20.0" layoutX="976.0" layoutY="441.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView10" fitHeight="20.0" fitWidth="20.0" layoutX="974.0" layoutY="479.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView11" fitHeight="20.0" fitWidth="20.0" layoutX="951.0" layoutY="508.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView12" fitHeight="20.0" fitWidth="20.0" layoutX="922.0" layoutY="528.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView13" fitHeight="20.0" fitWidth="20.0" layoutX="887.0" layoutY="540.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView14" fitHeight="20.0" fitWidth="20.0" layoutX="854.0" layoutY="548.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView15" fitHeight="20.0" fitWidth="20.0" layoutX="821.0" layoutY="550.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView16" fitHeight="20.0" fitWidth="20.0" layoutX="787.0" layoutY="549.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView17" fitHeight="20.0" fitWidth="20.0" layoutX="753.0" layoutY="547.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView18" fitHeight="20.0" fitWidth="20.0" layoutX="720.0" layoutY="539.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView19" fitHeight="20.0" fitWidth="20.0" layoutX="689.0" layoutY="525.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView20" fitHeight="20.0" fitWidth="20.0" layoutX="660.0" layoutY="505.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView21" fitHeight="20.0" fitWidth="20.0" layoutX="637.0" layoutY="470.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView22" fitHeight="20.0" fitWidth="20.0" layoutX="641.0" layoutY="433.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="posView23" fitHeight="20.0" fitWidth="20.0" layoutX="664.0" layoutY="404.0" pickOnBounds="true" preserveRatio="true" />
+      <Pane fx:id="posPane0" layoutX="694.0" layoutY="383.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane1" layoutX="728.0" layoutY="372.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane2" layoutX="761.0" layoutY="364.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane3" layoutX="795.0" layoutY="362.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane4" layoutX="829.0" layoutY="361.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane5" layoutX="861.0" layoutY="364.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane6" layoutX="894.0" layoutY="372.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane7" layoutX="928.0" layoutY="386.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane8" layoutX="957.0" layoutY="408.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane9" layoutX="978.0" layoutY="440.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane10" layoutX="976.0" layoutY="478.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane11" layoutX="951.0" layoutY="509.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane12" layoutX="920.0" layoutY="527.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane13" layoutX="889.0" layoutY="538.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane14" layoutX="855.0" layoutY="546.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane15" layoutX="820.0" layoutY="550.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane16" layoutX="788.0" layoutY="549.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane17" layoutX="754.0" layoutY="546.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane18" layoutX="722.0" layoutY="538.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane19" layoutX="690.0" layoutY="525.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane20" layoutX="661.0" layoutY="501.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane21" layoutX="638.0" layoutY="470.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane22" layoutX="641.0" layoutY="433.0" prefHeight="20.0" prefWidth="20.0" />
+      <Pane fx:id="posPane23" layoutX="665.0" layoutY="403.0" prefHeight="20.0" prefWidth="20.0" />
+      <Label fx:id="stateLabel" layoutX="321.0" layoutY="4.0" prefHeight="40.0" prefWidth="447.0" text="Pescare carta" textFill="WHITE">
+         <font>
+            <Font name="Orbitron Medium" size="28.0" />
+         </font>
+      </Label>
+      <Label fx:id="nameLabel" layoutX="867.0" layoutY="4.0" prefHeight="40.0" prefWidth="126.0" text="PLAYER" textFill="WHITE">
+         <font>
+            <Font name="Orbitron Medium" size="25.0" />
+         </font>
+      </Label>
+      <GridPane fx:id="shipPane" layoutX="32.0" layoutY="72.0" prefHeight="341.0" prefWidth="484.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+      </GridPane>
 
 
     </children>

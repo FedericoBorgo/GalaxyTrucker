@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 import com.googlecode.lanterna.TextColor;
+import javafx.scene.paint.Color;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -148,6 +149,15 @@ public class FlightBoard implements Serializable {
                 case GREEN -> TextColor.ANSI.GREEN_BRIGHT;
                 case BLUE -> TextColor.ANSI.BLUE_BRIGHT;
                 case RED -> TextColor.ANSI.RED_BRIGHT;
+            };
+        }
+
+        public Color toColor() {
+            return switch(this){
+                case YELLOW -> Color.GOLD;
+                case GREEN -> Color.GREEN;
+                case BLUE -> Color.BLUE;
+                case RED -> Color.RED;
             };
         }
     }

@@ -16,10 +16,8 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -28,13 +26,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.transform.Rotate;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Building implements Callback {
     ClientInterface server;
@@ -88,8 +84,9 @@ public class Building implements Callback {
 
     @FXML
     ImageView pAlienView, bAlienView;
-    private int players = 0;
+    private int nPlayers = 0;
     private FlightBoard board;
+    private HashMap<String, FlightBoard.Pawn> players;
 
     @FXML
     private void initialize(){
@@ -157,6 +154,19 @@ public class Building implements Callback {
 
                 if(bookedBox.getChildren().contains(event.getGestureSource()))
                     server.useBookedTile(t, rot, c).ifPresent(_ -> dragSuccess.set(true));
+                else if(seenImages.getChildren().contains(event.getGestureSource())){
+                    Result<Tile> res = server.getTileFromSeen(t);
+
+                    if(res.isErr())
+                        return;
+
+                    res = server.setTile(c, t, rot);
+
+                    if(res.isOk())
+                        dragSuccess.set(true);
+                    else
+                        server.giveTile(t);
+                }
                 else
                     server.setTile(c, t, rot).ifPresent(_ -> dragSuccess.set(true));
 
@@ -194,7 +204,7 @@ public class Building implements Callback {
     public void config(int players, String name, ClientInterface server, Scene scene){
         this.server = server;
         nameLabel.setText(name);
-        this.players = players;
+        this.nPlayers = players;
 
         try {
             listener = new Listener(this);
@@ -305,6 +315,7 @@ public class Building implements Callback {
     @Override
     public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
         Platform.runLater(() -> {
+            this.players = players;
             players.forEach((name, pawn) -> {
                 String text = name + (disconnected.contains(name)? " (disc)" : "")
                         + (quid.contains(name)? " (abb)" : "");
@@ -321,7 +332,7 @@ public class Building implements Callback {
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return players;
+        return nPlayers;
     }
 
     @Override
@@ -335,7 +346,7 @@ public class Building implements Callback {
     public void pushState(Model.State.Type state) throws RemoteException {
         this.state = state;
         Platform.runLater(() -> {
-            stateLabel.setText(state.name());
+            stateLabel.setText(state.getName());
 
             if(state == Model.State.Type.ALIEN_INPUT){
                 pAlienView.setVisible(true);
@@ -372,7 +383,7 @@ public class Building implements Callback {
             else if(state == Model.State.Type.DRAW_CARD){
                 Pair<CardScene, Scene> handler = Launcher.loadScene("/gui/card.fxml");
                 CardScene cardScene = handler.getKey();
-                cardScene.config(listener, board);
+                cardScene.config(server, listener, board, stateLabel.getText(), ship, players);
                 cardScene.blueLabel.setText(blueLabel.getText());
                 cardScene.redLabel.setText(redLabel.getText());
                 cardScene.greenLabel.setText(greenLabel.getText());
@@ -509,15 +520,15 @@ public class Building implements Callback {
         return rotatedImage;
     }
 
-    private Image getImage(Tile t){
+    public static Image getImage(Tile t){
         return getImage("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg");
     }
 
-    private Image getImage(String path){
-        return new Image(getClass().getResource(path).toExternalForm());
+    public static Image getImage(String path){
+        return new Image(Building.class.getResource(path).toExternalForm());
     }
 
-    private Image getCHouse(FlightBoard.Pawn p){
+    public static Image getCHouse(FlightBoard.Pawn p){
         String path = "/tiles/C_HOUSE/3333_" + switch(p){
             case YELLOW -> "yellow";
             case GREEN -> "green";
@@ -525,6 +536,6 @@ public class Building implements Callback {
             case RED -> "red";
         } + ".jpg";
 
-        return new Image(getClass().getResource(path).toExternalForm());
+        return new Image(Building.class.getResource(path).toExternalForm());
     }
 }
