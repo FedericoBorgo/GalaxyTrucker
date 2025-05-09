@@ -7,19 +7,26 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 import it.polimi.softeng.is25am10.model.cards.CardData;
+import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -31,10 +38,13 @@ public class CardScene implements Callback {
     ClientInterface server;
     Model.State.Type state;
     HashMap<String, FlightBoard.Pawn> players;
-    ShipBoard ship;
+    CardInput cardInput = new CardInput();
 
     @FXML
     Label stateLabel, nameLabel;
+
+    @FXML
+    Pane cardPane;
 
     @FXML
     public Label redLabel, blueLabel, greenLabel, yellowLabel;
@@ -50,19 +60,43 @@ public class CardScene implements Callback {
     GridPane shipPane;
 
     @FXML
+    Label errLabel;
+
+    @FXML
+    ImageView arrowView0, arrowView1, arrowView2, arrowView3;
+
+    Text[][] counters = new Text[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+    StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+
+    @FXML
     void initialize() {
         posPanes = new Pane[]{posPane0, posPane1, posPane2, posPane3, posPane4, posPane5, posPane6,
         posPane7, posPane8, posPane9, posPane10, posPane11, posPane12, posPane13, posPane14, posPane15,
         posPane16, posPane17, posPane18, posPane19, posPane20, posPane21, posPane22, posPane23};
     }
 
+    @FXML
+    private void drawCard(){
+        server.drawCard();
+    }
+
+    @FXML
+    private void ready(){
+        Result<CardInput> res = server.setInput(cardInput);
+
+        if(res.isErr())
+            errLabel.setText(res.getReason());
+        else
+            errLabel.setText("scelta dichiarata");
+    }
+
     void config(ClientInterface server, Listener listener, FlightBoard flight, String state, ShipBoard ship, HashMap<String, FlightBoard.Pawn> players) {
         this.listener = listener;
         this.server = server;
-        this.ship = ship;
         this.players = players;
         listener.setCallback(this);
         updatePos(flight);
+        updateNextTurn(flight.getOrder().getFirst());
         stateLabel.setText(state);
         nameLabel.setText(server.getPlayerName());
 
@@ -89,6 +123,77 @@ public class CardScene implements Callback {
 
             shipPane.add(view, c.x(), c.y());
         });
+
+        ship.getAstronaut().getPositions().forEach((c, qty) -> {
+            StackPane cell = new StackPane();
+            ImageView view = new ImageView(Building.getImage("/gui/astronaut.png"));
+            Text count = new Text(qty.toString() + "x");
+
+            count.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
+            count.setFill(Color.BLACK);
+            count.setStroke(Color.WHITE);
+            count.setStrokeWidth(2);
+
+            view.setFitHeight(shipPane.getHeight()/7);
+            view.setFitWidth(shipPane.getHeight()/7);
+
+            cell.getChildren().add(view);
+            cell.getChildren().add(count);
+            StackPane.setAlignment(view, Pos.CENTER);
+            StackPane.setAlignment(count, Pos.BOTTOM_RIGHT);
+
+            shipPane.add(cell, c.x(), c.y());
+            counters[c.x()][c.y()] = count;
+            stackPanes[c.x()][c.y()] = cell;
+        });
+
+        ship.getBattery().getPositions().forEach((c, qty) -> {
+            StackPane cell = new StackPane();
+            ImageView view = new ImageView(Building.getImage("/gui/battery.png"));
+
+            Text count = new Text(qty.toString() + "x");
+            count.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
+            count.setFill(Color.BLACK);
+            count.setStroke(Color.WHITE);
+            count.setStrokeWidth(2);
+
+            view.setFitHeight(shipPane.getHeight()/7);
+            view.setFitWidth(shipPane.getHeight()/7);
+
+            cell.getChildren().add(view);
+            cell.getChildren().add(count);
+            StackPane.setAlignment(view, Pos.CENTER);
+            StackPane.setAlignment(count, Pos.BOTTOM_RIGHT);
+
+            shipPane.add(cell, c.x(), c.y());
+            counters[c.x()][c.y()] = count;
+            stackPanes[c.x()][c.y()] = cell;
+        });
+
+        ship.getPurple().getPositions().forEach((c, _) -> {
+            StackPane cell = new StackPane();
+            ImageView view = new ImageView(Building.getImage("/gui/purple.png"));
+            view.setFitHeight(shipPane.getHeight()/7);
+            view.setFitWidth(shipPane.getHeight()/7);
+            cell.getChildren().add(view);
+            StackPane.setAlignment(view, Pos.CENTER);
+            shipPane.add(cell, c.x(), c.y());
+            counters[c.x()][c.y()] = new Text("1x");
+            stackPanes[c.x()][c.y()] = cell;
+        });
+
+        ship.getBrown().getPositions().forEach((c, _) -> {
+            StackPane cell = new StackPane();
+            ImageView view = new ImageView(Building.getImage("/gui/brown.png"));
+            view.setFitHeight(shipPane.getHeight()/7);
+            view.setFitWidth(shipPane.getHeight()/7);
+            cell.getChildren().add(view);
+            StackPane.setAlignment(view, Pos.CENTER);
+            shipPane.add(cell, c.x(), c.y());
+            counters[c.x()][c.y()] = new Text("1x");
+            stackPanes[c.x()][c.y()] = cell;
+        });
+
     }
 
     void updatePos(FlightBoard board){
@@ -151,17 +256,54 @@ public class CardScene implements Callback {
 
     @Override
     public void pushCardData(CardData card) throws RemoteException {
-
+        Platform.runLater(() -> {
+            Image img = Building.getImage("/cards/" + card.type.name()+ "/" + card.id + ".jpg");
+            ImageView imgView = new ImageView(img);
+            imgView.setFitHeight(cardPane.getHeight());
+            imgView.setFitWidth(cardPane.getWidth());
+            cardPane.getChildren().add(imgView);
+        });
     }
 
     @Override
     public void pushCardChanges(CardOutput output) throws RemoteException {
+        cardInput = new CardInput();
+        Platform.runLater(() -> {
+            errLabel.setText("");
+            cardPane.getChildren().clear();
 
+            output.killedCrew.get(server.getPlayerName()).forEach(c ->{
+                int val = counters[c.x()][c.y()].getText().charAt(0) - '0';
+                val--;
+
+                if(val <= 0)
+                    stackPanes[c.x()][c.y()].getChildren().clear();
+                else
+                    counters[c.x()][c.y()].setText(val + "x");
+            });
+
+        });
+    }
+
+    private void updateNextTurn(FlightBoard.Pawn pawn){
+        arrowView0.setVisible(false);
+        arrowView1.setVisible(false);
+        arrowView2.setVisible(false);
+        arrowView3.setVisible(false);
+
+        switch(pawn){
+            case YELLOW -> arrowView3.setVisible(true);
+            case GREEN -> arrowView2.setVisible(true);
+            case BLUE -> arrowView1.setVisible(true);
+            case RED -> arrowView0.setVisible(true);
+        }
     }
 
     @Override
     public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
-
+        Platform.runLater(() -> {
+            updateNextTurn(pawn);
+        });
     }
 
     @Override
@@ -181,7 +323,13 @@ public class CardScene implements Callback {
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
+        Platform.runLater(() -> {
+            updatePos(board);
+            List<FlightBoard.Pawn> order = board.getOrder();
 
+            if(!order.isEmpty())
+                updateNextTurn(order.getFirst());
+        });
     }
 
     @Override

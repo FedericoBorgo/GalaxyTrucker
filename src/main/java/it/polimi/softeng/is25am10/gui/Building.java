@@ -174,18 +174,17 @@ public class Building implements Callback {
                     ship.getTiles().setTile(c, t, rot);
             }
             else if(state == Model.State.Type.ALIEN_INPUT){
-                Circle point = new Circle();
-                point.setRadius(10);
-                point.setCenterX(shipPane.getWidth()/7);
-                point.setCenterY(0);
+                ImageView view = new ImageView();
+                view.setFitHeight(shipPane.getHeight()/7);
+                view.setFitWidth(shipPane.getHeight()/7);
+
 
                 if(db.getString().equals("p")){
                     if(!ship.getPurple().cantPlace(c, 1)){
                         dragSuccess.set(true);
                         pAlienView.setVisible(false);
                         purple = Result.ok(c);
-                        point.setFill(Color.MAGENTA);
-                        shipPane.add(new StackPane(point), col, row);
+                        view.setImage(getImage("/gui/purple.png"));
                     }
                 }
                 else if(db.getString().equals("b")){
@@ -193,10 +192,12 @@ public class Building implements Callback {
                         dragSuccess.set(true);
                         bAlienView.setVisible(false);
                         brown = Result.ok(c);
-                        point.setFill(Color.GOLD);
-                        shipPane.add(new StackPane(point), col, row);
+                        view.setImage(getImage("/gui/purple.png"));
                     }
                 }
+
+                if(dragSuccess.get())
+                    shipPane.add(new StackPane(view), col, row);
             }
         });
 

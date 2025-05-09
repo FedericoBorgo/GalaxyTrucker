@@ -43,9 +43,33 @@ public class Deck extends Card implements Serializable {
         visible = new Card[3][3];
         selectedCard = null;
         flightBoard = board;
-
+        /*
+        Testate
         cards.addAll(Stardust.construct(board));
+
+         */
+
         cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+        cards.addAll(Epidemic.construct(board));
+
+/*
+        Da testare
         cards.addAll(Planets.construct(board));
         cards.addAll(Space.construct(model, board));
         cards.addAll(Meteors.construct(model, board));
@@ -54,7 +78,7 @@ public class Deck extends Card implements Serializable {
         cards.addAll(Slavers.construct(model,board));
         cards.addAll(Smugglers.construct(model,board));
         cards.addAll(Pirates.construct(model,board));
-        cards.addAll(Warzone.construct(model,board));
+        cards.addAll(Warzone.construct(model,board));*/
 
 
         Collections.shuffle(cards);

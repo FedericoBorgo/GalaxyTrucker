@@ -80,6 +80,7 @@ public class AutoBuilder extends Thread{
             }
         });
 
+        building.ship.init(purple.get(), brown.get());
         building.server.init(purple.get(), brown.get());
     }
 }
