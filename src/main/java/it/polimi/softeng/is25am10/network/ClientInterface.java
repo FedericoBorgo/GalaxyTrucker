@@ -117,6 +117,14 @@ public abstract class ClientInterface extends Thread{
         return call(name);
     }
 
+    public int getEnginePower(String name) {
+        return call(name);
+    }
+
+    public double getCannonPower(String name) {
+        return call(name);
+    }
+
     public Result<CardInput> setInput(CardInput input) {
         return call(name, input);
     }

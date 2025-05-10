@@ -765,4 +765,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     public Result<Card[][]> getVisible(String name) {
         return getModel(name).getVisible();
     }
+
+    @Override
+    public int getEnginePower(String name) {
+        return getModel(name).getEnginePower(name);
+    }
+
+    @Override
+    public double getCannonPower(String name) {
+        return getModel(name).getCannonPower(name);
+    }
 }

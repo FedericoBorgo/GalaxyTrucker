@@ -554,6 +554,14 @@ public class Model implements Serializable {
         return Result.ok(1);
     }
 
+    public synchronized int getEnginePower(String name){
+        return ship(name).getEnginePower(removed.get(get(name)).battery);
+    }
+
+    public synchronized double getCannonPower(String name){
+        return ship(name).getCannonsPower(cannonsToUse.get(get(name)));
+    }
+
     /**
      * Same drop but for goods.
      *

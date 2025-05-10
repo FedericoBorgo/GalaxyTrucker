@@ -1,13 +1,10 @@
 package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Player;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
-import it.polimi.softeng.is25am10.model.boards.TilesBoard;
+import it.polimi.softeng.is25am10.model.boards.*;
+import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardInput;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
@@ -16,29 +13,36 @@ import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CardScene implements Callback {
     ClientInterface server;
     Model.State.Type state;
     HashMap<String, FlightBoard.Pawn> players;
     CardInput cardInput = new CardInput();
+    AtomicBoolean dragSuccess = new AtomicBoolean(false);
+    CardData cardData = null;
 
     @FXML
     Label stateLabel, nameLabel;
@@ -67,6 +71,18 @@ public class CardScene implements Callback {
 
     Text[][] counters = new Text[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
     StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+
+    @FXML
+    Pane holePane;
+
+    @FXML
+    Text engineText, cannonText;
+
+    @FXML
+    Pane cardDataPane;
+
+    @FXML
+    Text cashText;
 
     @FXML
     void initialize() {
@@ -121,79 +137,137 @@ public class CardScene implements Callback {
             view.setFitWidth(shipPane.getWidth() / 7);
             view.setRotate(r.toInt()*90);
 
+            stackPanes[c.x()][c.y()] = new StackPane();
             shipPane.add(view, c.x(), c.y());
+            shipPane.add(stackPanes[c.x()][c.y()], c.x(), c.y());
         });
 
-        ship.getAstronaut().getPositions().forEach((c, qty) -> {
-            StackPane cell = new StackPane();
-            ImageView view = new ImageView(Building.getImage("/gui/astronaut.png"));
-            Text count = new Text(qty.toString() + "x");
+        List<Pair<Map<Coordinate, Integer>, String>> boards = new ArrayList<>();
+        boards.add(new Pair<>(ship.getAstronaut().getPositions(), "astronaut"));
+        boards.add(new Pair<>(ship.getBattery().getPositions(), "battery"));
+        boards.add(new Pair<>(ship.getPurple().getPositions(), "purple"));
+        boards.add(new Pair<>(ship.getBrown().getPositions(), "brown"));
 
-            count.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
-            count.setFill(Color.BLACK);
-            count.setStroke(Color.WHITE);
-            count.setStrokeWidth(2);
+        boards.forEach(pair -> {
+            String type = pair.getValue();
 
-            view.setFitHeight(shipPane.getHeight()/7);
-            view.setFitWidth(shipPane.getHeight()/7);
+            pair.getKey().forEach((c, qty) -> {
+                StackPane cell = stackPanes[c.x()][c.y()];
+                ImageView view = new ImageView(Building.getImage("/gui/" + type + ".png"));
+                Text count = new Text(qty.toString() + "x");
+                count.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
+                count.setFill(Color.BLACK);
+                count.setStroke(Color.WHITE);
+                count.setStrokeWidth(2);
 
-            cell.getChildren().add(view);
-            cell.getChildren().add(count);
-            StackPane.setAlignment(view, Pos.CENTER);
-            StackPane.setAlignment(count, Pos.BOTTOM_RIGHT);
+                view.setFitHeight(shipPane.getHeight()/7);
+                view.setFitWidth(shipPane.getHeight()/7);
 
-            shipPane.add(cell, c.x(), c.y());
-            counters[c.x()][c.y()] = count;
-            stackPanes[c.x()][c.y()] = cell;
+                view.setOnDragDetected(event -> {
+                    if(view.getImage() == null)
+                        return;
+
+                    view.setCursor(Cursor.CLOSED_HAND);
+
+                    Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(type + " " + c);
+                    db.setContent(content);
+                    db.setDragView(Building.getRotatedImage(view.getImage(), 0));
+                    event.consume();
+                });
+
+                view.setOnDragDone(event -> {
+                    event.consume();
+                    if(!dragSuccess.get())
+                        return;
+                    dragSuccess.set(false);
+                    removeOne(c);
+                });
+
+                view.setOnMousePressed(event -> {
+                    view.setCursor(Cursor.CLOSED_HAND);
+                    event.consume();
+                });
+
+                view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
+                view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
+
+                cell.getChildren().add(view);
+                cell.getChildren().add(count);
+                StackPane.setAlignment(view, Pos.CENTER);
+                StackPane.setAlignment(count, Pos.BOTTOM_RIGHT);
+                counters[c.x()][c.y()] = count;
+            });
         });
 
-        ship.getBattery().getPositions().forEach((c, qty) -> {
-            StackPane cell = new StackPane();
-            ImageView view = new ImageView(Building.getImage("/gui/battery.png"));
-
-            Text count = new Text(qty.toString() + "x");
-            count.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
-            count.setFill(Color.BLACK);
-            count.setStroke(Color.WHITE);
-            count.setStrokeWidth(2);
-
-            view.setFitHeight(shipPane.getHeight()/7);
-            view.setFitWidth(shipPane.getHeight()/7);
-
-            cell.getChildren().add(view);
-            cell.getChildren().add(count);
-            StackPane.setAlignment(view, Pos.CENTER);
-            StackPane.setAlignment(count, Pos.BOTTOM_RIGHT);
-
-            shipPane.add(cell, c.x(), c.y());
-            counters[c.x()][c.y()] = count;
-            stackPanes[c.x()][c.y()] = cell;
+        shipPane.setOnDragOver(event -> {
+            if (event.getGestureSource() != shipPane && event.getDragboard().hasString())
+                event.acceptTransferModes(TransferMode.MOVE);
+            event.consume();
         });
 
-        ship.getPurple().getPositions().forEach((c, _) -> {
-            StackPane cell = new StackPane();
-            ImageView view = new ImageView(Building.getImage("/gui/purple.png"));
-            view.setFitHeight(shipPane.getHeight()/7);
-            view.setFitWidth(shipPane.getHeight()/7);
-            cell.getChildren().add(view);
-            StackPane.setAlignment(view, Pos.CENTER);
-            shipPane.add(cell, c.x(), c.y());
-            counters[c.x()][c.y()] = new Text("1x");
-            stackPanes[c.x()][c.y()] = cell;
+        shipPane.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            event.setDropCompleted(true);
+            event.consume();
+
+            if (!db.hasString())
+                return;
+
+            // get dropped coordinate
+            int col = (int) (event.getX() / (shipPane.getWidth() / 7));
+            int row = (int) (event.getY() / (shipPane.getHeight() / 5));
+
+            if (Coordinate.isInvalid(col, row))
+                return;
+
+            Coordinate c = new Coordinate(col, row);
+            dragSuccess.set(false);
+
+            if(cardData == null)
+                return;
+
+            String content = db.getString();
+
+            if(content.contains("battery")){
+                Result<Tile> res = ship.getTiles().getTile(c);
+
+                if(res.isErr())
+                    return;
+
+                Tile.Type t = res.getData().getType();
+
+                Rectangle rect = new Rectangle(shipPane.getWidth()/7, shipPane.getHeight()/5);
+                rect.setFill(Color.web("rgb(102, 255, 51)", 0.3));
+                rect.setStroke(Color.GREEN);
+                rect.setStrokeWidth(1);
+
+                if(cardData.type == Card.Type.OPEN_SPACE && t != Tile.Type.D_ENGINE)
+                    return;
+
+                Coordinate from = Coordinate.fromString(content.substring(content.indexOf(' ') + 1)).getData();
+
+                server.drop(from).ifPresent(_ -> {
+                    dragSuccess.set(true);
+                    stackPanes[c.x()][c.y()].getChildren().add(rect);
+                });
+            }
+
+            engineText.setText(String.valueOf(server.getEnginePower(server.getPlayerName())));
+            cannonText.setText(String.valueOf((int)server.getCannonPower(server.getPlayerName())));
         });
 
-        ship.getBrown().getPositions().forEach((c, _) -> {
-            StackPane cell = new StackPane();
-            ImageView view = new ImageView(Building.getImage("/gui/brown.png"));
-            view.setFitHeight(shipPane.getHeight()/7);
-            view.setFitWidth(shipPane.getHeight()/7);
-            cell.getChildren().add(view);
-            StackPane.setAlignment(view, Pos.CENTER);
-            shipPane.add(cell, c.x(), c.y());
-            counters[c.x()][c.y()] = new Text("1x");
-            stackPanes[c.x()][c.y()] = cell;
-        });
+    }
 
+    void removeOne(Coordinate c){
+        int val = counters[c.x()][c.y()].getText().charAt(0) - '0';
+        val--;
+
+        if(val <= 0)
+            stackPanes[c.x()][c.y()].getChildren().clear();
+        else
+            counters[c.x()][c.y()].setText(val + "x");
     }
 
     void updatePos(FlightBoard board){
@@ -256,12 +330,32 @@ public class CardScene implements Callback {
 
     @Override
     public void pushCardData(CardData card) throws RemoteException {
+        this.cardData = card;
         Platform.runLater(() -> {
+            engineText.setText(String.valueOf(server.getEnginePower(server.getPlayerName())));
+            cannonText.setText(String.valueOf((int)server.getCannonPower(server.getPlayerName())));
+
             Image img = Building.getImage("/cards/" + card.type.name()+ "/" + card.id + ".jpg");
             ImageView imgView = new ImageView(img);
             imgView.setFitHeight(cardPane.getHeight());
             imgView.setFitWidth(cardPane.getWidth());
             cardPane.getChildren().add(imgView);
+            cardDataPane.getChildren().clear();
+            VBox vBox = new VBox();
+
+            switch(card.type){
+                case OPEN_SPACE -> {
+                    card.declaredPower.forEach((p, v) -> {
+                        Text label = new Text(p + ": " + v);
+                        label.setFill(Color.web("#14723e"));
+                        label.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+                        vBox.getChildren().add(label);
+                    });
+                }
+                default -> {}
+            };
+
+            cardDataPane.getChildren().add(vBox);
         });
     }
 
@@ -271,17 +365,16 @@ public class CardScene implements Callback {
         Platform.runLater(() -> {
             errLabel.setText("");
             cardPane.getChildren().clear();
+            cardDataPane.getChildren().clear();
 
-            output.killedCrew.get(server.getPlayerName()).forEach(c ->{
-                int val = counters[c.x()][c.y()].getText().charAt(0) - '0';
-                val--;
+            if(output.cash.containsKey(server.getPlayerName())){
+                int cash = output.cash.get(server.getPlayerName());
+                cash += Integer.parseInt(cashText.getText());
+                cashText.setText(String.valueOf(cash));
+            }
 
-                if(val <= 0)
-                    stackPanes[c.x()][c.y()].getChildren().clear();
-                else
-                    counters[c.x()][c.y()].setText(val + "x");
-            });
-
+            if(output.killedCrew.containsKey(server.getPlayerName()))
+                output.killedCrew.get(server.getPlayerName()).forEach(this::removeOne);
         });
     }
 

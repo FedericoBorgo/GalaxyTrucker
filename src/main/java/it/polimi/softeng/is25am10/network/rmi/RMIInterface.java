@@ -70,4 +70,8 @@ public interface RMIInterface extends Remote {
     Result<CardData> getCardData(String name) throws RemoteException;
 
     Result<Card[][]> getVisible(String name) throws RemoteException;
+
+    int getEnginePower(String name) throws RemoteException;
+
+    double getCannonPower(String name) throws RemoteException;
 }
