@@ -4,10 +4,7 @@ import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.*;
-import it.polimi.softeng.is25am10.model.cards.Card;
-import it.polimi.softeng.is25am10.model.cards.CardData;
-import it.polimi.softeng.is25am10.model.cards.CardInput;
-import it.polimi.softeng.is25am10.model.cards.CardOutput;
+import it.polimi.softeng.is25am10.model.cards.*;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.application.Platform;
@@ -15,15 +12,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -71,7 +68,7 @@ public class CardScene implements Callback {
 
     Text[][] counters = new Text[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
     StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
-
+    Map<Coordinate, List<Pos>> freeContainers = new HashMap<>();
     @FXML
     Pane holePane;
 
@@ -98,12 +95,20 @@ public class CardScene implements Callback {
 
     @FXML
     private void ready(){
-        Result<CardInput> res = server.setInput(cardInput);
+        if(state == Model.State.Type.WAITING_INPUT){
+            Result<CardInput> res = server.setInput(cardInput);
 
-        if(res.isErr())
-            errLabel.setText(res.getReason());
-        else
-            errLabel.setText("scelta dichiarata");
+            if(res.isErr())
+                errLabel.setText(res.getReason());
+            else
+                errLabel.setText("scelta dichiarata");
+        }
+        else if(state == Model.State.Type.PLACE_REWARD){
+            server.dropReward().ifPresent(_ -> {
+                cardDataPane.getChildren().clear();
+            });
+        }
+
     }
 
     void config(ClientInterface server, Listener listener, FlightBoard flight, String state, ShipBoard ship, HashMap<String, FlightBoard.Pawn> players) {
@@ -140,6 +145,9 @@ public class CardScene implements Callback {
             stackPanes[c.x()][c.y()] = new StackPane();
             shipPane.add(view, c.x(), c.y());
             shipPane.add(stackPanes[c.x()][c.y()], c.x(), c.y());
+
+            if(Tile.box(t))
+                freeContainers.put(c, new ArrayList<>(List.of(Pos.TOP_LEFT, Pos.TOP_RIGHT, Pos.BOTTOM_RIGHT)));
         });
 
         List<Pair<Map<Coordinate, Integer>, String>> boards = new ArrayList<>();
@@ -230,33 +238,46 @@ public class CardScene implements Callback {
 
             String content = db.getString();
 
-            if(content.contains("battery")){
-                Result<Tile> res = ship.getTiles().getTile(c);
+            if(this.state == Model.State.Type.WAITING_INPUT){
+                if(content.contains("battery")){
+                    Result<Tile> res = ship.getTiles().getTile(c);
 
-                if(res.isErr())
-                    return;
+                    if(res.isErr())
+                        return;
 
-                Tile.Type t = res.getData().getType();
+                    Tile.Type t = res.getData().getType();
 
-                Rectangle rect = new Rectangle(shipPane.getWidth()/7, shipPane.getHeight()/5);
-                rect.setFill(Color.web("rgb(102, 255, 51)", 0.3));
-                rect.setStroke(Color.GREEN);
-                rect.setStrokeWidth(1);
+                    Rectangle rect = new Rectangle(shipPane.getWidth()/7, shipPane.getHeight()/5);
+                    rect.setFill(Color.web("rgb(102, 255, 51)", 0.3));
+                    rect.setStroke(Color.GREEN);
+                    rect.setStrokeWidth(1);
 
-                if(cardData.type == Card.Type.OPEN_SPACE && t != Tile.Type.D_ENGINE)
-                    return;
+                    if(cardData.type == Card.Type.OPEN_SPACE && t != Tile.Type.D_ENGINE)
+                        return;
 
-                Coordinate from = Coordinate.fromString(content.substring(content.indexOf(' ') + 1)).getData();
+                    Coordinate from = Coordinate.fromString(content.substring(content.indexOf(' ') + 1)).getData();
 
-                server.drop(from).ifPresent(_ -> {
+                    server.drop(from).ifPresent(_ -> {
+                        dragSuccess.set(true);
+                        stackPanes[c.x()][c.y()].getChildren().add(rect);
+                    });
+                }
+
+                engineText.setText(String.valueOf(server.getEnginePower(server.getPlayerName())));
+                cannonText.setText(String.valueOf((int)server.getCannonPower(server.getPlayerName())));
+            }
+            else if(this.state == Model.State.Type.PLACE_REWARD){
+                GoodsBoard.Type type = GoodsBoard.Type.valueOf(content);
+
+                server.placeReward(type, c).ifPresent(_ -> {
                     dragSuccess.set(true);
-                    stackPanes[c.x()][c.y()].getChildren().add(rect);
+                    ImageView view = new ImageView(Building.getImage("/gui/" + type.name().toLowerCase() + ".png"));
+                    Pos pos = freeContainers.get(c).removeFirst();
+                    stackPanes[c.x()][c.y()].getChildren().add(view);
+                    StackPane.setAlignment(view, pos);
                 });
             }
-
-            engineText.setText(String.valueOf(server.getEnginePower(server.getPlayerName())));
-            cannonText.setText(String.valueOf((int)server.getCannonPower(server.getPlayerName())));
-        });
+            });
 
     }
 
@@ -352,6 +373,32 @@ public class CardScene implements Callback {
                         vBox.getChildren().add(label);
                     });
                 }
+                case PLANETS -> {
+                    SplitMenuButton splitMenuButton = new SplitMenuButton();
+                    splitMenuButton.setPrefWidth(cardDataPane.getWidth()/2);
+                    splitMenuButton.setText(Planets.Planet.NOPLANET.name());
+
+                    card.planets.forEach((p, _) -> {
+                        if(card.chosenPlanets.contains(p))
+                            return;
+
+                        MenuItem item = new MenuItem("" + p);
+                        splitMenuButton.getItems().add(item);
+                        item.setOnAction(_ -> {
+                            cardInput.planet = p;
+                            splitMenuButton.setText(p.name());
+                        });
+                    });
+
+                    MenuItem item = new MenuItem(Planets.Planet.NOPLANET.name());
+                    item.setOnAction(_ -> {
+                        cardInput.planet = Planets.Planet.NOPLANET;
+                        splitMenuButton.setText(Planets.Planet.NOPLANET.name());
+                    });
+                    splitMenuButton.getItems().add(item);
+
+                    vBox.getChildren().add(splitMenuButton);
+                }
                 default -> {}
             };
 
@@ -375,6 +422,46 @@ public class CardScene implements Callback {
 
             if(output.killedCrew.containsKey(server.getPlayerName()))
                 output.killedCrew.get(server.getPlayerName()).forEach(this::removeOne);
+
+            if(output.rewards.containsKey(server.getPlayerName())){
+                VBox vBox = new VBox();
+                output.rewards.get(server.getPlayerName()).forEach(r -> {
+                    ImageView view = new ImageView(Building.getImage("/gui/" + r.name().toLowerCase() + ".png"));
+                    vBox.getChildren().add(view);
+
+                    view.setOnDragDetected(event -> {
+                        if(view.getImage() == null)
+                            return;
+
+                        view.setCursor(Cursor.CLOSED_HAND);
+
+                        Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
+                        ClipboardContent content = new ClipboardContent();
+                        content.putString(r.name());
+                        db.setContent(content);
+                        db.setDragView(Building.getRotatedImage(view.getImage(), 0));
+                        event.consume();
+                    });
+
+                    view.setOnDragDone(event -> {
+                        event.consume();
+                        if(!dragSuccess.get())
+                            return;
+                        dragSuccess.set(false);
+                        vBox.getChildren().remove(view);
+                    });
+
+                    view.setOnMousePressed(event -> {
+                        view.setCursor(Cursor.CLOSED_HAND);
+                        event.consume();
+                    });
+
+                    view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
+                    view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
+
+                });
+                cardDataPane.getChildren().add(vBox);
+            }
         });
     }
 

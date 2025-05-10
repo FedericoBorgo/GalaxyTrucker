@@ -47,21 +47,25 @@ public class Deck extends Card implements Serializable {
         Testate
         cards.addAll(Stardust.construct(board));
         cards.addAll(Epidemic.construct(board));
+        cards.addAll(Space.construct(model, board));
 
          */
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
+        cards.addAll(Planets.construct(board));
 /*
         Da testare
-        cards.addAll(Planets.construct(board));
-        cards.addAll(Space.construct(model, board));
+
         cards.addAll(Meteors.construct(model, board));
         cards.addAll(AbandonedShip.construct(model, board));
         cards.addAll(Station.construct(board));
