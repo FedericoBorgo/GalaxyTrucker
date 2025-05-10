@@ -66,6 +66,7 @@ public class CardScene implements Callback {
     @FXML
     ImageView arrowView0, arrowView1, arrowView2, arrowView3;
 
+    Map<Rectangle, StackPane> rectangles = new HashMap<>();
     Text[][] counters = new Text[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
     StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
     Map<Coordinate, List<Pos>> freeContainers = new HashMap<>();
@@ -260,6 +261,7 @@ public class CardScene implements Callback {
                     server.drop(from).ifPresent(_ -> {
                         dragSuccess.set(true);
                         stackPanes[c.x()][c.y()].getChildren().add(rect);
+                        rectangles.put(rect, stackPanes[c.x()][c.y()]);
                     });
                 }
 
@@ -413,6 +415,12 @@ public class CardScene implements Callback {
             errLabel.setText("");
             cardPane.getChildren().clear();
             cardDataPane.getChildren().clear();
+
+            rectangles.forEach((r, p) -> {
+                p.getChildren().remove(r);
+            });
+
+            rectangles.clear();
 
             if(output.cash.containsKey(server.getPlayerName())){
                 int cash = output.cash.get(server.getPlayerName());
