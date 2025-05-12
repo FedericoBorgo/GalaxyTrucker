@@ -3,11 +3,15 @@ package it.polimi.softeng.is25am10.model.cards;
 import it.polimi.softeng.is25am10.gui.CardScene;
 import it.polimi.softeng.is25am10.gui.Launcher;
 import it.polimi.softeng.is25am10.model.Projectile;
+import it.polimi.softeng.is25am10.model.State;
+import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -181,6 +185,9 @@ public class CardData implements Serializable {
                 vBox.getChildren().add(text);
                 vBox.getChildren().add(checkBox);
                 break;
+            case WAR_ZONE:
+
+            case PIRATES:
             case METEORS:
                 projectiles.forEach(p -> {
                     ImageView view = new ImageView(Launcher.getImage("/gui/textures/asteroid/" + p.type().name().toLowerCase() + ".png"));
@@ -190,6 +197,34 @@ public class CardData implements Serializable {
                         case DOWN -> 180;
                         case LEFT -> 270;
                     });
+
+                    if(p.type() == Projectile.Type.SMALL_ASTEROID || p.type() == Projectile.Type.SMALL_FIRE){
+                        view.setOnDragOver(event -> {
+                            if (event.getGestureSource() != view && event.getDragboard().hasString())
+                                event.acceptTransferModes(TransferMode.MOVE);
+                            event.consume();
+                        });
+
+                        view.setOnDragDropped(event -> {
+                            Dragboard db = event.getDragboard();
+                            event.setDropCompleted(true);
+                            event.consume();
+
+                            if (!db.hasString())
+                                return;
+                            String data = db.getString();
+                            s.dragSuccess.set(false);
+
+                            if (data.contains("battery")) {
+                                Coordinate from = Coordinate.fromString(data.substring(data.indexOf(' ') + 1)).getData();
+
+                                s.server.drop(from).ifPresent(_ -> {
+                                    s.cardInput.shieldFor.add(p.ID());
+                                    s.dragSuccess.set(true);
+                                });
+                            }
+                        });
+                    }
 
                     switch(p.side()){
                         case UP -> {

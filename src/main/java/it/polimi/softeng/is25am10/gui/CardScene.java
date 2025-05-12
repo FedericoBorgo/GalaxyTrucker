@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CardScene implements Callback {
-    ClientInterface server;
+    public ClientInterface server;
     State.Type state;
     HashMap<String, FlightBoard.Pawn> players;
     public CardInput cardInput = new CardInput();
@@ -250,6 +250,14 @@ public class CardScene implements Callback {
                 });
             }
 
+            if(data.contains("box")){
+                String[] split = data.split(" ");
+                GoodsBoard.Type t = GoodsBoard.Type.valueOf(split[1]);
+                Coordinate c = Coordinate.fromString(split[2]).getData();
+
+                server.drop(c, t).ifPresent(_ -> dragSuccess.set(true));
+            }
+
             if(data.contains("astronaut")){
                 Coordinate from = Coordinate.fromString(data.substring(data.indexOf(' ')+1)).getData();
                 server.drop(from).ifPresent(_ -> dragSuccess.set(true));
@@ -279,13 +287,26 @@ public class CardScene implements Callback {
                     rect.setStroke(Color.GREEN);
                     rect.setStrokeWidth(1);
 
-                    if(cardData.type != Card.Type.OPEN_SPACE || t != Tile.Type.D_ENGINE)
+                    if(cardData.type == Card.Type.OPEN_SPACE && t != Tile.Type.D_ENGINE)
+                        return;
+
+                    if((cardData.type == Card.Type.PIRATES || cardData.type == Card.Type.SMUGGLERS) && t != Tile.Type.D_CANNON)
+                        return;
+
+                    if(cardData.type == Card.Type.WAR_ZONE && (t != Tile.Type.D_ENGINE && t != Tile.Type.D_CANNON))
                         return;
 
                     Coordinate from = Coordinate.fromString(content.substring(content.indexOf(' ') + 1)).getData();
 
                     server.drop(from).ifPresent(_ -> {
                         dragSuccess.set(true);
+
+                        if(cardData.type == Card.Type.PIRATES || cardData.type == Card.Type.SMUGGLERS)
+                            server.increaseCannon(ship.getTiles().getRotation(c), 1);
+
+                        if(cardData.type == Card.Type.WAR_ZONE && t == Tile.Type.D_CANNON)
+                            server.increaseCannon(ship.getTiles().getRotation(c), 1);
+
                         stackPanes[c.x()][c.y()].getChildren().add(rect);
                         rectangles.put(rect, stackPanes[c.x()][c.y()]);
                     });
@@ -303,6 +324,33 @@ public class CardScene implements Callback {
                     Pos pos = freeContainers.get(c).removeFirst();
                     stackPanes[c.x()][c.y()].getChildren().add(view);
                     StackPane.setAlignment(view, pos);
+
+                    view.setOnDragDetected(e -> {
+                        view.setCursor(Cursor.CLOSED_HAND);
+                        Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
+                        ClipboardContent clipboardContent = new ClipboardContent();
+                        clipboardContent.putString("box " + type + " " + c);
+                        db.setContent(clipboardContent);
+                        db.setDragView(Launcher.getRotatedImage(view.getImage(), 0));
+                        e.consume();
+                    });
+
+                    view.setOnDragDone(e -> {
+                        e.consume();
+                        if(!dragSuccess.get())
+                            return;
+                        dragSuccess.set(false);
+                        stackPanes[c.x()][c.y()].getChildren().remove(view);
+                        freeContainers.get(c).add(pos);
+                    });
+
+                    view.setOnMousePressed(e -> {
+                        view.setCursor(Cursor.CLOSED_HAND);
+                        e.consume();
+                    });
+
+                    view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
+                    view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
                 });
             }
         });

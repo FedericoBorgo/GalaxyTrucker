@@ -6,10 +6,7 @@ import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Used to contains all the cards relative to a single game.
@@ -43,40 +40,20 @@ public class Deck extends Card implements Serializable {
         visible = new Card[3][3];
         selectedCard = null;
         flightBoard = board;
-        /*
-        Testate
+
         cards.addAll(Stardust.construct(board));
         cards.addAll(Epidemic.construct(board));
         cards.addAll(Space.construct(model, board));
         cards.addAll(Planets.construct(board));
         cards.addAll(AbandonedShip.construct(model, board));
         cards.addAll(Station.construct(board));
-         */
-
         cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-        cards.addAll(Meteors.construct(model, board));
-
-
-/*
-        Da testare
-
-        cards.addAll(Meteors.construct(model, board));
-
-        cards.addAll(Smugglers.construct(model,board));
         cards.addAll(Pirates.construct(model,board));
-        cards.addAll(Warzone.construct(model,board));*/
+        cards.addAll(Slavers.construct(model,board));
+        cards.addAll(Smugglers.construct(model,board));
+        cards.addAll(Warzone.construct(model,board));
 
-
-        Collections.shuffle(cards);
+        Collections.shuffle(cards, new Random());
 
         // 9 visible cards
         for (int i = 0; i < visible.length; i++) {
