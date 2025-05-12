@@ -17,7 +17,7 @@
     <children>
         <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
             <image>
-                <Image url="@building.png" />
+                <Image url="@textures/building.png" />
             </image>
         </ImageView>
       <Button layoutX="28.0" layoutY="552.0" mnemonicParsing="false" onAction="#playerReady" opacity="0.0" prefHeight="46.0" prefWidth="145.0" text="end" />
@@ -45,17 +45,17 @@
       <Pane fx:id="drawTilePane" layoutX="559.0" layoutY="196.0" prefHeight="125.0" prefWidth="126.0" />
       <ImageView fx:id="clock1" fitHeight="54.0" fitWidth="64.0" layoutX="905.0" layoutY="378.0" preserveRatio="true" rotate="23.6">
          <image>
-            <Image url="@clock.png" />
+            <Image url="@textures/clock.png" />
          </image>
       </ImageView>
-        <ImageView fx:id="clock2" fitHeight="53.0" fitWidth="64.0" layoutX="936.0" layoutY="402.0" preserveRatio="true" rotate="38.7">
+        <ImageView fx:id="clock2" fitHeight="53.0" fitWidth="64.0" layoutX="936.0" layoutY="402.0" preserveRatio="true" rotate="38.7" visible="false">
             <image>
-                <Image url="@clock.png" />
+                <Image url="@textures/clock.png" />
             </image>
         </ImageView>
-        <ImageView fx:id="clock3" fitHeight="69.0" fitWidth="70.0" layoutX="954.0" layoutY="421.0" preserveRatio="true" rotate="45.0">
+        <ImageView fx:id="clock3" fitHeight="69.0" fitWidth="70.0" layoutX="954.0" layoutY="421.0" preserveRatio="true" rotate="45.0" visible="false">
             <image>
-                <Image url="@clock.png" />
+                <Image url="@textures/clock.png" />
             </image>
         </ImageView>
       <Label fx:id="secondsLabel" layoutX="1000.0" layoutY="470.0" prefHeight="97.0" prefWidth="80.0" text="00" textFill="#f5f3f3">
@@ -99,25 +99,25 @@
          </content>
       </ScrollPane>
       <VBox fx:id="bookedBox" layoutX="717.0" layoutY="73.0" prefHeight="250.0" prefWidth="126.0" />
-      <Label fx:id="buildingLabel" layoutX="181.0" layoutY="546.0" lineSpacing="1.0" prefHeight="56.0" prefWidth="301.0" text="ASSEMBLAGGIO TERMINATO" textAlignment="JUSTIFY" textFill="#760094">
+      <Label fx:id="buildingLabel" layoutX="181.0" layoutY="546.0" lineSpacing="1.0" prefHeight="56.0" prefWidth="301.0" text="ASSEMBLAGGIO TERMINATO" textAlignment="JUSTIFY" textFill="#760094" visible="false">
          <font>
             <Font name="System Bold" size="21.0" />
          </font>
       </Label>
       <Pane fx:id="pAlienPane" layoutX="540.0" layoutY="327.0" prefHeight="75.0" prefWidth="72.0">
          <children>
-            <ImageView fx:id="pAlienView" fitHeight="75.0" fitWidth="82.0" layoutX="-3.0">
+            <ImageView fx:id="pAlienView" fitHeight="75.0" fitWidth="82.0" layoutX="-3.0" visible="false">
                <image>
-                  <Image url="@purple.png" />
+                  <Image url="@textures/purple.png" />
                </image>
             </ImageView>
          </children>
       </Pane>
       <Pane fx:id="bAlienPane" layoutX="630.0" layoutY="327.0" prefHeight="75.0" prefWidth="72.0">
          <children>
-            <ImageView fx:id="bAlienView" fitHeight="75.0" fitWidth="72.0" layoutX="1.0" layoutY="2.0">
+            <ImageView fx:id="bAlienView" fitHeight="75.0" fitWidth="72.0" layoutX="1.0" layoutY="2.0" visible="false">
                <image>
-                  <Image url="@brown.png" />
+                  <Image url="@textures/brown.png" />
                </image>
             </ImageView>
          </children>

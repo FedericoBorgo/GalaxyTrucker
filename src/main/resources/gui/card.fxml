@@ -16,25 +16,25 @@
     <children>
         <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
             <image>
-                <Image url="@card.png" />
+                <Image url="@textures/card.png" />
             </image>
         </ImageView>
-      <Label fx:id="redLabel" layoutX="97.0" layoutY="443.0" prefHeight="40.0" prefWidth="254.0" textFill="#f80000">
+      <Label fx:id="redLabel" layoutX="83.0" layoutY="515.0" prefHeight="40.0" prefWidth="219.0" textFill="#f80000">
          <font>
             <Font name="System Bold" size="28.0" />
          </font>
       </Label>
-      <Label fx:id="blueLabel" layoutX="97.0" layoutY="483.0" prefHeight="40.0" prefWidth="254.0" textFill="#0014f7">
+      <Label fx:id="blueLabel" layoutX="83.0" layoutY="560.0" prefHeight="40.0" prefWidth="219.0" textFill="#0014f7">
          <font>
             <Font name="System Bold" size="28.0" />
          </font>
       </Label>
-      <Label fx:id="greenLabel" layoutX="97.0" layoutY="523.0" prefHeight="40.0" prefWidth="254.0" textFill="#00a153">
+      <Label fx:id="greenLabel" layoutX="373.0" layoutY="515.0" prefHeight="40.0" prefWidth="254.0" textFill="#00a153">
          <font>
             <Font name="System Bold" size="28.0" />
          </font>
       </Label>
-      <Label fx:id="yellowLabel" layoutX="97.0" layoutY="563.0" prefHeight="40.0" prefWidth="254.0" textFill="#caf700">
+      <Label fx:id="yellowLabel" layoutX="373.0" layoutY="560.0" prefHeight="40.0" prefWidth="254.0" textFill="#caf700">
          <font>
             <Font name="System Bold" size="28.0" />
          </font>
@@ -73,7 +73,7 @@
             <Font name="Orbitron Medium" size="25.0" />
          </font>
       </Label>
-      <GridPane fx:id="shipPane" layoutX="32.0" layoutY="72.0" prefHeight="341.0" prefWidth="484.0">
+      <GridPane fx:id="shipPane" layoutX="60.0" layoutY="81.0" prefHeight="365.0" prefWidth="504.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -90,53 +90,111 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
+         <children>
+            <Text fx:id="shipFixText" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="NAVE SEPARATA" wrappingWidth="145.13000106811523">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Text>
+         </children>
       </GridPane>
-      <Pane fx:id="cardPane" layoutX="565.0" layoutY="115.0" prefHeight="207.0" prefWidth="145.0" />
-      <Button fx:id="drawButton" layoutX="559.0" layoutY="66.0" mnemonicParsing="false" onAction="#drawCard" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="drawButton" />
-      <Button layoutX="744.0" layoutY="66.0" mnemonicParsing="false" onAction="#ready" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="ready" />
-      <Label fx:id="errLabel" layoutX="730.0" layoutY="275.0" prefHeight="47.0" prefWidth="343.0" textFill="#5f007c">
+      <Pane fx:id="cardPane" layoutX="709.0" layoutY="116.0" prefHeight="207.0" prefWidth="126.0" />
+      <Button fx:id="drawButton" layoutX="695.0" layoutY="66.0" mnemonicParsing="false" onAction="#drawCard" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="drawButton" />
+      <Button layoutX="872.0" layoutY="71.0" mnemonicParsing="false" onAction="#ready" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="ready" />
+      <Label fx:id="errLabel" layoutX="672.0" layoutY="314.0" prefHeight="47.0" prefWidth="394.0" textFill="#e9baf8">
          <font>
             <Font name="System Bold" size="23.0" />
          </font>
       </Label>
-      <ImageView fx:id="arrowView0" fitHeight="55.0" fitWidth="56.0" layoutX="43.0" layoutY="432.0" rotate="180.0" visible="false">
+      <ImageView fx:id="arrowView0" fitHeight="55.0" fitWidth="56.0" layoutX="4.0" layoutY="512.0">
          <image>
-            <Image url="@arrow.png" />
+            <Image url="@textures/arrow.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="arrowView1" fitHeight="55.0" fitWidth="56.0" layoutX="43.0" layoutY="472.0" rotate="180.0" visible="false">
+      <ImageView fx:id="arrowView1" fitHeight="55.0" fitWidth="56.0" layoutX="2.0" layoutY="553.0">
          <image>
-            <Image url="@arrow.png" />
+            <Image url="@textures/arrow.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="arrowView2" fitHeight="55.0" fitWidth="56.0" layoutX="44.0" layoutY="513.0" rotate="180.0" visible="false">
+      <ImageView fx:id="arrowView2" fitHeight="55.0" fitWidth="56.0" layoutX="287.0" layoutY="511.0">
          <image>
-            <Image url="@arrow.png" />
+            <Image url="@textures/arrow.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="arrowView3" fitHeight="55.0" fitWidth="56.0" layoutX="45.0" layoutY="552.0" rotate="180.0" visible="false">
+      <ImageView fx:id="arrowView3" fitHeight="55.0" fitWidth="56.0" layoutX="286.0" layoutY="551.0">
          <image>
-            <Image url="@arrow.png" />
+            <Image url="@textures/arrow.png" />
          </image>
       </ImageView>
-      <Pane fx:id="holePane" layoutX="365.0" layoutY="429.0" prefHeight="177.0" prefWidth="218.0" />
-      <Text fx:id="engineText" fill="#14723e" layoutX="541.0" layoutY="365.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00" wrappingWidth="49.0">
+      <Pane fx:id="holePane" layoutX="767.0" layoutY="418.0" prefHeight="105.0" prefWidth="106.0" />
+      <Text fx:id="engineText" fill="#14723e" layoutX="806.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00" wrappingWidth="49.0">
          <font>
             <Font name="System Bold" size="40.0" />
          </font>
       </Text>
-      <Text fx:id="cannonText" fill="#5d1470" layoutX="541.0" layoutY="407.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00" wrappingWidth="49.0">
+      <Text fx:id="cannonText" fill="#7e189a" layoutX="740.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="00" wrappingWidth="49.0">
          <font>
             <Font name="System Bold" size="40.0" />
          </font>
       </Text>
-      <Pane fx:id="cardDataPane" layoutX="755.0" layoutY="115.0" prefHeight="170.0" prefWidth="316.0" />
+      <Pane fx:id="cardDataPane" layoutX="862.0" layoutY="122.0" prefHeight="216.0" prefWidth="199.0" />
       <Text fx:id="cashText" fill="WHITE" layoutX="581.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" wrappingWidth="119.13000106811523">
          <font>
             <Font size="40.0" />
          </font>
       </Text>
-
+      <GridPane fx:id="downGrid" layoutX="60.0" layoutY="443.0" prefHeight="54.0" prefWidth="504.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+      </GridPane>
+      <GridPane fx:id="upGrid" layoutX="62.0" layoutY="23.0" prefHeight="54.0" prefWidth="504.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
+      <GridPane fx:id="leftGrid" layoutX="4.0" layoutY="77.0" prefHeight="365.0" prefWidth="56.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+      </GridPane>
+      <GridPane fx:id="rightGrid" layoutX="566.0" layoutY="81.0" prefHeight="365.0" prefWidth="56.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
 
     </children>
 </AnchorPane>

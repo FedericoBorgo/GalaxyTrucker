@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.tui.asciiui;
 
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.State;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.*;
 import it.polimi.softeng.is25am10.model.cards.*;
@@ -33,7 +34,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     int cash = 0;
     public Tile currentTile = null;
     boolean notReady = true;
-    public Model.State.Type state = Model.State.Type.JOINING;
+    public State.Type state = State.Type.JOINING;
 
     public FlightBoard.Pawn myPawn;
 
@@ -122,7 +123,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     };
 
     Predicate<String> checkAlien = (cmd) -> {
-        if(state != Model.State.Type.ALIEN_INPUT)
+        if(state != State.Type.ALIEN_INPUT)
             return false;
 
         String[] args = cmd.split(" ");
@@ -200,7 +201,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     };
 
     Predicate<String> checkPlace = (cmd) -> {
-        if(!notReady || state != Model.State.Type.BUILDING)
+        if(!notReady || state != State.Type.BUILDING)
             return false;
 
         String[] args = cmd.split(" ");
@@ -228,7 +229,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     Function<String, String> remove = (cmd) -> server.remove(new Coordinate(cmd.charAt(0) - '0', cmd.charAt(1) - '0')).unwrap("rimosso");
 
     Predicate<String> checkRemove = (where) -> {
-        if(state != Model.State.Type.CHECKING)
+        if(state != State.Type.CHECKING)
             return false;
 
         int x = where.charAt(0) - '0';
@@ -243,11 +244,11 @@ public class Game extends UnicastRemoteObject implements Callback {
         return "nessun elemento pescato";
     };
 
-    Predicate<String> checkBook = (cmd) -> state == Model.State.Type.BUILDING;
+    Predicate<String> checkBook = (cmd) -> state == State.Type.BUILDING;
 
     Function<String, String> draw = (cmd) -> {
         Result<?> res;
-        if(state == Model.State.Type.BUILDING){
+        if(state == State.Type.BUILDING){
             res = server.drawTile();
             if(res.isOk()){
                 if(currentTile != null)
@@ -262,9 +263,9 @@ public class Game extends UnicastRemoteObject implements Callback {
     };
 
     Predicate<String> checkDraw = (cmd) -> {
-        if (state == Model.State.Type.BUILDING && notReady)
+        if (state == State.Type.BUILDING && notReady)
             return true;
-        return state == Model.State.Type.DRAW_CARD && flight.getOrder().getFirst() == myPawn;
+        return state == State.Type.DRAW_CARD && flight.getOrder().getFirst() == myPawn;
     };
 
     Function<String, String> ready = (cmd) -> {
@@ -273,11 +274,11 @@ public class Game extends UnicastRemoteObject implements Callback {
         return res.unwrap("ok");
     };
 
-    Predicate<String> checkReady = (cmd) -> state == Model.State.Type.BUILDING;
+    Predicate<String> checkReady = (cmd) -> state == State.Type.BUILDING;
 
     Function<String, String> clock = (cmd) -> server.moveTimer().unwrap("spostato");
 
-    Predicate<String> checkClock = (cmd) -> state == Model.State.Type.BUILDING;
+    Predicate<String> checkClock = (cmd) -> state == State.Type.BUILDING;
 
     Pair<String, String> convert(String cmd){
         int divider = cmd.indexOf(' ');
@@ -422,7 +423,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     Predicate<String> checkSend = (cmd) -> {
         String[] args = cmd.split(" ");
 
-        if(state != Model.State.Type.WAITING_INPUT)
+        if(state != State.Type.WAITING_INPUT)
             return false;
 
         switch(cardData.type){
@@ -462,7 +463,7 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     Function<String, String> quit = (cmd) -> server.quit().unwrap("abbandonato");
 
-    Predicate<String> checkQuit = (cmd) -> state == Model.State.Type.DRAW_CARD;
+    Predicate<String> checkQuit = (cmd) -> state == State.Type.DRAW_CARD;
 
     Function<String, String> placeGoods = (cmd) -> {
         String[] args = cmd.split(" ");
@@ -498,7 +499,7 @@ public class Game extends UnicastRemoteObject implements Callback {
     };
 
     Predicate<String> checkPlaceGoods = (cmd) -> {
-        if(state != Model.State.Type.PLACE_REWARD)
+        if(state != State.Type.PLACE_REWARD)
             return false;
 
         String[] args = cmd.split(" ");
@@ -555,18 +556,18 @@ public class Game extends UnicastRemoteObject implements Callback {
     }
 
     @Override
-    public synchronized void pushState(Model.State.Type state) throws RemoteException {
+    public synchronized void pushState(State.Type state) throws RemoteException {
         this.state = state;
 
-        if(state == Model.State.Type.DRAW_CARD) {
+        if(state == State.Type.DRAW_CARD) {
             frame.clearUnusedSpace();
             frame.clearCardData();
         }
 
-        if(state == Model.State.Type.CHECKING)
+        if(state == State.Type.CHECKING)
             frame.drawErrors(board.getTiles().isOK());
 
-        if(state == Model.State.Type.WAITING_INPUT)
+        if(state == State.Type.WAITING_INPUT)
             frame.clearDestroyed();
 
         frame.drawState();

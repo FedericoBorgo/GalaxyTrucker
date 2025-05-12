@@ -1,8 +1,7 @@
 package it.polimi.softeng.is25am10.gui;
 
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.*;
+import it.polimi.softeng.is25am10.model.boards.AlienBoard;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
@@ -10,22 +9,14 @@ import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.transform.Rotate;
 import javafx.util.Pair;
 
 import java.rmi.RemoteException;
@@ -36,20 +27,23 @@ public class Building implements Callback {
     public ClientInterface server;
 
     int rotation = 0;
+    public int nPlayers = 0;
+
+    public FlightBoard board;
+    public HashMap<String, FlightBoard.Pawn> players;
+    public State.Type state = State.Type.JOINING;
+    public ShipBoard ship = new ShipBoard();
 
     ImageView tileView = null;
     Map<ImageView, Tile> imgToTile = new HashMap<>();
     VBox seenImages = new VBox();
-    public Model.State.Type state = Model.State.Type.JOINING;
 
-    public ShipBoard ship = new ShipBoard();
+    public AtomicBoolean dragSuccess = new AtomicBoolean(false);
 
-    AtomicBoolean dragSuccess = new AtomicBoolean(false);
+    public Result<Coordinate> purple = Result.err();
+    public Result<Coordinate> brown = Result.err();
 
-    Result<Coordinate> purple = Result.err();
-    Result<Coordinate> brown = Result.err();
-
-    Listener listener;
+    public GUIEventListener listener;
 
     @FXML
     GridPane shipPane;
@@ -61,32 +55,28 @@ public class Building implements Callback {
     ScrollPane seenScrollPane;
 
     @FXML
-    ImageView clock1, clock2, clock3;
-    ImageView[] clocks;
+    public ImageView clock1, clock2, clock3;
 
     @FXML
     Label secondsLabel;
 
     @FXML
-    Label stateLabel;
+    public Label stateLabel;
 
     @FXML
     Label nameLabel;
 
     @FXML
-    Label redLabel, blueLabel, yellowLabel, greenLabel;
+    public Label redLabel, blueLabel, yellowLabel, greenLabel;
 
     @FXML
     VBox bookedBox;
 
     @FXML
-    Label buildingLabel;
+    public Label buildingLabel;
 
     @FXML
-    ImageView pAlienView, bAlienView;
-    private int nPlayers = 0;
-    private FlightBoard board;
-    private HashMap<String, FlightBoard.Pawn> players;
+    public ImageView pAlienView, bAlienView;
 
     @FXML
     private void initialize(){
@@ -94,15 +84,6 @@ public class Building implements Callback {
         seenScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         seenScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         seenScrollPane.setContent(seenImages);
-        buildingLabel.setVisible(false);
-
-        //configure clocks
-        clock2.setVisible(false);
-        clock3.setVisible(false);
-        clocks = new ImageView[]{clock1, clock2, clock3};
-
-        pAlienView.setVisible(false);
-        bAlienView.setVisible(false);
 
         //configure drawn tiles
         tileView = new ImageView();
@@ -132,24 +113,14 @@ public class Building implements Callback {
 
         //register the ship placing tile
         shipPane.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
-            event.setDropCompleted(true);
-            event.consume();
-
-            if(!db.hasString())
+            Optional<Pair<Coordinate, String>> opt = Launcher.getCoordinate(event, shipPane, dragSuccess);
+            if(opt.isEmpty())
                 return;
 
-            // get dropped coordinate
-            int col = (int)(event.getX() / (shipPane.getWidth() / 7));
-            int row = (int)(event.getY() / (shipPane.getHeight() / 5));
+            Coordinate c = opt.get().getKey();
 
-            if(Coordinate.isInvalid(col, row))
-                return;
-
-            Coordinate c = new Coordinate(col, row);
-
-            if(state == Model.State.Type.BUILDING){
-                Tile t = new Tile(db.getString());
+            if(state == State.Type.BUILDING){
+                Tile t = new Tile(opt.get().getValue());
                 Tile.Rotation rot = Tile.Rotation.fromInt(rotation);
 
                 if(bookedBox.getChildren().contains(event.getGestureSource()))
@@ -173,53 +144,31 @@ public class Building implements Callback {
                 if(dragSuccess.get())
                     ship.getTiles().setTile(c, t, rot);
             }
-            else if(state == Model.State.Type.ALIEN_INPUT){
+            else if(state == State.Type.ALIEN_INPUT){
                 ImageView view = new ImageView();
                 view.setFitHeight(shipPane.getHeight()/7);
                 view.setFitWidth(shipPane.getHeight()/7);
 
-
-                if(db.getString().equals("p")){
-                    if(!ship.getPurple().cantPlace(c, 1)){
-                        dragSuccess.set(true);
-                        pAlienView.setVisible(false);
-                        purple = Result.ok(c);
-                        view.setImage(getImage("/gui/purple.png"));
-                    }
-                }
-                else if(db.getString().equals("b")){
-                    if(!ship.getBrown().cantPlace(c, 1)){
-                        dragSuccess.set(true);
-                        bAlienView.setVisible(false);
-                        brown = Result.ok(c);
-                        view.setImage(getImage("/gui/purple.png"));
-                    }
-                }
+                if(opt.get().getValue().equals("p"))
+                    ((AlienBoard)ship.getPurple()).placeAlien(this, c, view);
+                else if(opt.get().getValue().equals("b"))
+                    ((AlienBoard)ship.getBrown()).placeAlien(this, c, view);
 
                 if(dragSuccess.get())
-                    shipPane.add(new StackPane(view), col, row);
+                    shipPane.add(new StackPane(view), c.x(), c.y());
             }
         });
 
         new AutoBuilder(this);
     }
 
-    public void config(int players, String name, ClientInterface server, Scene scene){
+    public void config(FlightBoard.Pawn pawn, String name, ClientInterface server, Scene scene){
         this.server = server;
         nameLabel.setText(name);
-        this.nPlayers = players;
 
-        try {
-            listener = new Listener(this);
-            server.join(listener).ifPresent(pawn -> {
-                ImageView view = new ImageView(getCHouse(pawn));
-                view.setFitHeight(shipPane.getHeight()/5);
-                view.setFitWidth(shipPane.getWidth()/7);
-                shipPane.add(view, 3, 2);
-            });
-        } catch (RemoteException e) {
-            throw new RuntimeException("Impossibile connettersi al server", e);
-        }
+        ImageView view = new ImageView(Launcher.getCHouse(pawn));
+        resizeForShip(view);
+        shipPane.add(view, 3, 2);
 
         scene.setOnKeyPressed(event -> {
             if(event.getCode() == KeyCode.A)
@@ -255,7 +204,7 @@ public class Building implements Callback {
             ClipboardContent content = new ClipboardContent();
             content.putString(imgToTile.get(view).toString());
             db.setContent(content);
-            db.setDragView(getRotatedImage(view.getImage(), rotation*90));
+            db.setDragView(Launcher.getRotatedImage(view.getImage(), rotation*90));
             event.consume();
         });
 
@@ -270,21 +219,13 @@ public class Building implements Callback {
             event.consume();
         });
 
-        view.setOnMouseEntered(event -> {view.setCursor(Cursor.OPEN_HAND);});
-        view.setOnMouseExited(event -> {view.setCursor(Cursor.DEFAULT);});
+        view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
+        view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
     }
 
     @FXML
     private void playerReady(){
-        if(state == Model.State.Type.BUILDING)
-            server.setReady().ifPresent(_ -> buildingLabel.setVisible(true));
-        else if(state == Model.State.Type.ALIEN_INPUT){
-            ship.init(purple, brown);
-            server.init(purple, brown).ifPresent(_ -> {
-                buildingLabel.setText("ALIENI ASSEGNATI");
-                buildingLabel.setVisible(true);
-            });
-        }
+        state.ready(this);
     }
 
     @FXML
@@ -300,7 +241,7 @@ public class Building implements Callback {
                 }
             });
 
-            tileView.setImage(getImage(t));
+            tileView.setImage(Launcher.getImage(t));
         });
     }
 
@@ -315,23 +256,10 @@ public class Building implements Callback {
         server.moveTimer();
     }
 
-
     @Override
     public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
-        Platform.runLater(() -> {
-            this.players = players;
-            players.forEach((name, pawn) -> {
-                String text = name + (disconnected.contains(name)? " (disc)" : "")
-                        + (quid.contains(name)? " (abb)" : "");
-
-                switch (pawn){
-                    case YELLOW -> yellowLabel.setText(text);
-                    case GREEN -> greenLabel.setText(text);
-                    case BLUE -> blueLabel.setText(text);
-                    case RED -> redLabel.setText(text);
-                };
-            });
-        });
+        this.players = players;
+        Player.drawPlayers(players, quid, disconnected, yellowLabel, redLabel, blueLabel, greenLabel);
     }
 
     @Override
@@ -341,118 +269,37 @@ public class Building implements Callback {
 
     @Override
     public void pushSecondsLeft(Integer seconds) throws RemoteException {
-        Platform.runLater(() -> {
-            secondsLabel.setText("" +seconds);
-        });
+        secondsLabel.setText("" +seconds);
     }
 
     @Override
-    public void pushState(Model.State.Type state) throws RemoteException {
+    public void pushState(State.Type state) throws RemoteException {
         this.state = state;
-        Platform.runLater(() -> {
-            stateLabel.setText(state.getName());
-
-            if(state == Model.State.Type.ALIEN_INPUT){
-                pAlienView.setVisible(true);
-                bAlienView.setVisible(true);
-
-                pAlienView.setOnDragDetected(event -> {
-                    event.consume();
-                    if(purple.isOk()) {
-                        pAlienView.setOnDragDetected(null);
-                        return;
-                    }
-                    pAlienView.setCursor(Cursor.CLOSED_HAND);
-                    Dragboard db = pAlienView.startDragAndDrop(TransferMode.MOVE);
-                    ClipboardContent content = new ClipboardContent();
-                    content.putString("p");
-                    db.setContent(content);
-                    db.setDragView(getRotatedImage(getImage("/gui/purple.png"), 0));
-                });
-
-                bAlienView.setOnDragDetected(event -> {
-                    event.consume();
-                    if(brown.isOk()) {
-                        bAlienView.setOnDragDetected(null);
-                        return;
-                    }
-                    bAlienView.setCursor(Cursor.CLOSED_HAND);
-                    Dragboard db = bAlienView.startDragAndDrop(TransferMode.MOVE);
-                    ClipboardContent content = new ClipboardContent();
-                    content.putString("b");
-                    db.setContent(content);
-                    db.setDragView(getRotatedImage(getImage("/gui/brown.png"), 0));
-                });
-            }
-            else if(state == Model.State.Type.DRAW_CARD){
-                Pair<CardScene, Scene> handler = Launcher.loadScene("/gui/card.fxml");
-                CardScene cardScene = handler.getKey();
-                cardScene.config(server, listener, board, stateLabel.getText(), ship, players);
-                cardScene.blueLabel.setText(blueLabel.getText());
-                cardScene.redLabel.setText(redLabel.getText());
-                cardScene.greenLabel.setText(greenLabel.getText());
-                cardScene.yellowLabel.setText(yellowLabel.getText());
-            }
-        });
-    }
-
-    @Override
-    public void pushCardData(CardData card) throws RemoteException {
-
-    }
-
-    @Override
-    public void pushCardChanges(CardOutput output) throws RemoteException {
-
-    }
-
-    @Override
-    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
-
+        stateLabel.setText(state.getName());
+        state.apply(this);
     }
 
     @Override
     public void gaveTile(Tile t) throws RemoteException {
-        Platform.runLater(() -> {
-            ImageView tileView = new ImageView(getImage(t));
-
-            register(tileView, t, () -> {
-                if(dragSuccess.get())
-                    seenImages.getChildren().remove(tileView);
-            });
-
-            seenImages.getChildren().add(tileView);
-        });
+        register(t, seenImages);
     }
 
     @Override
     public void gotTile(Tile t) throws RemoteException {
-        Platform.runLater(() -> {
-            Optional<ImageView> opt = imgToTile
-                                        .keySet()
-                                        .stream()
-                                        .filter(e -> imgToTile.get(e).equals(t))
-                                        .findFirst();
-            opt.ifPresent(image -> {
-                seenImages.getChildren().remove(image);
-                imgToTile.remove(image);
-            });
-        });
-    }
-
-    @Override
-    public void pushBoard(ShipBoard board) throws RemoteException {
-
+        imgToTile.keySet()
+                .stream()
+                .filter(e -> imgToTile.get(e).equals(t))
+                .findFirst()
+                .ifPresent(image -> {
+                    seenImages.getChildren().remove(image);
+                    imgToTile.remove(image);
+                });
     }
 
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
         this.board = board;
-        Platform.runLater(() -> {
-            for (ImageView clock : clocks)
-                clock.setVisible(false);
-            clocks[board.getTimer()].setVisible(true);
-        });
+        board.updateClock(this);
     }
 
     @Override
@@ -462,84 +309,48 @@ public class Building implements Callback {
 
     @Override
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
-        Platform.runLater(() -> {
-            ImageView view = new ImageView(getImage(t));
-            view.setFitHeight(shipPane.getHeight() / 5);
-            view.setFitWidth(shipPane.getWidth() / 7);
-            view.setRotate(r.toInt()*90);
-
-            shipPane.add(view, c.x(), c.y());
-        });
+        ImageView view = Launcher.getView(t);
+        resizeForShip(view);
+        view.setRotate(r.toInt()*90);
+        shipPane.add(view, c.x(), c.y());
     }
 
     @Override
     public void bookedTile(Tile t) throws RemoteException {
-        Platform.runLater(() -> {
-            ImageView view = new ImageView(getImage(t));
+        register(t, bookedBox);
+    }
 
-            register(view, t, () -> {
-                if(dragSuccess.get())
-                    bookedBox.getChildren().remove(view);
-            });
+    private void register(Tile t, Pane p){
+        ImageView view = Launcher.getView(t);
 
-            bookedBox.getChildren().add(view);
+        register(view, t, () -> {
+            if(dragSuccess.get())
+                p.getChildren().remove(view);
         });
+
+        p.getChildren().add(view);
     }
+
 
     @Override
-    public void removed(Coordinate c) throws RemoteException {
-
-    }
-
+    public void removed(Coordinate c) throws RemoteException {}
     @Override
-    public void pushDropped(Model.Removed dropped) throws RemoteException {
-
-    }
-
+    public void pushDropped(Model.Removed dropped) throws RemoteException {}
     @Override
-    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
-
-    }
-
+    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {}
     @Override
-    public void pushModel(Model m) throws RemoteException {
+    public void pushModel(Model m) throws RemoteException {}
+    @Override
+    public void pushBoard(ShipBoard board) throws RemoteException {}
+    @Override
+    public void pushCardData(CardData card) throws RemoteException {}
+    @Override
+    public void pushCardChanges(CardOutput output) throws RemoteException {}
+    @Override
+    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {}
 
-    }
-
-    static public Image getRotatedImage(Image original, double angleDegrees) {
-        double size = 30;
-
-        Canvas canvas = new Canvas(size, size);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        gc.save();
-        Rotate r = new Rotate(angleDegrees, size/2, size/2);
-        gc.transform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
-        gc.drawImage(original, 0, 0, size, size);
-        gc.restore();
-
-        WritableImage rotatedImage = new WritableImage((int) size, (int) size);
-        canvas.snapshot(null, rotatedImage);
-
-        return rotatedImage;
-    }
-
-    public static Image getImage(Tile t){
-        return getImage("/tiles/" + t.getType().name() + "/" + t.connectorsToInt() + ".jpg");
-    }
-
-    public static Image getImage(String path){
-        return new Image(Building.class.getResource(path).toExternalForm());
-    }
-
-    public static Image getCHouse(FlightBoard.Pawn p){
-        String path = "/tiles/C_HOUSE/3333_" + switch(p){
-            case YELLOW -> "yellow";
-            case GREEN -> "green";
-            case BLUE -> "blue";
-            case RED -> "red";
-        } + ".jpg";
-
-        return new Image(Building.class.getResource(path).toExternalForm());
+    private void resizeForShip(ImageView view){
+        view.setFitHeight(shipPane.getHeight()/5);
+        view.setFitWidth(shipPane.getWidth()/7);
     }
 }

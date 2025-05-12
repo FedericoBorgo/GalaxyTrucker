@@ -49,30 +49,28 @@ public class Deck extends Card implements Serializable {
         cards.addAll(Epidemic.construct(board));
         cards.addAll(Space.construct(model, board));
         cards.addAll(Planets.construct(board));
+        cards.addAll(AbandonedShip.construct(model, board));
+        cards.addAll(Station.construct(board));
          */
 
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
-        cards.addAll(Space.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+        cards.addAll(Meteors.construct(model, board));
+
 
 /*
         Da testare
 
         cards.addAll(Meteors.construct(model, board));
-        cards.addAll(AbandonedShip.construct(model, board));
-        cards.addAll(Station.construct(board));
-        cards.addAll(Slavers.construct(model,board));
+
         cards.addAll(Smugglers.construct(model,board));
         cards.addAll(Pirates.construct(model,board));
         cards.addAll(Warzone.construct(model,board));*/

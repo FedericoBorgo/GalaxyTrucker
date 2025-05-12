@@ -1,9 +1,6 @@
 package it.polimi.softeng.is25am10.tui.asciiui;
 
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesCollection;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.AlienBoard;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
@@ -116,7 +113,7 @@ public class AutoBuilder {
     }
 
     public static void initGame(Game game){
-        while(game.state != Model.State.Type.BUILDING) {
+        while(game.state != State.Type.BUILDING) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -129,7 +126,7 @@ public class AutoBuilder {
         //game.execute("clessidra");
         //game.execute("clessidra");
 
-        while(game.state != Model.State.Type.ALIEN_INPUT) {
+        while(game.state != State.Type.ALIEN_INPUT) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -139,7 +136,7 @@ public class AutoBuilder {
 
         placeAlien(game);
 
-        while(game.state == Model.State.Type.ALIEN_INPUT) {
+        while(game.state == State.Type.ALIEN_INPUT) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -147,7 +144,7 @@ public class AutoBuilder {
             }
         }
 
-        while(game.state == Model.State.Type.WAITING_INPUT) {
+        while(game.state == State.Type.WAITING_INPUT) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

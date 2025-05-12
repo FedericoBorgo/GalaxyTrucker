@@ -4,11 +4,10 @@ import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
 import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import javafx.scene.control.Label;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Stores all the information of the single player, associating it with a pawn and the nickname.
@@ -114,5 +113,20 @@ public class Player implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
         return cash == player.cash && pawn == player.pawn && Objects.equals(board, player.board) && Objects.equals(goodsReward, player.goodsReward) && Objects.equals(name, player.name);
+    }
+
+    static public void drawPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected,
+                                   Label yellowLabel, Label redLabel, Label blueLabel, Label greenLabel) {
+        players.forEach((name, pawn) -> {
+            String text = name + (disconnected.contains(name)? " (disc)" : "")
+                    + (quid.contains(name)? " (abb)" : "");
+
+            switch (pawn){
+                case YELLOW -> yellowLabel.setText(text);
+                case GREEN -> greenLabel.setText(text);
+                case BLUE -> blueLabel.setText(text);
+                case RED -> redLabel.setText(text);
+            };
+        });
     }
 }

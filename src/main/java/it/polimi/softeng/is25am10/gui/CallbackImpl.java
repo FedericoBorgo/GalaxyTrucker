@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.State;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -36,7 +37,7 @@ public class CallbackImpl implements Callback, Serializable {
     public void pushSecondsLeft(Integer seconds) throws RemoteException {}
 
     @Override
-    public void pushState(Model.State.Type state) throws RemoteException {
+    public void pushState(State.Type state) throws RemoteException {
         System.out.println("Stato gioco: " + state);
     }
 

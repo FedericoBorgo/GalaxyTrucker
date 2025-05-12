@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.gui;
 
+import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
@@ -55,7 +56,11 @@ public class Login {
                 server = new SocketClient(name, address, port1, port2);
 
             Pair<Building, Scene> handler = Launcher.loadScene("/gui/building.fxml");
-            handler.getKey().config(players, name, server, handler.getValue());
+            Building building = handler.getKey();
+            building.nPlayers = players;
+            building.listener = new GUIEventListener(building);
+            FlightBoard.Pawn pawn = server.join(building.listener).getData();
+            building.config(pawn, name, server, handler.getValue());
         }catch (Exception _){
             errLabel.setText("Impossibile connettersi al server");
             errLabel.setAlignment(Pos.CENTER);

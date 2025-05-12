@@ -15,7 +15,7 @@
    <children>
       <ImageView fitHeight="729.0" fitWidth="1080.0" preserveRatio="true">
          <image>
-            <Image url="@login.png" />
+            <Image url="@textures/login.png" />
          </image>
       </ImageView>
       <Button layoutX="703.0" layoutY="434.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="60.0" prefWidth="177.0" text="Button" />

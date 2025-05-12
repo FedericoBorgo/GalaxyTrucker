@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10;
 
 import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
+import it.polimi.softeng.is25am10.model.State;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -26,7 +27,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.jar.Attributes;
 
 /**
  * This class gives an interface between the model and the view. It shows available methods to the clients
@@ -54,7 +54,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     /**
      * Method to call when the game state changed.
      */
-    private transient BiConsumer<Model, Model.State.Type> stateEvent;
+    private transient BiConsumer<Model, State.Type> stateEvent;
 
     ///  starting game
     private Model starting = null;
@@ -96,15 +96,15 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             pushFlight(m);
             pushPlayers(m);
 
-            if(state == Model.State.Type.DRAW_CARD) {
+            if(state == State.Type.DRAW_CARD) {
                 pushDropped(m);
                 pushCannons(m);
             }
 
-            if(state == Model.State.Type.BUILDING)
+            if(state == State.Type.BUILDING)
                 starting = null;
 
-            if(state == Model.State.Type.PAY_DEBT)
+            if(state == State.Type.PAY_DEBT)
                 pushDropped(m);
         };
     }
@@ -150,7 +150,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             @Override
             public void run() {
                 games.values().forEach(m -> {
-                    if(m.getState() == Model.State.Type.BUILDING)
+                    if(m.getState() == State.Type.BUILDING)
                         pushSecondsLeft(m);
                 });
             }
@@ -204,7 +204,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             m.removeIgnore(name);
 
             if(m.nPlayers - disconnected.get(m).size() >= 2
-                    && m.getState() == Model.State.Type.PAUSED)
+                    && m.getState() == State.Type.PAUSED)
                 m.resume();
 
         } catch (RemoteException e) {
@@ -433,15 +433,15 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     private void handleAutomaticInput(){
         games.values().forEach(m -> {
             disconnected.get(m).forEach(name -> {
-                if (m.getState() == Model.State.Type.ALIEN_INPUT) {
+                if (m.getState() == State.Type.ALIEN_INPUT) {
                     if (m.init(name, Optional.empty(), Optional.empty()).isOk())
                         Logger.playerLog(m.hashCode(), name, "player unreachable, setting default aliens");
-                } else if (m.getState() == Model.State.Type.WAITING_INPUT &&
+                } else if (m.getState() == State.Type.WAITING_INPUT &&
                         name.equals(m.getNextToPlay())) {
                     Logger.playerLog(m.hashCode(), name, "player unreachable, setting default card input");
                     setInput(name, CardInput.disconnected());
                 }
-                else if(m.getState() == Model.State.Type.DRAW_CARD &&
+                else if(m.getState() == State.Type.DRAW_CARD &&
                         m.getFlight().getOrder().getFirst().equals(m.getPlayers().get(name))) {
                     drawCard(name);
                 }

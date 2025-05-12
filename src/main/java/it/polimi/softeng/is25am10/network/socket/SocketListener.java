@@ -3,6 +3,7 @@ package it.polimi.softeng.is25am10.network.socket;
 import it.polimi.softeng.is25am10.Controller;
 import it.polimi.softeng.is25am10.Logger;
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.State;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -22,8 +23,6 @@ import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -158,7 +157,7 @@ class EventInvoker implements Callback {
     }
 
     @Override
-    public void pushState(Model.State.Type state) {
+    public void pushState(State.Type state) {
         call(state);
     }
 

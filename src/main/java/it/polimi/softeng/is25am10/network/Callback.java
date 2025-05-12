@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.network;
 
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.State;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -12,8 +13,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public interface Callback extends Remote {
     void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException;
@@ -22,7 +21,7 @@ public interface Callback extends Remote {
 
     void pushSecondsLeft(Integer seconds) throws RemoteException;
 
-    void pushState(Model.State.Type state) throws RemoteException;
+    void pushState(State.Type state) throws RemoteException;
 
     void pushCardData(CardData card) throws RemoteException;
 

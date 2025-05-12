@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.tui;
 
 import it.polimi.softeng.is25am10.model.Model;
+import it.polimi.softeng.is25am10.model.State;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
@@ -9,12 +10,9 @@ import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class PlaceholderCallback implements Callback {
 
@@ -34,7 +32,7 @@ public class PlaceholderCallback implements Callback {
     }
 
     @Override
-    public void pushState(Model.State.Type state) throws RemoteException {
+    public void pushState(State.Type state) throws RemoteException {
 
     }
 

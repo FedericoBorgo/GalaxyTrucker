@@ -1,9 +1,13 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 import com.googlecode.lanterna.TextColor;
+import it.polimi.softeng.is25am10.gui.Building;
+import it.polimi.softeng.is25am10.gui.Launcher;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
+import javafx.scene.image.ImageView;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,5 +89,22 @@ public class AlienBoard extends ElementsBoard{
      */
     public TextColor.ANSI getColor(){
         return type == Tile.Type.B_ADDON ? TextColor.ANSI.YELLOW : TextColor.ANSI.MAGENTA;
+    }
+
+    public void placeAlien(Building b, Coordinate c, ImageView view){
+        if(!cantPlace(c, 1)){
+            b.dragSuccess.set(true);
+
+            if(type == Tile.Type.P_ADDON){
+                b.pAlienView.setVisible(false);
+                b.purple = Result.ok(c);
+                view.setImage(Launcher.getImage("/gui/textures/purple.png"));
+            }
+            else{
+                b.bAlienView.setVisible(false);
+                b.brown = Result.ok(c);
+                view.setImage(Launcher.getImage("/gui/textures/brown.png"));
+            }
+        }
     }
 }

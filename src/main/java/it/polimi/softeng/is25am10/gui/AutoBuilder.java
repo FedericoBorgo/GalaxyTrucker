@@ -1,16 +1,10 @@
 package it.polimi.softeng.is25am10.gui;
 
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.Tile;
-import it.polimi.softeng.is25am10.model.TilesCollection;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.AlienBoard;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.TilesBoard;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static it.polimi.softeng.is25am10.tui.asciiui.AutoBuilder.*;
@@ -27,7 +21,7 @@ public class AutoBuilder extends Thread{
 
     @Override
     public void run() {
-        while(building.state != Model.State.Type.BUILDING) {
+        while(building.state != it.polimi.softeng.is25am10.model.State.Type.BUILDING) {
             try {
                 sleep(1000);
             } catch (InterruptedException e) {
@@ -52,7 +46,7 @@ public class AutoBuilder extends Thread{
 
         building.server.setReady();
 
-        while(building.state != Model.State.Type.ALIEN_INPUT) {
+        while(building.state != it.polimi.softeng.is25am10.model.State.Type.ALIEN_INPUT) {
             try {
                 sleep(1000);
             } catch (InterruptedException e) {

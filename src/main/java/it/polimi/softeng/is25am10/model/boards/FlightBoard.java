@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 import com.googlecode.lanterna.TextColor;
+import it.polimi.softeng.is25am10.gui.Building;
 import javafx.scene.paint.Color;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -213,5 +214,17 @@ public class FlightBoard implements Serializable {
     public void set(List<Pawn> order, List<Integer> offset){
         this.order = order;
         this.offset = offset;
+    }
+
+    public void updateClock(Building b) {
+        b.clock1.setVisible(false);
+        b.clock2.setVisible(false);
+        b.clock3.setVisible(false);
+
+        switch (timer){
+            case 0 -> b.clock1.setVisible(true);
+            case 1 -> b.clock2.setVisible(true);
+            case 2 -> b.clock3.setVisible(true);
+        };
     }
 }
