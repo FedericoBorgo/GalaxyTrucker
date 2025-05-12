@@ -1,7 +1,18 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.gui.CardScene;
+import it.polimi.softeng.is25am10.gui.Launcher;
 import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitMenuButton;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -113,5 +124,108 @@ public class CardData implements Serializable {
         }
 
         return builder.toString();
+    }
+
+    public VBox handle(CardScene s){
+        VBox vBox = new VBox();
+
+        switch(type){
+            case OPEN_SPACE:
+                declaredPower.forEach((p, v) -> {
+                    Text label = new Text(p + ": " + v);
+                    label.setFill(Color.web("#14723e"));
+                    label.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+                    vBox.getChildren().add(label);
+                });
+                break;
+            case PLANETS:
+                SplitMenuButton splitMenuButton = new SplitMenuButton();
+                splitMenuButton.setPrefWidth(s.cardDataPane.getWidth()/2);
+                splitMenuButton.setText(Planets.Planet.NOPLANET.name());
+
+                planets.forEach((p, _) -> {
+                    if(chosenPlanets.contains(p))
+                        return;
+
+                    MenuItem item = new MenuItem("" + p);
+                    splitMenuButton.getItems().add(item);
+                    item.setOnAction(_ -> {
+                        s.cardInput.planet = p;
+                        splitMenuButton.setText(p.name());
+                    });
+                });
+
+                MenuItem item = new MenuItem(Planets.Planet.NOPLANET.name());
+                item.setOnAction(_ -> {
+                    s.cardInput.planet = Planets.Planet.NOPLANET;
+                    splitMenuButton.setText(Planets.Planet.NOPLANET.name());
+                });
+                splitMenuButton.getItems().add(item);
+
+                vBox.getChildren().add(splitMenuButton);
+                break;
+            case STATION:
+            case AB_SHIP:
+                CheckBox checkBox = new CheckBox();
+                Text text = new Text("Accettare ricompensa?");
+
+                text.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+                text.setFill(Color.WHITE);
+
+                checkBox.setSelected(false);
+                checkBox.setMinSize(s.cardDataPane.getHeight()/7, s.cardDataPane.getHeight()/7);
+                checkBox.setOnAction(event -> {
+                    s.cardInput.accept = checkBox.isSelected();
+                    event.consume();
+                });
+                vBox.getChildren().add(text);
+                vBox.getChildren().add(checkBox);
+                break;
+            case METEORS:
+                projectiles.forEach(p -> {
+                    ImageView view = new ImageView(Launcher.getImage("/gui/textures/asteroid/" + p.type().name().toLowerCase() + ".png"));
+                    view.setRotate(switch(p.side()){
+                        case UP -> 0;
+                        case RIGHT -> 90;
+                        case DOWN -> 180;
+                        case LEFT -> 270;
+                    });
+
+                    switch(p.side()){
+                        case UP -> {
+                            if(p.where() < 4 || p.where() > 10)
+                                break;
+                            view.setFitHeight(s.upGrid.getHeight());
+                            view.setFitWidth(s.upGrid.getWidth()/7);
+                            s.upGrid.add(view, p.where()-4, 0);
+                        }
+                        case RIGHT -> {
+                            if(p.where() < 5 || p.where() > 9)
+                                break;
+                            view.setFitHeight(s.leftGrid.getHeight()/5);
+                            view.setFitWidth(s.leftGrid.getWidth());
+                            s.rightGrid.add(view, 0, p.where()-5);
+                        }
+                        case DOWN -> {
+                            if(p.where() < 4 || p.where() > 10)
+                                break;
+                            view.setFitHeight(s.upGrid.getHeight());
+                            view.setFitWidth(s.upGrid.getWidth()/7);
+                            s.downGrid.add(view, p.where()-4, 0);
+                        }
+                        case LEFT -> {
+                            if(p.where() < 5 || p.where() > 9)
+                                break;
+                            view.setFitHeight(s.leftGrid.getHeight()/5);
+                            view.setFitWidth(s.leftGrid.getWidth());
+                            s.leftGrid.add(view, 0, p.where()-5);
+                        }
+                    }
+                });
+
+                break;
+        };
+
+        return vBox;
     }
 }

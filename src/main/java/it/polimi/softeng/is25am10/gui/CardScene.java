@@ -1,9 +1,6 @@
 package it.polimi.softeng.is25am10.gui;
 
-import it.polimi.softeng.is25am10.model.Model;
-import it.polimi.softeng.is25am10.model.Result;
-import it.polimi.softeng.is25am10.model.State;
-import it.polimi.softeng.is25am10.model.Tile;
+import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.*;
 import it.polimi.softeng.is25am10.model.cards.*;
 import it.polimi.softeng.is25am10.network.Callback;
@@ -35,8 +32,8 @@ public class CardScene implements Callback {
     ClientInterface server;
     State.Type state;
     HashMap<String, FlightBoard.Pawn> players;
-    CardInput cardInput = new CardInput();
-    AtomicBoolean dragSuccess = new AtomicBoolean(false);
+    public CardInput cardInput = new CardInput();
+    public AtomicBoolean dragSuccess = new AtomicBoolean(false);
     CardData cardData = null;
 
     @FXML
@@ -53,27 +50,33 @@ public class CardScene implements Callback {
     Pane posPane0, posPane1, posPane2, posPane3, posPane4, posPane5, posPane6, posPane7, posPane8,
             posPane9, posPane10, posPane11, posPane12, posPane13, posPane14, posPane15, posPane16,
             posPane17, posPane18, posPane19, posPane20, posPane21, posPane22, posPane23;
-    Pane[] posPanes;
+    public Pane[] posPanes;
 
     @FXML
-    GridPane shipPane;
+    public GridPane shipPane;
 
     @FXML
     Label errLabel;
 
     @FXML
-    Text shipFixText;
+    public Text shipFixText;
 
     @FXML
     ImageView arrowView0, arrowView1, arrowView2, arrowView3;
 
     @FXML
-    GridPane downGrid, upGrid, leftGrid, rightGrid;
+    public GridPane downGrid;
+    @FXML
+    public GridPane upGrid;
+    @FXML
+    public GridPane leftGrid;
+    @FXML
+    public GridPane rightGrid;
 
-    Map<Coordinate, ImageView> images = new HashMap<>();
-    Map<Rectangle, StackPane> rectangles = new HashMap<>();
+    public Map<Coordinate, ImageView> images = new HashMap<>();
+    public Map<Rectangle, StackPane> rectangles = new HashMap<>();
     Text[][] counters = new Text[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
-    StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+    public StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
     Map<Coordinate, List<Pos>> freeContainers = new HashMap<>();
     @FXML
     Pane holePane;
@@ -82,10 +85,10 @@ public class CardScene implements Callback {
     Text engineText, cannonText;
 
     @FXML
-    Pane cardDataPane;
+    public Pane cardDataPane;
 
     @FXML
-    Text cashText;
+    public Text cashText;
 
     @FXML
     void initialize() {
@@ -123,7 +126,7 @@ public class CardScene implements Callback {
         this.server = server;
         this.players = players;
         listener.setCallback(this);
-        updatePos(flight);
+        flight.drawPos(this);
         updateNextTurn(flight.getOrder().getFirst());
         stateLabel.setText(state);
         nameLabel.setText(server.getPlayerName());
@@ -254,27 +257,13 @@ public class CardScene implements Callback {
         });
 
         shipPane.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
-            event.setDropCompleted(true);
-            event.consume();
+            Optional<Pair<Coordinate, String>> opt = Launcher.getCoordinate(event, shipPane, dragSuccess);
 
-            if (!db.hasString())
+            if(opt.isEmpty() || cardData == null)
                 return;
 
-            // get dropped coordinate
-            int col = (int) (event.getX() / (shipPane.getWidth() / 7));
-            int row = (int) (event.getY() / (shipPane.getHeight() / 5));
-
-            if (Coordinate.isInvalid(col, row))
-                return;
-
-            Coordinate c = new Coordinate(col, row);
-            dragSuccess.set(false);
-
-            if(cardData == null)
-                return;
-
-            String content = db.getString();
+            Coordinate c = opt.get().getKey();
+            String content = opt.get().getValue();
 
             if(this.state == State.Type.WAITING_INPUT){
                 if(content.contains("battery")){
@@ -316,11 +305,11 @@ public class CardScene implements Callback {
                     StackPane.setAlignment(view, pos);
                 });
             }
-            });
+        });
 
     }
 
-    void removeOne(Coordinate c){
+    public void removeOne(Coordinate c){
         int val = counters[c.x()][c.y()].getText().charAt(0) - '0';
         val--;
 
@@ -330,332 +319,76 @@ public class CardScene implements Callback {
             counters[c.x()][c.y()].setText(val + "x");
     }
 
-    void updatePos(FlightBoard board){
-        int pos = board.getLeaderPosition()%24;
-        List<FlightBoard.Pawn> order = board.getOrder();
-        List<Integer> offset = board.getOffset();
-        FlightBoard.Pawn pawn;
-
-        for(Pane pane : posPanes)
-            pane.getChildren().clear();
-
-        for (int i = 0; i < order.size(); i++) {
-            pawn = order.get(i);
-            posPanes[pos].getChildren().add(new StackPane(new Circle(10, pawn.toColor())));
-
-            if(i < offset.size()-1)
-                pos = board.getLeaderPosition()%24 + offset.get(i+1);
-
-            if(pos < 0)
-                pos = 23 + pos;
-        }
-    }
 
     @Override
     public void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
-        Platform.runLater(() -> {
-            this.players = players;
-            players.forEach((name, pawn) -> {
-                String text = name + (disconnected.contains(name)? " (disc)" : "")
-                        + (quid.contains(name)? " (abb)" : "");
-
-                switch (pawn){
-                    case YELLOW -> yellowLabel.setText(text);
-                    case GREEN -> greenLabel.setText(text);
-                    case BLUE -> blueLabel.setText(text);
-                    case RED -> redLabel.setText(text);
-                };
-            });
-        });
+        this.players = players;
+        Player.drawPlayers(players, quid, disconnected, yellowLabel, redLabel, blueLabel, greenLabel);
     }
 
-    @Override
-    public int askHowManyPlayers() throws RemoteException {
-        return 4;
-    }
-
-    @Override
-    public void pushSecondsLeft(Integer seconds) throws RemoteException {
-
-    }
 
     @Override
     public void pushState(State.Type state) throws RemoteException {
         this.state = state;
-
-        Platform.runLater(() -> {
-            stateLabel.setText(state.getName());
-
-            if(state == State.Type.CHECKING){
-                for (StackPane[] stackPane : stackPanes)
-                    for (StackPane pane : stackPane)
-                        if(pane != null)
-                            pane.setVisible(false);
-
-                images.forEach((c, view) -> {
-                    view.setOnDragDetected(event -> {
-                        if(view.getImage() == null)
-                            return;
-
-                        view.setCursor(Cursor.CLOSED_HAND);
-
-                        Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
-                        ClipboardContent content = new ClipboardContent();
-                        content.putString(c.toString());
-                        db.setContent(content);
-                        db.setDragView(Launcher.getRotatedImage(view.getImage(), 0));
-                        event.consume();
-                    });
-
-                    view.setOnDragDone(event -> {
-                        event.consume();
-                        if(!dragSuccess.get())
-                            return;
-                        shipPane.getChildren().remove(stackPanes[c.x()][c.y()]);
-                        shipPane.getChildren().remove(view);
-                    });
-
-                    view.setOnMousePressed(event -> {
-                        view.setCursor(Cursor.CLOSED_HAND);
-                        event.consume();
-                    });
-
-                    view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
-                    view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
-                });
-
-                drawErrors();
-            }
-        });
+        stateLabel.setText(state.getName());
+        state.apply(this);
     }
 
-    void drawErrors(){
-        Set<Coordinate> res = server.getShip().getTiles().isOK();
-
-        rectangles.forEach((r, p) -> p.getChildren().remove(r));
-
-        if(res.isEmpty()){
-            for (StackPane[] stackPane : stackPanes)
-                for (StackPane pane : stackPane)
-                    if(pane != null)
-                        pane.setVisible(true);
-            shipFixText.setVisible(false);
-            return;
-        }
-
-        if(res.contains(new Coordinate(0, 0))){
-            shipFixText.setVisible(true);
-            return;
-        }
-
-        res.forEach(c -> {
-            Rectangle rect = new Rectangle(shipPane.getWidth()/7, shipPane.getHeight()/5);
-            rect.setFill(Color.web("rgb(255, 0, 0)", 0.3));
-            rect.setStroke(Color.RED);
-            rect.setStrokeWidth(1);
-            stackPanes[c.x()][c.y()].getChildren().add(rect);
-            rectangles.put(rect, stackPanes[c.x()][c.y()]);
-        });
+    public void drawErrors(){
+        server.getShip().getTiles().drawErrors(this);
     }
 
     @Override
     public void pushCardData(CardData card) throws RemoteException {
         this.cardData = card;
-        Platform.runLater(() -> {
-            engineText.setText(String.valueOf(server.getEnginePower(server.getPlayerName())));
-            cannonText.setText(String.valueOf((int)server.getCannonPower(server.getPlayerName())));
+        engineText.setText(String.valueOf(server.getEnginePower(server.getPlayerName())));
+        cannonText.setText(String.valueOf((int)server.getCannonPower(server.getPlayerName())));
 
-            Image img = Launcher.getImage("/cards/" + card.type.name()+ "/" + card.id + ".jpg");
-            ImageView imgView = new ImageView(img);
-            imgView.setFitHeight(cardPane.getHeight());
-            imgView.setFitWidth(cardPane.getWidth());
-            cardPane.getChildren().add(imgView);
-            cardDataPane.getChildren().clear();
-            VBox vBox = new VBox();
+        Image img = Launcher.getImage("/cards/" + card.type.name()+ "/" + card.id + ".jpg");
+        ImageView imgView = new ImageView(img);
+        imgView.setFitHeight(cardPane.getHeight());
+        imgView.setFitWidth(cardPane.getWidth());
+        cardPane.getChildren().add(imgView);
+        cardDataPane.getChildren().clear();
 
-            switch(card.type){
-                case OPEN_SPACE:
-                    card.declaredPower.forEach((p, v) -> {
-                        Text label = new Text(p + ": " + v);
-                        label.setFill(Color.web("#14723e"));
-                        label.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-                        vBox.getChildren().add(label);
-                    });
-                    break;
-                case PLANETS:
-                    SplitMenuButton splitMenuButton = new SplitMenuButton();
-                    splitMenuButton.setPrefWidth(cardDataPane.getWidth()/2);
-                    splitMenuButton.setText(Planets.Planet.NOPLANET.name());
-
-                    card.planets.forEach((p, _) -> {
-                        if(card.chosenPlanets.contains(p))
-                            return;
-
-                        MenuItem item = new MenuItem("" + p);
-                        splitMenuButton.getItems().add(item);
-                        item.setOnAction(_ -> {
-                            cardInput.planet = p;
-                            splitMenuButton.setText(p.name());
-                        });
-                    });
-
-                    MenuItem item = new MenuItem(Planets.Planet.NOPLANET.name());
-                    item.setOnAction(_ -> {
-                        cardInput.planet = Planets.Planet.NOPLANET;
-                        splitMenuButton.setText(Planets.Planet.NOPLANET.name());
-                    });
-                    splitMenuButton.getItems().add(item);
-
-                    vBox.getChildren().add(splitMenuButton);
-                    break;
-                case STATION:
-                case AB_SHIP:
-                    CheckBox checkBox = new CheckBox();
-                    Text text = new Text("Accettare ricompensa?");
-
-                    text.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-                    text.setFill(Color.WHITE);
-
-                    checkBox.setSelected(false);
-                    checkBox.setMinSize(cardDataPane.getHeight()/7, cardDataPane.getHeight()/7);
-                    checkBox.setOnAction(event -> {
-                        cardInput.accept = checkBox.isSelected();
-                        event.consume();
-                    });
-                    vBox.getChildren().add(text);
-                    vBox.getChildren().add(checkBox);
-                    break;
-                case METEORS:
-                    cardData.projectiles.forEach(p -> {
-                        ImageView view = new ImageView(Launcher.getImage("/gui/textures/asteroid/" + p.type().name().toLowerCase() + ".png"));
-                        view.setRotate(switch(p.side()){
-                            case UP -> 0;
-                            case RIGHT -> 90;
-                            case DOWN -> 180;
-                            case LEFT -> 270;
-                        });
-
-
-                        switch(p.side()){
-                            case UP -> {
-                                if(p.where() < 4 || p.where() > 10)
-                                    break;
-                                view.setFitHeight(upGrid.getHeight());
-                                view.setFitWidth(upGrid.getWidth()/7);
-                                upGrid.add(view, p.where()-4, 0);
-                            }
-                            case RIGHT -> {
-                                if(p.where() < 5 || p.where() > 9)
-                                    break;
-                                view.setFitHeight(leftGrid.getHeight()/5);
-                                view.setFitWidth(leftGrid.getWidth());
-                                rightGrid.add(view, 0, p.where()-5);
-                            }
-                            case DOWN -> {
-                                if(p.where() < 4 || p.where() > 10)
-                                    break;
-                                view.setFitHeight(upGrid.getHeight());
-                                view.setFitWidth(upGrid.getWidth()/7);
-                                downGrid.add(view, p.where()-4, 0);
-                            }
-                            case LEFT -> {
-                                if(p.where() < 5 || p.where() > 9)
-                                    break;
-                                view.setFitHeight(leftGrid.getHeight()/5);
-                                view.setFitWidth(leftGrid.getWidth());
-                                leftGrid.add(view, 0, p.where()-5);
-                            }
-                        }
-                    });
-
-                    break;
-            };
-
-            cardDataPane.getChildren().add(vBox);
-        });
+        cardDataPane.getChildren().add(card.handle(this));
     }
 
     @Override
     public void pushCardChanges(CardOutput output) throws RemoteException {
         cardInput = new CardInput();
-        Platform.runLater(() -> {
-            errLabel.setText("");
-            cardPane.getChildren().clear();
-            cardDataPane.getChildren().clear();
+        errLabel.setText("");
+        cardPane.getChildren().clear();
+        cardDataPane.getChildren().clear();
 
-            upGrid.getChildren().clear();
-            leftGrid.getChildren().clear();
-            rightGrid.getChildren().clear();
-            downGrid.getChildren().clear();
+        upGrid.getChildren().clear();
+        leftGrid.getChildren().clear();
+        rightGrid.getChildren().clear();
+        downGrid.getChildren().clear();
 
-            rectangles.forEach((r, p) -> {
-                p.getChildren().remove(r);
-            });
-
-            rectangles.clear();
-
-            if(output.cash.containsKey(server.getPlayerName())){
-                int cash = output.cash.get(server.getPlayerName());
-                cash += Integer.parseInt(cashText.getText());
-                cashText.setText(String.valueOf(cash));
-            }
-
-            if(output.killedCrew.containsKey(server.getPlayerName()))
-                output.killedCrew.get(server.getPlayerName()).forEach(this::removeOne);
-
-            if(output.rewards.containsKey(server.getPlayerName())){
-                VBox vBox = new VBox();
-                output.rewards.get(server.getPlayerName()).forEach(r -> {
-                    ImageView view = new ImageView(Launcher.getImage("/gui/textures/" + r.name().toLowerCase() + ".png"));
-                    vBox.getChildren().add(view);
-
-                    view.setOnDragDetected(event -> {
-                        if(view.getImage() == null)
-                            return;
-
-                        view.setCursor(Cursor.CLOSED_HAND);
-
-                        Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
-                        ClipboardContent content = new ClipboardContent();
-                        content.putString(r.name());
-                        db.setContent(content);
-                        db.setDragView(Launcher.getRotatedImage(view.getImage(), 0));
-                        event.consume();
-                    });
-
-                    view.setOnDragDone(event -> {
-                        event.consume();
-                        if(!dragSuccess.get())
-                            return;
-                        dragSuccess.set(false);
-                        vBox.getChildren().remove(view);
-                    });
-
-                    view.setOnMousePressed(event -> {
-                        view.setCursor(Cursor.CLOSED_HAND);
-                        event.consume();
-                    });
-
-                    view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
-                    view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
-
-                });
-                cardDataPane.getChildren().add(vBox);
-            }
-
-            if(output.removed.containsKey(server.getPlayerName())){
-                output.removed.get(server.getPlayerName()).forEach(c -> {
-                    shipPane.getChildren().removeIf(node -> {
-                        int nodeCol = GridPane.getColumnIndex(node) == null ? 0 : GridPane.getColumnIndex(node);
-                        int nodeRow = GridPane.getRowIndex(node) == null ? 0 : GridPane.getRowIndex(node);
-                        return nodeCol == c.x() && nodeRow == c.y();
-                    });
-                });
-            }
+        rectangles.forEach((r, p) -> {
+            p.getChildren().remove(r);
         });
+
+        rectangles.clear();
+        output.handleChanges(this, server.getPlayerName());
+    }
+
+    @Override
+    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
+        updateNextTurn(pawn);
+    }
+
+    @Override
+    public void pushFlight(FlightBoard board) throws RemoteException {
+        board.drawPos(this);
+        updateNextTurn(board.getOrder().getFirst());
     }
 
     private void updateNextTurn(FlightBoard.Pawn pawn){
+        if(pawn == null)
+            return;
+
         arrowView0.setVisible(false);
         arrowView1.setVisible(false);
         arrowView2.setVisible(false);
@@ -670,70 +403,30 @@ public class CardScene implements Callback {
     }
 
     @Override
-    public void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
-        Platform.runLater(() -> {
-            updateNextTurn(pawn);
-        });
-    }
-
-    @Override
-    public void gaveTile(Tile t) throws RemoteException {
-
-    }
-
-    @Override
-    public void gotTile(Tile t) throws RemoteException {
-
-    }
-
-    @Override
-    public void pushBoard(ShipBoard board) throws RemoteException {
-
-    }
-
-    @Override
-    public void pushFlight(FlightBoard board) throws RemoteException {
-        Platform.runLater(() -> {
-            updatePos(board);
-            List<FlightBoard.Pawn> order = board.getOrder();
-
-            if(!order.isEmpty())
-                updateNextTurn(order.getFirst());
-        });
-    }
-
-    @Override
     public int ping() throws RemoteException {
         return 0;
     }
 
     @Override
-    public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
-
-    }
-
+    public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {}
     @Override
-    public void bookedTile(Tile t) throws RemoteException {
-
-    }
-
+    public void bookedTile(Tile t) throws RemoteException {}
     @Override
-    public void removed(Coordinate c) throws RemoteException {
-
-    }
-
+    public void removed(Coordinate c) throws RemoteException {}
     @Override
-    public void pushDropped(Model.Removed dropped) throws RemoteException {
-
-    }
-
+    public void pushDropped(Model.Removed dropped) throws RemoteException {}
     @Override
-    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
-
-    }
-
+    public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {}
     @Override
-    public void pushModel(Model m) throws RemoteException {
-
-    }
+    public void pushModel(Model m) throws RemoteException {}
+    @Override
+    public void gaveTile(Tile t) throws RemoteException {}
+    @Override
+    public void gotTile(Tile t) throws RemoteException {}
+    @Override
+    public void pushBoard(ShipBoard board) throws RemoteException {}
+    @Override
+    public int askHowManyPlayers() throws RemoteException {return 4;}
+    @Override
+    public void pushSecondsLeft(Integer seconds) throws RemoteException {}
 }

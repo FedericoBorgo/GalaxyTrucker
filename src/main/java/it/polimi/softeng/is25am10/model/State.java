@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.StackPane;
 import javafx.util.Pair;
 
 import java.io.Serializable;
@@ -59,10 +60,10 @@ public class State implements Serializable {
             };
         }
 
-        private void registerAlien(ImageView view, Result<Coordinate> pos, String clip, String texture){
+        private void registerAlien(ImageView view, Result<Coordinate> pos, String clip, String texture) {
             view.setOnDragDetected(event -> {
                 event.consume();
-                if(pos.isOk()) {
+                if (pos.isOk()) {
                     view.setOnDragDetected(null);
                     return;
                 }
@@ -75,14 +76,14 @@ public class State implements Serializable {
             });
         }
 
-        public void apply(Building b){
-            if(this == State.Type.ALIEN_INPUT){
-                b.pAlienView.setVisible(true); b.bAlienView.setVisible(true);
+        public void apply(Building b) {
+            if (this == State.Type.ALIEN_INPUT) {
+                b.pAlienView.setVisible(true);
+                b.bAlienView.setVisible(true);
 
                 registerAlien(b.pAlienView, b.purple, "p", "purple");
                 registerAlien(b.bAlienView, b.brown, "b", "brown");
-            }
-            else if(this == State.Type.DRAW_CARD){
+            } else if (this == State.Type.DRAW_CARD) {
                 Pair<CardScene, Scene> handler = Launcher.loadScene("/gui/card.fxml");
                 CardScene cardScene = handler.getKey();
                 cardScene.config(b.server, b.listener, b.board, b.stateLabel.getText(), b.ship, b.players);
@@ -93,15 +94,62 @@ public class State implements Serializable {
             }
         }
 
-        public void ready(Building b){
-            if(this == State.Type.BUILDING)
+        public void ready(Building b) {
+            if (this == State.Type.BUILDING)
                 b.server.setReady().ifPresent(_ -> b.buildingLabel.setVisible(true));
-            else if(this == State.Type.ALIEN_INPUT){
+            else if (this == State.Type.ALIEN_INPUT) {
                 b.ship.init(b.purple, b.brown);
                 b.server.init(b.purple, b.brown).ifPresent(_ -> {
                     b.buildingLabel.setText("ALIENI ASSEGNATI");
                     b.buildingLabel.setVisible(true);
                 });
+            }
+        }
+
+        public void apply(CardScene s) {
+            if (this == State.Type.CHECKING) {
+                for (StackPane[] stackPane : s.stackPanes)
+                    for (StackPane pane : stackPane)
+                        if (pane != null)
+                            pane.setVisible(false);
+
+                s.images.forEach((c, view) -> {
+                    view.setOnDragDetected(event -> {
+                        if (view.getImage() == null)
+                            return;
+
+                        view.setCursor(Cursor.CLOSED_HAND);
+
+                        Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
+                        ClipboardContent content = new ClipboardContent();
+                        content.putString(c.toString());
+                        db.setContent(content);
+                        db.setDragView(Launcher.getRotatedImage(view.getImage(), 0));
+                        event.consume();
+                    });
+
+                    view.setOnDragDone(event -> {
+                        event.consume();
+                        if (!s.dragSuccess.get())
+                            return;
+                        s.shipPane.getChildren().remove(s.stackPanes[c.x()][c.y()]);
+                        s.shipPane.getChildren().remove(view);
+                    });
+
+                    view.setOnMousePressed(event -> {
+                        view.setCursor(Cursor.CLOSED_HAND);
+                        event.consume();
+                    });
+
+                    view.setOnMouseEntered(_ -> {
+                        view.setCursor(Cursor.OPEN_HAND);
+                    });
+                    view.setOnMouseExited(_ -> {
+                        view.setCursor(Cursor.DEFAULT);
+                    });
+                });
+
+                s.drawErrors();
             }
         }
     }

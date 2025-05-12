@@ -1,6 +1,7 @@
 package it.polimi.softeng.is25am10.model.boards;
 
 
+import it.polimi.softeng.is25am10.gui.CardScene;
 import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;

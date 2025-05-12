@@ -1,7 +1,16 @@
 package it.polimi.softeng.is25am10.model.cards;
 
+import it.polimi.softeng.is25am10.gui.CardScene;
+import it.polimi.softeng.is25am10.gui.Launcher;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
+import javafx.scene.Cursor;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,5 +53,67 @@ public class CardOutput implements Serializable {
 
         coordinates.add(c);
         removed.put(name, coordinates);
+    }
+    
+    public void handleChanges(CardScene s, String name){
+        if(cash.containsKey(name)){
+            int cash = this.cash.get(name);
+            cash += Integer.parseInt(s.cashText.getText());
+            s.cashText.setText(String.valueOf(cash));
+        }
+
+        if(killedCrew.containsKey(name))
+            killedCrew.get(name).forEach(s::removeOne);
+
+        if(rewards.containsKey(name)){
+            VBox vBox = new VBox();
+
+            rewards.get(name).forEach(r -> {
+                ImageView view = Launcher.getView("/gui/textures/" + r.name().toLowerCase() + ".png");
+                vBox.getChildren().add(view);
+
+                view.setOnDragDetected(event -> {
+                    if(view.getImage() == null)
+                        return;
+
+                    view.setCursor(Cursor.CLOSED_HAND);
+
+                    Dragboard db = view.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(r.name());
+                    db.setContent(content);
+                    db.setDragView(Launcher.getRotatedImage(view.getImage(), 0));
+                    event.consume();
+                });
+
+                view.setOnDragDone(event -> {
+                    event.consume();
+                    if(!s.dragSuccess.get())
+                        return;
+                    s.dragSuccess.set(false);
+                    vBox.getChildren().remove(view);
+                });
+
+                view.setOnMousePressed(event -> {
+                    view.setCursor(Cursor.CLOSED_HAND);
+                    event.consume();
+                });
+
+                view.setOnMouseEntered(_ -> {view.setCursor(Cursor.OPEN_HAND);});
+                view.setOnMouseExited(_ -> {view.setCursor(Cursor.DEFAULT);});
+
+            });
+            s.cardDataPane.getChildren().add(vBox);
+        }
+
+        if(removed.containsKey(name)){
+            removed.get(name).forEach(c -> {
+                s.shipPane.getChildren().removeIf(node -> {
+                    int nodeCol = GridPane.getColumnIndex(node) == null ? 0 : GridPane.getColumnIndex(node);
+                    int nodeRow = GridPane.getRowIndex(node) == null ? 0 : GridPane.getRowIndex(node);
+                    return nodeCol == c.x() && nodeRow == c.y();
+                });
+            });
+        }
     }
 }

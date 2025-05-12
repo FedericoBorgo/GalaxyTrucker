@@ -2,7 +2,11 @@ package it.polimi.softeng.is25am10.model.boards;
 
 import com.googlecode.lanterna.TextColor;
 import it.polimi.softeng.is25am10.gui.Building;
+import it.polimi.softeng.is25am10.gui.CardScene;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -226,5 +230,24 @@ public class FlightBoard implements Serializable {
             case 1 -> b.clock2.setVisible(true);
             case 2 -> b.clock3.setVisible(true);
         };
+    }
+
+    public void drawPos(CardScene s){
+        int pos = leaderPosition%24;
+        FlightBoard.Pawn pawn;
+
+        for(Pane pane : s.posPanes)
+            pane.getChildren().clear();
+
+        for (int i = 0; i < order.size(); i++) {
+            pawn = order.get(i);
+            s.posPanes[pos].getChildren().add(new StackPane(new Circle(10, pawn.toColor())));
+
+            if(i < offset.size()-1)
+                pos = leaderPosition%24 + offset.get(i+1);
+
+            if(pos < 0)
+                pos = 23 + pos;
+        }
     }
 }

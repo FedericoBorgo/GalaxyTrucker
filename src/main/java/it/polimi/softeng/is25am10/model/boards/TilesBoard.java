@@ -1,8 +1,12 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.gui.CardScene;
 import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -626,6 +630,35 @@ public class TilesBoard implements Serializable {
             return true;
         });
         return has.get();
+    }
+
+    public void drawErrors(CardScene s){
+        Set<Coordinate> res = isOK();
+
+        s.rectangles.forEach((r, p) -> p.getChildren().remove(r));
+
+        if(res.isEmpty()){
+            for (StackPane[] stackPane : s.stackPanes)
+                for (StackPane pane : stackPane)
+                    if(pane != null)
+                        pane.setVisible(true);
+            s.shipFixText.setVisible(false);
+            return;
+        }
+
+        if(res.contains(new Coordinate(0, 0))){
+            s.shipFixText.setVisible(true);
+            return;
+        }
+
+        res.forEach(c -> {
+            Rectangle rect = new Rectangle(s.shipPane.getWidth()/7, s.shipPane.getHeight()/5);
+            rect.setFill(Color.web("rgb(255, 0, 0)", 0.3));
+            rect.setStroke(Color.RED);
+            rect.setStrokeWidth(1);
+            s.stackPanes[c.x()][c.y()].getChildren().add(rect);
+            s.rectangles.put(rect, s.stackPanes[c.x()][c.y()]);
+        });
     }
 }
 
