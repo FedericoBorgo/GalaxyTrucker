@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.model.boards;
 
+import it.polimi.softeng.is25am10.gui.Building;
 import it.polimi.softeng.is25am10.gui.CardScene;
 import it.polimi.softeng.is25am10.model.Projectile;
 import it.polimi.softeng.is25am10.model.Result;
@@ -630,6 +631,31 @@ public class TilesBoard implements Serializable {
             return true;
         });
         return has.get();
+    }
+
+    public void drawErrors(Building s){
+        Set<Coordinate> res = isOK();
+
+        s.rectangles.forEach((r, p) -> p.getChildren().remove(r));
+
+        if(res.isEmpty()){
+            s.shipFixText.setVisible(false);
+            return;
+        }
+
+        if(res.contains(new Coordinate(0, 0))){
+            s.shipFixText.setVisible(true);
+            return;
+        }
+
+        res.forEach(c -> {
+            Rectangle rect = new Rectangle(s.shipPane.getWidth()/7, s.shipPane.getHeight()/5);
+            rect.setFill(Color.web("rgb(255, 0, 0)", 0.3));
+            rect.setStroke(Color.RED);
+            rect.setStrokeWidth(1);
+            s.stackPanes[c.x()][c.y()].getChildren().add(rect);
+            s.rectangles.put(rect, s.stackPanes[c.x()][c.y()]);
+        });
     }
 
     public void drawErrors(CardScene s){

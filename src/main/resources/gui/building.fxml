@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="601.0" prefWidth="1080.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.softeng.is25am10.gui.Building">
     <children>
@@ -41,6 +42,13 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
+         <children>
+            <Text fx:id="shipFixText" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="NAVE SEPARATA" wrappingWidth="145.13000106811523">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Text>
+         </children>
       </GridPane>
       <Pane fx:id="drawTilePane" layoutX="559.0" layoutY="196.0" prefHeight="125.0" prefWidth="126.0" />
       <ImageView fx:id="clock1" fitHeight="54.0" fitWidth="64.0" layoutX="905.0" layoutY="378.0" preserveRatio="true" rotate="23.6">

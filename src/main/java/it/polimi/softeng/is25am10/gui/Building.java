@@ -1,26 +1,27 @@
 package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.model.*;
-import it.polimi.softeng.is25am10.model.boards.AlienBoard;
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
+import it.polimi.softeng.is25am10.model.boards.*;
 import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.util.Pair;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Building implements Callback {
@@ -46,7 +47,7 @@ public class Building implements Callback {
     public GUIEventListener listener;
 
     @FXML
-    GridPane shipPane;
+    public GridPane shipPane;
 
     @FXML
     Pane drawTilePane;
@@ -79,11 +80,18 @@ public class Building implements Callback {
     public ImageView pAlienView, bAlienView;
 
     @FXML
+    public Text shipFixText;
+
+    public Map<Rectangle, StackPane> rectangles = new HashMap<>();
+    public StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+
+    @FXML
     private void initialize(){
         //configure scrollable panel
         seenScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         seenScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         seenScrollPane.setContent(seenImages);
+        shipFixText.setVisible(false);
 
         //configure drawn tiles
         tileView = new ImageView();
@@ -109,6 +117,31 @@ public class Building implements Callback {
 
             server.bookTile(new Tile(db.getString()))
                     .ifPresent(_ -> {dragSuccess.set(true);});
+        });
+
+        shipPane.setOnMouseClicked(event -> {
+            if(state != State.Type.CHECKING || ship.getTiles().isOK().isEmpty())
+                return;
+
+            int col = (int)(event.getX()/(shipPane.getWidth()/7));
+            int row = (int)(event.getY()/(shipPane.getHeight()/5));
+
+            if(Coordinate.isInvalid(col,row))
+                return;
+
+            Coordinate c = new Coordinate(col,row);
+
+            server.remove(c).ifPresent(_ -> {
+                ship.getTiles().remove(c);
+
+                shipPane.getChildren().removeIf(node -> {
+                    int nodeCol = GridPane.getColumnIndex(node) == null ? 0 : GridPane.getColumnIndex(node);
+                    int nodeRow = GridPane.getRowIndex(node) == null ? 0 : GridPane.getRowIndex(node);
+                    return nodeCol == c.x() && nodeRow == c.y();
+                });
+
+                ship.getTiles().drawErrors(this);
+            });
         });
 
         //register the ship placing tile
@@ -159,7 +192,6 @@ public class Building implements Callback {
             }
         });
 
-        new AutoBuilder(this);
     }
 
     public void config(FlightBoard.Pawn pawn, String name, ClientInterface server, Scene scene){
@@ -313,6 +345,9 @@ public class Building implements Callback {
         resizeForShip(view);
         view.setRotate(r.toInt()*90);
         shipPane.add(view, c.x(), c.y());
+        stackPanes[c.x()][c.y()] = new StackPane();
+        shipPane.add(stackPanes[c.x()][c.y()], c.x(), c.y());
+        ship.getTiles().drawErrors(this);
     }
 
     @Override
