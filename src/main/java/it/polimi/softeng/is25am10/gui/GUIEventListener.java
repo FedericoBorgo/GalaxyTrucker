@@ -229,6 +229,17 @@ public class GUIEventListener extends UnicastRemoteObject implements Remote, Cal
     }
 
     @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+        Platform.runLater(() -> {
+            try {
+                callback.pushFinalCash(cash);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Override
     public void pushModel(Model m) throws RemoteException {
         Platform.runLater(() -> {
             try {
@@ -240,11 +251,6 @@ public class GUIEventListener extends UnicastRemoteObject implements Remote, Cal
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    @Override
-    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
-
     }
 
     private void rejoinedPhase0(Model m) throws RemoteException {

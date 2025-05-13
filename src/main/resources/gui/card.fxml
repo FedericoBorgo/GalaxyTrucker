@@ -195,6 +195,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
+      <Button layoutX="941.0" layoutY="566.0" mnemonicParsing="false" onAction="#quit" opacity="0.0" prefHeight="40.0" prefWidth="135.0" text="Button" />
 
     </children>
 </AnchorPane>

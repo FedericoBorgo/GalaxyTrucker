@@ -1,9 +1,12 @@
 package it.polimi.softeng.is25am10.network.socket;
 
+import it.polimi.softeng.is25am10.gui.End;
+import it.polimi.softeng.is25am10.gui.Launcher;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -46,9 +49,11 @@ public class SocketClient extends ClientInterface {
                 eventOutput.reset();
                 eventOutput.writeObject(method.invoke(callback, request.getArgs()));
                 eventOutput.flush();
-            } catch (IOException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
-                     IllegalAccessException e) {
-                throw new RuntimeException("unable to handle the event", e);
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    ((End) Launcher.loadScene("/gui/end.fxml").getKey()).disconnected.setVisible(true);
+                });
+                throw new RuntimeException(e);
             }
         }
     }
@@ -61,8 +66,11 @@ public class SocketClient extends ClientInterface {
             methodOutput.flush();
 
             return (T) methodInput.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("unable to call", e);
+        } catch (Exception e) {
+            Platform.runLater(() -> {
+                ((End) Launcher.loadScene("/gui/end.fxml").getKey()).disconnected.setVisible(true);
+            });
+            throw new RuntimeException(e);
         }
     }
 

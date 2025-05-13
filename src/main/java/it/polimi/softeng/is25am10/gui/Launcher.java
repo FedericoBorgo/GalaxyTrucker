@@ -31,25 +31,18 @@ public class Launcher extends Application {
 
     static Stage stage = null;
 
-    public static void main(String[] args) throws IOException {
-        try{
-            Controller.main(new String[]{"false"});
-        }catch(Exception _){}
+    public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) throws IOException {
         Launcher.stage = stage;
-        loadScene("/gui/login.fxml");
+        loadScene("/gui/welcome.fxml");
 
         stage.setTitle("Galaxy Trucker");
         stage.setResizable(false);
         stage.show();
-
-        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-        stage.setX(0);
-        stage.setY(bounds.getMinY() + bounds.getHeight());
     }
 
     static public <T> Pair<T, Scene> loadScene(String path){

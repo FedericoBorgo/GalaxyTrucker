@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -386,6 +387,11 @@ public class CardScene implements Callback {
         server.getShip().getTiles().drawErrors(this);
     }
 
+    @FXML
+    public void quit(){
+        server.quit();
+    }
+
     @Override
     public void pushCardData(CardData card) throws RemoteException {
         this.cardData = card;
@@ -430,7 +436,8 @@ public class CardScene implements Callback {
     @Override
     public void pushFlight(FlightBoard board) throws RemoteException {
         board.drawPos(this);
-        updateNextTurn(board.getOrder().getFirst());
+        if(!board.getOrder().isEmpty())
+            updateNextTurn(board.getOrder().getFirst());
     }
 
     private void updateNextTurn(FlightBoard.Pawn pawn){
@@ -456,6 +463,12 @@ public class CardScene implements Callback {
     }
 
     @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+        Pair<End, Scene> p = Launcher.loadScene("/gui/end.fxml");
+        p.getKey().setRes(cash);
+    }
+
+    @Override
     public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {}
     @Override
     public void bookedTile(Tile t) throws RemoteException {}
@@ -467,12 +480,6 @@ public class CardScene implements Callback {
     public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {}
     @Override
     public void pushModel(Model m) throws RemoteException {}
-
-    @Override
-    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
-
-    }
-
     @Override
     public void gaveTile(Tile t) throws RemoteException {}
     @Override

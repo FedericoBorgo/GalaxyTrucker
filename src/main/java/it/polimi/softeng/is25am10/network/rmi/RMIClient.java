@@ -1,9 +1,12 @@
 package it.polimi.softeng.is25am10.network.rmi;
 
+import it.polimi.softeng.is25am10.gui.End;
+import it.polimi.softeng.is25am10.gui.Launcher;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
+import javafx.application.Platform;
 
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.NotBoundException;
@@ -30,7 +33,10 @@ public class RMIClient extends ClientInterface {
         try {
             return (T) RMIInterface.class.getMethod(getCallerName(), getClasses(args))
                     .invoke(server, args);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (Exception e) {
+            Platform.runLater(() -> {
+                ((End) Launcher.loadScene("/gui/end.fxml").getKey()).disconnected.setVisible(true);
+            });
             throw new RuntimeException(e);
         }
     }
@@ -40,6 +46,9 @@ public class RMIClient extends ClientInterface {
             server.setCallback(getPlayerName(), callback);
             return server.join(getPlayerName());
         } catch (RemoteException e) {
+            Platform.runLater(() -> {
+                ((End) Launcher.loadScene("/gui/end.fxml").getKey()).disconnected.setVisible(true);
+            });
             throw new RuntimeException(e);
         }
     }
