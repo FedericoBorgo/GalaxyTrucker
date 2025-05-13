@@ -467,6 +467,12 @@ public class CardScene implements Callback {
     public void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {}
     @Override
     public void pushModel(Model m) throws RemoteException {}
+
+    @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+
+    }
+
     @Override
     public void gaveTile(Tile t) throws RemoteException {}
     @Override

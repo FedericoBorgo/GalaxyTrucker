@@ -705,4 +705,9 @@ public class Game extends UnicastRemoteObject implements Callback {
             }
         });
     }
+
+    @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+        frame.pushFinalCash(cash);
+    }
 }

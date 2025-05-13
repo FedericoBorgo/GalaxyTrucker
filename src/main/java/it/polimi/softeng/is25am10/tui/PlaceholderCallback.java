@@ -105,4 +105,9 @@ public class PlaceholderCallback implements Callback {
     public void pushModel(Model m) throws RemoteException {
 
     }
+
+    @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+
+    }
 }

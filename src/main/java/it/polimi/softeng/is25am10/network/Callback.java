@@ -50,4 +50,6 @@ public interface Callback extends Remote {
     void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException;
 
     void pushModel(Model m) throws RemoteException;
+
+    void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException;
 }

@@ -231,4 +231,9 @@ class EventInvoker implements Callback {
         call(m);
     }
 
+    @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+        call(cash);
+    }
+
 }

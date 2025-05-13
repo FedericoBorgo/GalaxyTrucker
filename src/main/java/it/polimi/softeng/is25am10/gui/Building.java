@@ -376,6 +376,8 @@ public class Building implements Callback {
     @Override
     public void pushModel(Model m) throws RemoteException {}
     @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {}
+    @Override
     public void pushBoard(ShipBoard board) throws RemoteException {}
     @Override
     public void pushCardData(CardData card) throws RemoteException {}

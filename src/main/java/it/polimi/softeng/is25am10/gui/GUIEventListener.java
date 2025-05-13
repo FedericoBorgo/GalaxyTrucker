@@ -242,6 +242,11 @@ public class GUIEventListener extends UnicastRemoteObject implements Remote, Cal
         });
     }
 
+    @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+
+    }
+
     private void rejoinedPhase0(Model m) throws RemoteException {
         Pair<Building, Scene> p = Launcher.loadScene("/gui/building.fxml");
         Building b = p.getKey();

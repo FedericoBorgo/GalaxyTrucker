@@ -111,4 +111,9 @@ public class CallbackImpl implements Callback, Serializable {
     public void pushModel(Model m) throws RemoteException {
 
     }
+
+    @Override
+    public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
+
+    }
 }

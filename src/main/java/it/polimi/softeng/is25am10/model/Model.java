@@ -91,6 +91,7 @@ public class Model implements Serializable {
     private final Map<Player, Removed> removed = new ConcurrentHashMap<>();
     private final Map<Player, HashMap<Tile.Rotation, Integer>> cannonsToUse = new ConcurrentHashMap<>();
     private final Map<String, Player> quitters = new ConcurrentHashMap<>();
+    private final ArrayList<Player> quitOrder = new ArrayList<>();
     private final Map<String, Pawn> allPlayers = new ConcurrentHashMap<>();
     private final Set<String> ignoreChecks = new HashSet<>();
 
@@ -275,6 +276,7 @@ public class Model implements Serializable {
             return;
 
         quitters.put(name, get(name));
+        quitOrder.addFirst(get(name));
         flight.quit(players.get(name).getPawn());
         players.remove(name);
 
@@ -287,6 +289,38 @@ public class Model implements Serializable {
 
         quitters.forEach((p,_)->{ q.add(p);});
         return q;
+    }
+
+    public HashMap<String, Integer> computeCash(){
+        if(state.get() != State.Type.ENDED)
+            return null;
+        int[] reward = new int[] {8, 6, 4, 2};
+
+        for (int i = 0; i < quitOrder.size(); i++)
+            quitOrder.get(i).giveCash(reward[i]);
+
+        HashMap<String, Integer> cash = new HashMap<>();
+
+        Map<Player, Integer> connectors = new HashMap<>();
+        quitOrder.forEach(p -> connectors.put(p, p.getBoard().getTiles().countExposedConnectors()));
+        int min = connectors.values().stream().mapToInt(Integer::intValue).min().getAsInt();
+
+        connectors.forEach((p,v)->{
+            if(v == min)
+                p.giveCash(4);
+        });
+
+        quitOrder.forEach(p ->{
+            p.giveCash(p.getBoard().getGoods(GoodsBoard.Type.RED).getTotal()*4);
+            p.giveCash(p.getBoard().getGoods(GoodsBoard.Type.YELLOW).getTotal()*3);
+            p.giveCash(p.getBoard().getGoods(GoodsBoard.Type.GREEN).getTotal()*2);
+            p.giveCash(p.getBoard().getGoods(GoodsBoard.Type.BLUE).getTotal());
+
+            p.giveCash(-p.getBoard().getTiles().getTrashed().size());
+            cash.put(p.getName(), p.getCash());
+        });
+
+        return cash;
     }
 
     /**
@@ -642,6 +676,7 @@ public class Model implements Serializable {
 
         if(c == null) {
             state.next(State.Type.ENDED);
+            flight.getOrder().forEach(p -> quit(getPlayer(p)));
             return Result.ok(null);
         }
 
@@ -649,6 +684,10 @@ public class Model implements Serializable {
         state.next(State.Type.WAITING_INPUT);
 
         return Result.ok(c);
+    }
+
+    private String getPlayer(Pawn pawn){
+        return players.values().stream().filter(p -> p.getPawn().equals(pawn)).findFirst().get().getName();
     }
 
     private CardOutput changes = null;

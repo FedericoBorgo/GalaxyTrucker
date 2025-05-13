@@ -94,7 +94,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         // create the event notifier
         stateEvent = (m, state) -> {
             Logger.modelLog(m.hashCode(), "state changed to: " +state.toString());
-            pushState(m);
+            execService.execute(() -> pushState(m));
 
 
             execService.execute(() -> pushFlight(m));
@@ -104,12 +104,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 execService.execute(() -> pushDropped(m));
                 execService.execute(() -> pushCannons(m));
             }
-
-            if(state == State.Type.BUILDING)
+            else if(state == State.Type.BUILDING)
                 starting = null;
-
-            if(state == State.Type.PAY_DEBT)
+            else if(state == State.Type.PAY_DEBT)
                 execService.execute(() -> pushDropped(m));
+            else if(state == State.Type.ENDED)
+                execService.execute(() -> pushFinalCash(m));
         };
     }
 
@@ -308,6 +308,22 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     public void pushState(Model m) {
         notifyPlayers(m, null, m.getState());
+    }
+
+    public void pushFinalCash(Model m){
+        HashMap<String, Integer> cash = m.computeCash();
+        notifyPlayers(m, null, cash);
+
+        synchronized (games){
+            disconnected.remove(m);
+
+            games.forEach((name, g) -> {
+               if(g == m) {
+                   games.remove(name);
+                   callbacks.remove(name);
+               }
+            });
+        }
     }
 
     /**

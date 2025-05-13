@@ -616,4 +616,16 @@ public class FrameGenerator {
 
         refresh();
     }
+
+    public synchronized void pushFinalCash(HashMap<String, Integer> cash){
+        screen.clear();
+
+        AtomicInteger i = new AtomicInteger(0);
+        cash.forEach((p, v) -> {
+            String out = p + ": " + v;
+            graphics.putString(new TerminalPosition(0, i.getAndIncrement()), out);
+        });
+
+        refresh();
+    }
 }
