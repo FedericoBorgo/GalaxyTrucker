@@ -173,9 +173,6 @@ public class Building implements Callback {
                 }
                 else
                     server.setTile(c, t, rot).ifPresent(_ -> dragSuccess.set(true));
-
-                if(dragSuccess.get())
-                    ship.getTiles().setTile(c, t, rot);
             }
             else if(state == State.Type.ALIEN_INPUT){
                 ImageView view = new ImageView();
@@ -218,6 +215,8 @@ public class Building implements Callback {
             else if(event.getCode() == KeyCode.C)
                 moveClock();
         });
+
+        new AutoBuilder(this);
     }
 
     private void register(ImageView view, Tile t, Runnable whenDone){
@@ -347,6 +346,7 @@ public class Building implements Callback {
         shipPane.add(view, c.x(), c.y());
         stackPanes[c.x()][c.y()] = new StackPane();
         shipPane.add(stackPanes[c.x()][c.y()], c.x(), c.y());
+        ship.getTiles().setTile(c, t, r);
         ship.getTiles().drawErrors(this);
     }
 

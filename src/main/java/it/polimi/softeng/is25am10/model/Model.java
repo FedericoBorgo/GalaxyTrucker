@@ -98,7 +98,7 @@ public class Model implements Serializable {
     private final Set<String> ignoreChecks = new HashSet<>();
 
     //Current state of the game
-    private final State state;
+    public final State state;
 
     //pawns still not assigned to a player
     private final List<Pawn> unusedPawns = new ArrayList<>(List.of(Pawn.RED, Pawn.BLUE, Pawn.GREEN, Pawn.YELLOW));
@@ -114,6 +114,8 @@ public class Model implements Serializable {
     private transient TimerTask task;
     public static final int TIMER_DELAY = 0;
     private int secondsLeft = TIMER_DELAY;
+
+    public int phase = 0;
 
     /**
      * Builds a new Model with the number of required players.
@@ -401,8 +403,10 @@ public class Model implements Serializable {
         ship(name).init(purple, brown);
         countPlayers++;
 
-        if (countPlayers == nPlayers)
+        if (countPlayers == nPlayers) {
+            phase = 1;
             state.next(State.Type.DRAW_CARD);
+        }
         return Result.ok("");
     }
 

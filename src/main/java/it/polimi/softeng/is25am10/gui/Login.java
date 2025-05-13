@@ -58,7 +58,7 @@ public class Login {
             Pair<Building, Scene> handler = Launcher.loadScene("/gui/building.fxml");
             Building building = handler.getKey();
             building.nPlayers = players;
-            building.listener = new GUIEventListener(building);
+            building.listener = new GUIEventListener(server, building);
             FlightBoard.Pawn pawn = server.join(building.listener).getData();
             building.config(pawn, name, server, handler.getValue());
         }catch (Exception _){
