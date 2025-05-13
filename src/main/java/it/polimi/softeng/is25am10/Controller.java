@@ -394,8 +394,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     public int askHowManyPlayers(String name){
         try {
-            return 2;
-            //return callbacks.get(name).askHowManyPlayers();
+            return callbacks.get(name).askHowManyPlayers();
         } catch (Exception _) {
             return 2;
         }
@@ -607,6 +606,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             }
         }
         return res;
+    }
+
+    @Override
+    public Model.Removed getRemoved(String name){
+        return getModel(name).getRemoved(name);
     }
 
     @Override

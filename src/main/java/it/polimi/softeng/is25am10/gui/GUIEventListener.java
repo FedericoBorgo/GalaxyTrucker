@@ -21,7 +21,10 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GUIEventListener extends UnicastRemoteObject implements Remote, Callback {
     Callback callback;
@@ -49,16 +52,7 @@ public class GUIEventListener extends UnicastRemoteObject implements Remote, Cal
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        AtomicInteger res =  new AtomicInteger(2);
-        Platform.runLater(() -> {
-            try {
-                res.set(callback.askHowManyPlayers());
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return 4;
+        return callback.askHowManyPlayers();
     }
 
     @Override

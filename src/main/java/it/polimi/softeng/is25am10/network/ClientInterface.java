@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.network;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
@@ -134,6 +135,10 @@ public abstract class ClientInterface extends Thread{
     }
 
     public Result<Card[][]> getVisible() {
+        return call(name);
+    }
+
+    public Model.Removed getRemoved(){
         return call(name);
     }
 

@@ -263,6 +263,28 @@ public class CardScene implements Callback {
                 Coordinate from = Coordinate.fromString(data.substring(data.indexOf(' ')+1)).getData();
                 server.drop(from).ifPresent(_ -> dragSuccess.set(true));
             }
+
+            if(this.state == State.Type.PAY_DEBT){
+                cardDataPane.getChildren().clear();
+                Model.Removed rm = server.getRemoved();
+                VBox box = new VBox();
+
+                if(rm.guys < 0){
+                    Text text = new Text("Astronauti: " + rm.guys);
+                    text.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                    text.setFill(Color.WHITE);
+                    box.getChildren().add(text);
+                }
+
+                if(rm.goods < 0){
+                    Text text = new Text("Astronauti: " + rm.guys);
+                    text.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                    text.setFill(Color.WHITE);
+                    box.getChildren().add(text);
+                }
+
+                cardDataPane.getChildren().add(box);
+            }
         });
 
         shipPane.setOnDragDropped(event -> {
@@ -426,6 +448,28 @@ public class CardScene implements Callback {
 
         rectangles.clear();
         output.handleChanges(this, server.getPlayerName());
+
+        Model.Removed rm = server.getRemoved();
+
+        if(rm.isDebt(server.getShip())){
+            VBox box = new VBox();
+
+            if(rm.guys < 0){
+                Text text = new Text("Astronauti: " + rm.guys);
+                text.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                text.setFill(Color.WHITE);
+                box.getChildren().add(text);
+            }
+
+            if(rm.goods < 0){
+                Text text = new Text("Astronauti: " + rm.guys);
+                text.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                text.setFill(Color.WHITE);
+                box.getChildren().add(text);
+            }
+
+            cardDataPane.getChildren().add(box);
+        }
     }
 
     @Override

@@ -216,7 +216,7 @@ public class Building implements Callback {
                 moveClock();
         });
 
-        //new AutoBuilder(this);
+        new AutoBuilder(this);
     }
 
     private void register(ImageView view, Tile t, Runnable whenDone){
@@ -295,7 +295,7 @@ public class Building implements Callback {
 
     @Override
     public int askHowManyPlayers() throws RemoteException {
-        return 4;
+        return nPlayers;
     }
 
     @Override

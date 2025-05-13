@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.gui;
 
+import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
@@ -59,9 +60,28 @@ public class Login {
             Building building = handler.getKey();
             building.nPlayers = players;
             building.listener = new GUIEventListener(server, building);
-            FlightBoard.Pawn pawn = server.join(building.listener).getData();
-            building.config(pawn, name, server, handler.getValue());
+
+            Result<FlightBoard.Pawn> res = server.join(building.listener);
+
+            if(res.isErr()){
+                Pair<Login, Scene> handler2 = Launcher.loadScene("/gui/login.fxml");
+                Login login = handler2.getKey();
+
+                login.addressField.setText(address);
+                login.usernameField.setText(name);
+                login.port1.setText(String.valueOf(port1));
+                login.port2.setText(String.valueOf(port2));
+                login.playersField.setText(String.valueOf(players));
+                login.errLabel.setText("Giocatore già connesso");
+            }
+            else{
+                FlightBoard.Pawn pawn = res.getData();
+                building.config(pawn, name, server, handler.getValue());
+            }
+
+
         }catch (Exception _){
+
             errLabel.setText("Impossibile connettersi al server");
             errLabel.setAlignment(Pos.CENTER);
         }

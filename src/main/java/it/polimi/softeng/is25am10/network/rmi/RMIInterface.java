@@ -1,5 +1,6 @@
 package it.polimi.softeng.is25am10.network.rmi;
 
+import it.polimi.softeng.is25am10.model.Model;
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
@@ -74,4 +75,6 @@ public interface RMIInterface extends Remote {
     int getEnginePower(String name) throws RemoteException;
 
     double getCannonPower(String name) throws RemoteException;
+
+    public Model.Removed getRemoved(String name) throws RemoteException;
 }
