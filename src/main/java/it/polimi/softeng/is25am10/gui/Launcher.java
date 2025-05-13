@@ -5,6 +5,7 @@ import it.polimi.softeng.is25am10.model.Tile;
 import it.polimi.softeng.is25am10.model.boards.Coordinate;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
@@ -43,6 +44,11 @@ public class Launcher extends Application {
         stage.setTitle("Galaxy Trucker");
         stage.setResizable(false);
         stage.show();
+        stage.setOnCloseRequest(_ -> {
+            System.out.println("Closing GalaxyTrucker");
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     static public <T> Pair<T, Scene> loadScene(String path){
