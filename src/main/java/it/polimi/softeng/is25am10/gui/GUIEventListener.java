@@ -58,7 +58,7 @@ public class GUIEventListener extends UnicastRemoteObject implements Remote, Cal
             }
         });
 
-        return res.get();
+        return 4;
     }
 
     @Override

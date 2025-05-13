@@ -17,6 +17,8 @@ import javafx.util.Pair;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
 /**
@@ -158,12 +160,14 @@ public class State implements Serializable {
     public Type curr;
     private final Model m;
     public transient BiConsumer<Model, Type> notify;
+    public transient ExecutorService executor;
 
     public State(Type curr, BiConsumer<Model, Type> notify, Model m) {
         prev = null;
         this.curr = curr;
         this.m = m;
         this.notify = notify;
+        executor = Executors.newSingleThreadExecutor();
     }
 
     public void setNotify(BiConsumer<Model, Type> notify) {
@@ -173,7 +177,7 @@ public class State implements Serializable {
     public void next(Type next) {
         prev = curr;
         curr = next;
-        notify.accept(m, next);
+        executor.execute(() -> notify.accept(m, next));
     }
 
     public Type get() {

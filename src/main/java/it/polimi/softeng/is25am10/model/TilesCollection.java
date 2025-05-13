@@ -23,8 +23,8 @@ public class TilesCollection implements Serializable {
      * Creates a deck of tiles for a match and shuffles it.
      */
     public TilesCollection() {
-        tiles = new ArrayList<>();
-        seen = new ArrayList<>();
+        tiles = Collections.synchronizedList(new ArrayList<>());
+        seen = Collections.synchronizedList(new ArrayList<>());
 
         String out = Card.dump(Objects.requireNonNull(TilesCollection.class.getResourceAsStream("tiles.json")));
         JSONObject object = new JSONObject(out);

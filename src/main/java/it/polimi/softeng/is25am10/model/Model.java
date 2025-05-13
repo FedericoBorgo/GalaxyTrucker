@@ -1,10 +1,7 @@
 package it.polimi.softeng.is25am10.model;
 
-import it.polimi.softeng.is25am10.model.boards.Coordinate;
-import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.boards.*;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard.Pawn;
-import it.polimi.softeng.is25am10.model.boards.GoodsBoard;
-import it.polimi.softeng.is25am10.model.boards.ShipBoard;
 import it.polimi.softeng.is25am10.model.cards.*;
 
 import java.io.Serializable;
@@ -217,7 +214,7 @@ public class Model implements Serializable {
      * It eventually moves the BUILDING state to CHECKING or ALIEN.
      * @return the position of the timer.
      */
-    public synchronized Result<Integer> moveTimer(){
+    public Result<Integer> moveTimer(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         if(secondsLeft == 0) {
@@ -298,7 +295,7 @@ public class Model implements Serializable {
      * @param name the name of the player that wants to quit
      * @return err if it fails
      */
-    public synchronized Result<String> quit(String name){
+    public Result<String> quit(String name){
         if(state.get() != State.Type.DRAW_CARD)
             return Result.err("can't quit, not in the DRAW phase");
         quitIgnore(name);
@@ -306,30 +303,31 @@ public class Model implements Serializable {
     }
 
     /// place tile
-    public synchronized Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation){
+    public Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         if(flight.getOrder().contains(get(name).getPawn()))
             return Result.err("player già pronto");
+
         return ship(name).getTiles().setTile(c, t, rotation);
     }
 
     /// book tile
-    public synchronized Result<Tile> bookTile(String name, Tile t){
+    public Result<Tile> bookTile(String name, Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return ship(name).getTiles().bookTile(t);
     }
 
     /// use a booked tile
-    public synchronized Result<Tile> useBookedTile(String name, Tile t, Tile.Rotation rotation, Coordinate c){
+    public Result<Tile> useBookedTile(String name, Tile t, Tile.Rotation rotation, Coordinate c){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return ship(name).getTiles().useBookedTile(t, rotation, c);
     }
 
     /// remove a tile
-    public synchronized Result<String> remove(String name, Coordinate c){
+    public Result<String> remove(String name, Coordinate c){
         if(state.get() != State.Type.CHECKING)
             return Result.err("not CHECKING state");
 
@@ -374,7 +372,7 @@ public class Model implements Serializable {
      * Ignore the checks of a player.
      * @param name
      */
-    public synchronized void ignoreCheck(String name){
+    public void ignoreCheck(String name){
         ignoreChecks.add(name);
     }
 
@@ -382,7 +380,7 @@ public class Model implements Serializable {
      * Remove th ignore checks of the player.
      * @param name
      */
-    public synchronized void removeIgnore(String name){
+    public void removeIgnore(String name){
         if(ignoreChecks.contains(name))
             ignoreChecks.remove(name);
     }
@@ -394,7 +392,7 @@ public class Model implements Serializable {
      * @param brown coordinate
      * @return result
      */
-    public synchronized Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown) {
+    public Result<String> init(String name, Optional<Coordinate> purple, Optional<Coordinate> brown) {
         if (state.get() != State.Type.ALIEN_INPUT)
             return Result.err("not ALIEN state");
 
@@ -410,11 +408,11 @@ public class Model implements Serializable {
         return Result.ok("");
     }
 
-    public synchronized List<GoodsBoard.Type> getReward(String name){
+    public List<GoodsBoard.Type> getReward(String name){
         return get(name).getGoodsReward();
     }
 
-    public synchronized Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c){
+    public Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c){
         if(state.curr != State.Type.PLACE_REWARD)
             return Result.err("not place reward state");
 
@@ -426,7 +424,7 @@ public class Model implements Serializable {
         return res;
     }
 
-    public synchronized Result<String> dropReward(String name){
+    public Result<String> dropReward(String name){
         if(state.curr != State.Type.PLACE_REWARD)
             return Result.err("not place reward state");
 
@@ -452,15 +450,17 @@ public class Model implements Serializable {
      * @param c coordinate to remove the single element
      * @return ok if its accepted, err if not
      */
-    public synchronized Result<Integer> drop(String name, Coordinate c){
+    public Result<Integer> drop(String name, Coordinate c){
         if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
             return Result.err("not WAITING state");
 
         if(deck.getRegistered().contains(get(name)) && state.get() != State.Type.PAY_DEBT)
             return Result.err("player already registered");
 
+
         ShipBoard ship = ship(name);
         Player p = get(name);
+
 
         if(ship.getBattery().get(c) > 0){
             ship.getBattery().remove(c, 1);
@@ -486,11 +486,11 @@ public class Model implements Serializable {
         return Result.ok(1);
     }
 
-    public synchronized int getEnginePower(String name){
+    public int getEnginePower(String name){
         return ship(name).getEnginePower(removed.get(get(name)).battery);
     }
 
-    public synchronized double getCannonPower(String name){
+    public double getCannonPower(String name){
         return ship(name).getCannonsPower(cannonsToUse.get(get(name)));
     }
 
@@ -502,7 +502,7 @@ public class Model implements Serializable {
      * @param t type of goods to remove
      * @return ok if its accepted, err if not
      */
-    public synchronized Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
+    public Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t){
         if(state.get() != State.Type.WAITING_INPUT && state.get() != State.Type.PAY_DEBT)
             return Result.err("not WAITING state");
 
@@ -589,7 +589,7 @@ public class Model implements Serializable {
     }
 
     //tiles section
-    public synchronized Result<Tile> drawTile(String name){
+    public Result<Tile> drawTile(String name){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         if(flight.getOrder().contains(get(name).getPawn()))
@@ -601,7 +601,7 @@ public class Model implements Serializable {
      * Retrieves the list containing all the face-up tiles.
      * @return The seen list.
      */
-    public synchronized List<Tile> getSeenTiles(){
+    public List<Tile> getSeenTiles(){
         return tiles.getSeen();
     }
 
@@ -610,14 +610,14 @@ public class Model implements Serializable {
      * @param t the tile to be added to the seen list.
      * @return ok if succeeded, err if not
      */
-    public synchronized Result<String> giveTile(Tile t){
+    public Result<String> giveTile(Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         tiles.give(t);
         return Result.ok("");
     }
 
-    public synchronized Result<Tile> getTileFromSeen(Tile t){
+    public Result<Tile> getTileFromSeen(Tile t){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(tiles.getFromSeen(t));
@@ -672,7 +672,7 @@ public class Model implements Serializable {
         return res;
     }
 
-    public synchronized CardOutput getChanges(){
+    public CardOutput getChanges(){
         return changes;
     }
 
@@ -699,7 +699,7 @@ public class Model implements Serializable {
      * Get the temporary data about the drawn card.
      * @return the card data
      */
-    public synchronized CardData getCardData(){
+    public CardData getCardData(){
         return deck.getData();
     }
 
@@ -760,7 +760,7 @@ public class Model implements Serializable {
         return hasReward.get();
     }
 
-    public synchronized Result<Card[][]> getVisible(){
+    public Result<Card[][]> getVisible(){
         if(state.get() != State.Type.BUILDING)
             return Result.err("not BUILDING state");
         return Result.ok(deck.getVisible());

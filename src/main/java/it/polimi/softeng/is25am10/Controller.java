@@ -25,6 +25,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -61,6 +63,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     public static boolean ready = false;
 
+    private transient ExecutorService execService = null;
+
     public static void main(String[] args) throws IOException {
         if(args.length > 0)
             Logger.SILENCE = Boolean.parseBoolean(args[0]);
@@ -93,19 +97,19 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             pushState(m);
 
 
-            pushFlight(m);
-            pushPlayers(m);
+            execService.execute(() -> pushFlight(m));
+            execService.execute(() -> pushPlayers(m));
 
             if(state == State.Type.DRAW_CARD) {
-                pushDropped(m);
-                pushCannons(m);
+                execService.execute(() -> pushDropped(m));
+                execService.execute(() -> pushCannons(m));
             }
 
             if(state == State.Type.BUILDING)
                 starting = null;
 
             if(state == State.Type.PAY_DEBT)
-                pushDropped(m);
+                execService.execute(() -> pushDropped(m));
         };
     }
 
@@ -162,6 +166,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 handleAutomaticInput();
             }
         }, 0, 2000);
+
+        execService = Executors.newFixedThreadPool(8);
     }
 
     private Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
@@ -245,7 +251,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             Result<FlightBoard.Pawn> pawn = starting.addPlayer(name);
 
             if(pawn.isOk())
-                pushPlayers(temp);
+                execService.execute(() -> pushPlayers(temp));
 
             return pawn;
         }
@@ -269,34 +275,31 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      * @param args arguments gave to the player
      */
     private void notifyPlayers(Model m, Consumer<String> error , Object... args){
-        synchronized (callbacks) {
-            Method method;
+        Method method;
 
-            // get the method name-arguments
-            try {
-                method = Callback.class.getMethod(ClientInterface.getCallerName(), ClientInterface.getClasses(args));
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-
-            Set<String> dis = disconnected.get(m);
-
-            // call the event for every player connected to this model
-            m.getPlayers().forEach((name, _) -> {
-                if(dis.contains(name))
-                    return;
-
-                try {
-                    method.invoke(callbacks.get(name), args);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException | NullPointerException e) {
-                    // the player is unreachable
-                    if (error != null)
-                        error.accept(name);
-                }
-            });
+        // get the method name-arguments
+        try {
+            method = Callback.class.getMethod(ClientInterface.getCallerName(), ClientInterface.getClasses(args));
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
+
+        Set<String> dis = disconnected.get(m);
+
+        // call the event for every player connected to this model
+        m.getPlayers().forEach((name, _) -> {
+            if(dis.contains(name))
+                return;
+            try {
+                method.invoke(callbacks.get(name), args);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException | NullPointerException e) {
+                // the player is unreachable
+                if (error != null)
+                    error.accept(name);
+            }
+        });
     }
 
     /**
@@ -375,7 +378,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     public int askHowManyPlayers(String name){
         try {
-            return callbacks.get(name).askHowManyPlayers();
+            return 2;
+            //return callbacks.get(name).askHowManyPlayers();
         } catch (Exception _) {
             return 2;
         }
@@ -504,7 +508,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         Result<Integer> result = m.moveTimer();
 
         if(result.isOk())
-            pushFlight(m);
+            execService.execute(() -> pushFlight(m));
 
         return result;
     }
@@ -518,8 +522,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     public Result<String> quit(String name) {
         Result<String> res = getModel(name).quit(name);
         if(res.isOk()) {
-            pushPlayers(getModel(name));
-            pushFlight(getModel(name));
+            execService.execute(() -> pushPlayers(getModel(name)));
+            execService.execute(() -> pushFlight(getModel(name)));
         }
         return res;
     }
@@ -570,7 +574,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         res = setTile(name, c, t, rotation);
 
         if(res.isErr())
-            giveTile(name, t);
+            execService.execute(() -> giveTile(name, t));
 
         return res;
     }
@@ -684,7 +688,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         if(res.isErr())
             return Result.err("errore");
 
-        gaveTile(getModel(name), t);
+        execService.execute(() -> gaveTile(getModel(name), t));
         return res;
     }
 
@@ -700,7 +704,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         if(res.isErr())
             return Result.err("errore");
 
-        gotTile(getModel(name), t);
+        execService.execute(() -> gotTile(getModel(name), t));
         return res;
     }
 
@@ -714,8 +718,8 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
     public Result<Card> drawCard(String name) {
         Result<Card> res = getModel(name).drawCard(name);
         if(res.isOk()) {
-            pushCardData(getModel(name));
-            waitFor(getModel(name));
+            execService.execute(() -> pushCardData(getModel(name)));
+            execService.execute(() -> waitFor(getModel(name)));
         }
 
         return res;
@@ -730,16 +734,15 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     @Override
     public Result<CardInput> setInput(String name, CardInput input) {
-        //TODO stardust meteors
         Result<CardInput> res = getModel(name).setInput(name, input);
 
         if(res.isOk()) {
             if(getModel(name).getChanges() == null){
-                pushCardData(getModel(name));
-                waitFor(getModel(name));
+                execService.execute(() -> pushCardData(getModel(name)));
+                execService.execute(() -> waitFor(getModel(name)));
             }
             else
-                pushCardChanges(getModel(name));
+                execService.execute(() -> pushCardChanges(getModel(name)));
 
         }
 
