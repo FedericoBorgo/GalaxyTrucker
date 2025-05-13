@@ -216,7 +216,7 @@ public class Building implements Callback {
                 moveClock();
         });
 
-        new AutoBuilder(this);
+        //new AutoBuilder(this);
     }
 
     private void register(ImageView view, Tile t, Runnable whenDone){
