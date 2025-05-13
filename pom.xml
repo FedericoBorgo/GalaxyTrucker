@@ -7,7 +7,7 @@
     <groupId>it.polimi.softeng</groupId>
     <artifactId>IS25-AM10</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>1</version>
     <name>IS25-AM10</name>
 
     <properties>
@@ -63,6 +63,73 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.4.2</version>
+                <executions>
+
+                    <execution>
+                        <id>Controller</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>GalaxyTrucker-Server</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>it.polimi.softeng.is25am10.Controller</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>TUI</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>GalaxyTrucker-TUI</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>it.polimi.softeng.is25am10.tui.Asciiui</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>GUI</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>GalaxyTrucker-GUI</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>it.polimi.softeng.is25am10.gui.GUIMain</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
