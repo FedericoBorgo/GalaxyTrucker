@@ -108,6 +108,8 @@ public class Launcher extends Application {
         return rotatedImage;
     }
 
+    // Get methods
+
     public static ImageView getView(String path){
         return new ImageView(getImage(path));
     }

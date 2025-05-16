@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static it.polimi.softeng.is25am10.tui.asciiui.AutoBuilder.*;
 
 /**
- * This class is used to generate random ships and place them on the board in the gui.
+ * This class is used to generate a ship automatically by placing random tiles on the board in the gui.
  * It also places the aliens on the board. Its purpose is to avoid the preparatory phase of the game
  * when the game has to be tested or displayed in a demo.
  */
@@ -41,7 +41,7 @@ public class AutoBuilder extends Thread{
         long start = System.currentTimeMillis();
 
         //places the tiles on the shipboard automatically and randomly
-        while(System.currentTimeMillis()-start < 60000){
+        while(System.currentTimeMillis()-start < 5000){
             Coordinate c = genRandomCoord();
             Tile t = genRandomTile();
             Tile.Rotation r = Tile.engine(t) ? Tile.Rotation.NONE : genRandomOri();

@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller of the welcome scene.
+ */
 public class Welcome {
     @FXML
     private void join(){

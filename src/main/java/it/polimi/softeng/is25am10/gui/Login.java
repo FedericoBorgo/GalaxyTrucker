@@ -16,6 +16,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+/**
+ * Controller of the login screen, manages the entire process in the gui.
+ * Automatically sets the port while selecting RMI/Socket.
+ * Checks for connection problems such as same username error.
+ */
 public class Login {
 
     @FXML
@@ -63,6 +68,7 @@ public class Login {
 
             Result<FlightBoard.Pawn> res = server.join(building.listener);
 
+            // Salva i valori inseriti dall'utente in caso di errore "utente già connesso"
             if(res.isErr()){
                 Pair<Login, Scene> handler2 = Launcher.loadScene("/gui/login.fxml");
                 Login login = handler2.getKey();
