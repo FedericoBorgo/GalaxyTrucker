@@ -16,6 +16,12 @@ public class Epidemic extends Card {
         super(null, false, board, id, Type.EPIDEMIC);
     }
 
+    /**
+     * checks that the card can be played, displays error message otherwise
+     * @param player the player that execute the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
@@ -25,6 +31,10 @@ public class Epidemic extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * kills the crew of the players that suffered the epidemic
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         //begin common part
@@ -51,6 +61,11 @@ public class Epidemic extends Card {
         return new CardData(type, id);
     }
 
+    /**
+     * constructs the epidemic cards starting from json input
+     * @param board
+     * @return
+     */
     public static List<Card> construct(FlightBoard board){
         String out = dump(Objects.requireNonNull(Objects.requireNonNull(Epidemic.class.getResourceAsStream("epidemic.json"))));
         JSONObject jsonObject = new JSONObject(out);

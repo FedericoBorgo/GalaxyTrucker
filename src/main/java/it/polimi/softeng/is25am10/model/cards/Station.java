@@ -25,6 +25,12 @@ public class Station extends Card {
 
     }
 
+    /**
+     * gives error messages if the crew is insuffucient, otherwise the card can be played
+     * @param player the player that executes the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
@@ -47,6 +53,10 @@ public class Station extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * if nobody played yes, a message is shown, otherwise the pawns are moved and the rewards given
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         if(!ready())
@@ -77,6 +87,11 @@ public class Station extends Card {
         return data;
     }
 
+    /**
+     * Constructs a list of Station cards from the JSON file
+     * @param board
+     * @return
+     */
     public static List<Card> construct(FlightBoard board){
         String out = dump(Objects.requireNonNull(Station.class.getResourceAsStream("station.json")));
         JSONArray jsonCards = new JSONArray(out);

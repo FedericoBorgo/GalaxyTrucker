@@ -24,6 +24,12 @@ public class AbandonedShip extends Card {
         this.crew = crew;
     }
 
+    /**
+     * Manages the player interaction with the card according to the input.
+     * @param player the player that executes the action
+     * @param input this is dependent of every card
+     * @return Result<CardInput> the result of the action
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
@@ -31,9 +37,9 @@ public class AbandonedShip extends Card {
         if(unexpected(player))
             return Result.err("player choice is not in order");
 
-        // the player want to descend?
+        //does the player want to land?
         if(input.accept) {
-            // the player remove enough crews?
+            // does the player remove enough crew?
             if (model.getRemoved(player).guys >= crew)
                 winner = Result.ok(player);
             else
@@ -44,6 +50,10 @@ public class AbandonedShip extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * This method is called when the players have made their choices and the card is played.
+     * @return Result<CardOutput> the result of the action
+     */
     @Override
     public Result<CardOutput> play() {
         if(!ready())
@@ -66,6 +76,10 @@ public class AbandonedShip extends Card {
         return winner.isOk() || allRegistered();
     }
 
+    /**
+     * This method is called to get the parameters for the card.
+     * @return CardData the data of the card
+     */
     @Override
     public CardData getData() {
         CardData data = new CardData(type, id);
@@ -75,6 +89,12 @@ public class AbandonedShip extends Card {
         return data;
     }
 
+    /**
+     * This method is called to get parameters for the card from a json file.
+     * @param model the model of the game
+     * @param board the board of the game
+     * @return List<Card> the list of cards
+     */
     public static List<Card> construct(Model model, FlightBoard board){
         String out = dump(Objects.requireNonNull(AbandonedShip.class.getResourceAsStream("abandoned_ship.json")));
         JSONArray jsonCards = new JSONArray(out);

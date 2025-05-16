@@ -65,6 +65,10 @@ public class Planets extends Card{
     }
 
 
+    /**
+     * This method is called when the card is played. It takes and gives items to the player according to their choice.
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         //begin common part
@@ -101,6 +105,11 @@ public class Planets extends Card{
         return data;
     }
 
+    /**
+     * This method is used to construct the card from a json file. It reads the json file and creates a list of cards.
+     * @param board
+     * @return
+     */
     public static List<Card> construct(FlightBoard board){
         String out = dump(Objects.requireNonNull(Planets.class.getResourceAsStream("planets.json")));
         JSONArray jsonCards = new JSONArray(out);

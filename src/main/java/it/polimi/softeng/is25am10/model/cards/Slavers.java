@@ -28,6 +28,12 @@ public class Slavers extends Card {
         this.enemyPower = enemyPower;
     }
 
+    /**
+     * checks if the player inputs are legal and sends error messages otherwise
+     * @param player the player that execute the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         //begin
@@ -59,6 +65,10 @@ public class Slavers extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * Gives rewards and makes changes according to player choice.
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         // common part
@@ -91,6 +101,12 @@ public class Slavers extends Card {
         return data;
     }
 
+    /**
+     * This method is used to create the Slavers cards from json files.
+     * @param model the model
+     * @param board the board
+     * @return a list of Slavers cards
+     */
     public static List<Card> construct(Model model, FlightBoard board)
     {
         String out = dump(Objects.requireNonNull(Slavers.class.getResourceAsStream("slavers.json")));

@@ -52,6 +52,12 @@ public class Meteors extends Card {
     }
 
 
+    /**
+     * returns errors if conditions are not met otherwise sets the values
+     * @param player the player that execute the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if (isRegistered(player))
@@ -71,6 +77,10 @@ public class Meteors extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * plays the card, changing the players' spaceships
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         if (!ready())
@@ -100,6 +110,12 @@ public class Meteors extends Card {
         return data;
     }
 
+    /**
+     * constructs the card from json data
+     * @param m
+     * @param board
+     * @return
+     */
     public static List<Card> construct(Model m, FlightBoard board){
         String out = dump(Objects.requireNonNull(Meteors.class.getResourceAsStream("meteors.json")));
         JSONArray jsonCards = new JSONArray(out);

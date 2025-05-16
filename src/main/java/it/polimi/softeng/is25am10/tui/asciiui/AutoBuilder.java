@@ -12,6 +12,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * This class is used to generate random ships and place them on the board in the tui.
+ * It also places the aliens on the board. Its purpose is to avoid the preparatory phase of the game
+ * when the game has to be tested or displayed in a demo.
+ */
 public class AutoBuilder {
     static Random rmd = new Random();
 
@@ -48,6 +53,10 @@ public class AutoBuilder {
         return new Coordinate(rmd.nextInt(0, TilesBoard.BOARD_WIDTH), rmd.nextInt(0, TilesBoard.BOARD_HEIGHT));
     }
 
+    /**
+     * Generates a random ship.
+     * @param game
+     */
     static void genRandomShip(Game game) {
         TilesBoard board = new TilesBoard();
 
@@ -69,6 +78,10 @@ public class AutoBuilder {
         }
     }
 
+    /**
+     * Places the aliens on the generated ships.
+     * @param game
+     */
     static void placeAlien(Game game){
         AtomicReference<Optional<Coordinate>> purple = new AtomicReference<>(Optional.empty());
         AtomicReference<Optional<Coordinate>> brown = new AtomicReference<>(Optional.empty());
@@ -104,6 +117,11 @@ public class AutoBuilder {
         game.execute(cmd.toString());
     }
 
+    /**
+     * Manages the execution of the random ship generation in a separate thread.
+     * @param game
+     * @param timeout
+     */
     static void placeRandom(Game game, int timeout){
         Future<?> future =  Executors.newSingleThreadExecutor().submit(() -> genRandomShip(game));
 

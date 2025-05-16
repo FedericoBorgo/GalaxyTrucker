@@ -16,6 +16,12 @@ public class Stardust extends Card {
         super(null, false, board, id, Type.STARDUST);
     }
 
+    /**
+     * checks that the card can be played
+     * @param player the player that executes the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
@@ -24,6 +30,10 @@ public class Stardust extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * Makes the changes consequent to the card being played.
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         //begin common part
@@ -51,6 +61,11 @@ public class Stardust extends Card {
         return new CardData(type, id);
     }
 
+    /**
+     * Creates the card from the json file.
+     * @param board
+     * @return
+     */
     public static List<Card> construct(FlightBoard board){
         String out = dump(Objects.requireNonNull(Stardust.class.getResourceAsStream("stardust.json")));
         JSONObject jsonObject = new JSONObject(out);
