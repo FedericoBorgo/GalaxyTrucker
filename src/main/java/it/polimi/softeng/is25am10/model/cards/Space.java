@@ -17,6 +17,12 @@ public class Space extends Card {
         super(model, true, board, id, Type.OPEN_SPACE);
     }
 
+    /**
+     * checks if the card can be played and
+     * @param player the player that execute the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         //begin
@@ -36,6 +42,10 @@ public class Space extends Card {
     }
 
 
+    /**
+     * Plays the card and makes the consequent changes to the game.
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         //begin common part
@@ -67,6 +77,12 @@ public class Space extends Card {
         return data;
     }
 
+    /**
+     * Builds the card from the received json.
+     * @param model
+     * @param board
+     * @return
+     */
     public static List<Card> construct(Model model, FlightBoard board){
         String out = dump(Objects.requireNonNull(Space.class.getResourceAsStream("open_space.json")));
         JSONObject jsonObject = new JSONObject(out);

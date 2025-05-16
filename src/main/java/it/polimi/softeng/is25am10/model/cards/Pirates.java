@@ -42,6 +42,12 @@ public class Pirates extends Card {
         projectiles = Meteors.genProjectiles(proj);
     }
 
+    /**
+     * checks if the player choices are valid and sends error messages if they are not
+     * @param player the player that executes the action
+     * @param input this is dependent of every card
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if (isRegistered(player))
@@ -54,7 +60,7 @@ public class Pirates extends Card {
         if(input.disconnected)
             shotPlayers.add(player);
         else{
-            //does the player dropped enough batteries?
+            //has the player dropped enough batteries?
             if(model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
                 return Result.err("battery required");
 
@@ -78,6 +84,10 @@ public class Pirates extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * Plays the card changing the situation of the players according to their choices.
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         if (!ready())
@@ -118,6 +128,12 @@ public class Pirates extends Card {
         return data;
     }
 
+    /**
+     * Creates the card from the json file and adds it to the list.
+     * @param model
+     * @param board
+     * @return
+     */
 
     public static List<Card> construct(Model model,FlightBoard board) {
         String out = dump(Objects.requireNonNull(Pirates.class.getResourceAsStream("pirates.json")));

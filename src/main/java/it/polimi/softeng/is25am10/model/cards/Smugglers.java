@@ -31,6 +31,13 @@ public class Smugglers extends Card {
     }
 
 
+    /**
+     * this method is called when the player chooses to play the card, it checks if the inputs are legal
+     * and the card can be properly played
+     * @param player
+     * @param input
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
@@ -73,6 +80,10 @@ public class Smugglers extends Card {
         return data;
     }
 
+    /**
+     * plays the card, gives the winner his rewards and sets the other changes.
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         // common part
@@ -90,6 +101,12 @@ public class Smugglers extends Card {
         return Result.ok(output);
     }
 
+    /**
+     * Constructs the smugglers cards from the json file.
+     * @param model
+     * @param board
+     * @return
+     */
     public static List<Card> construct(Model model, FlightBoard board){
         String out = dump(Objects.requireNonNull(Smugglers.class.getResourceAsStream("smugglers.json")));
         JSONArray jsonCards = new JSONArray(out);

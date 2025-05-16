@@ -85,6 +85,11 @@ public class Warzone extends Card {
         return Result.ok(input);
     }
 
+    /**
+     * find the player with the least value of the given type
+     * @param type
+     * @return
+     */
     private List<Player> findLeast(LeastTypes type){
         OptionalDouble min = declaredPower.values()
                 .stream()
@@ -101,6 +106,10 @@ public class Warzone extends Card {
         return result;
     }
 
+    /**
+     * move pawns and remove goods
+     * @return
+     */
     @Override
     public Result<CardOutput> play() {
         if(!ready())
@@ -145,6 +154,12 @@ public class Warzone extends Card {
         return data;
     }
 
+    /**
+     * constructs thecard from the json data
+     * @param model
+     * @param board
+     * @return
+     */
     public static List<Card> construct(Model model, FlightBoard board){
         String out = dump(Objects.requireNonNull(Warzone.class.getResourceAsStream("warzone.json")));
         JSONArray jsonCards = new JSONArray(out);

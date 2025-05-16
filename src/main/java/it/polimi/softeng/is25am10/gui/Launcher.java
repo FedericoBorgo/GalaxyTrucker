@@ -36,6 +36,11 @@ public class Launcher extends Application {
         launch(args);
     }
 
+    /**
+     * Starts the application and sets basic screen parameters.
+     * @param stage
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
         Launcher.stage = stage;
@@ -51,6 +56,12 @@ public class Launcher extends Application {
         });
     }
 
+    /**
+     * Loads a scene from the given path and sets it to the stage.
+     * @param path The path to the FXML file.
+     * @param <T> The type of the controller.
+     * @return A pair containing the handler and the scene.
+     */
     static public <T> Pair<T, Scene> loadScene(String path){
         FXMLLoader loader = new FXMLLoader(Launcher.class.getResource(path));
         Parent root;
@@ -68,10 +79,17 @@ public class Launcher extends Application {
         return new Pair<>(handler, scene);
     }
 
+    // returns the image
     static public Image getSmallImage(Image original){
         return getRotatedImage(original, 0);
     }
 
+    /**
+     * Rotates an image by the given angle in degrees.
+     * @param original
+     * @param angleDegrees
+     * @return
+     */
     static public Image getRotatedImage(Image original, double angleDegrees) {
         double size = 30;
 
@@ -116,6 +134,7 @@ public class Launcher extends Application {
 
         return new Image(Building.class.getResource(path).toExternalForm());
     }
+
 
     public static Optional<Pair<Coordinate, String>> getCoordinate(DragEvent event, GridPane ship, AtomicBoolean success){
         Dragboard db = event.getDragboard();
