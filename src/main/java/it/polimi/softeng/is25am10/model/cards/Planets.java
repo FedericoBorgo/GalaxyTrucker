@@ -41,19 +41,19 @@ public class Planets extends Card{
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
         //end
 
         Planet planet = input.planet;
 
         //some player already took the planet?
         if(planet != Planet.NOPLANET && chosenPlanet.containsValue(planet))
-            return Result.err("planet already occupied");
+            return Result.err("pianeta già occupato");
 
         if(!planets.containsKey(planet) && planet != Planet.NOPLANET)
-            return Result.err("planet does not exist");
+            return Result.err("il pianeta non esiste");
 
         chosenPlanet.put(player, planet);
 
@@ -73,7 +73,7 @@ public class Planets extends Card{
     public Result<CardOutput> play() {
         //begin common part
         if(!ready())
-            return Result.err("not all player declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro scelta");
         //end
 
         CardOutput output = new CardOutput();

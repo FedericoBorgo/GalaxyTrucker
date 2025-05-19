@@ -39,14 +39,14 @@ public class Slavers extends Card {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
         //end
 
         if(!input.disconnected) {
             if (model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
-                return Result.err("not enough batteries used to activate the cannons");
+                return Result.err("non ci sono abbastanza batterie per attivare i cannoni");
 
             double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
 
@@ -58,7 +58,7 @@ public class Slavers extends Card {
             }
             else if (power < enemyPower)
                 if (model.getRemoved(player).guys < crew && player.getBoard().getAstronaut().getTotal() > 0)
-                    return Result.err("player did not give enough astronauts to the slavers");
+                    return Result.err("il giocatore non ha dato abbastanza astronauti agli schiavisti");
         }
 
         register(player);
@@ -73,7 +73,7 @@ public class Slavers extends Card {
     public Result<CardOutput> play() {
         // common part
         if(!ready())
-            return Result.err("not all players declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro decisione");
 
         CardOutput output = new CardOutput();
 

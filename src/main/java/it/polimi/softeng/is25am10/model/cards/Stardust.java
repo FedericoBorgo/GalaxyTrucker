@@ -25,7 +25,7 @@ public class Stardust extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         register(player);
         return Result.ok(input);
     }
@@ -38,7 +38,7 @@ public class Stardust extends Card {
     public Result<CardOutput> play() {
         //begin common part
         if(!ready())
-            return Result.err("not all player declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro decisione");
         //end
 
         FlightBoard.Pawn pawn;

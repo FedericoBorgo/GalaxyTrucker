@@ -33,9 +33,9 @@ public class AbandonedShip extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
 
         //does the player want to land?
         if(input.accept) {
@@ -43,7 +43,7 @@ public class AbandonedShip extends Card {
             if (model.getRemoved(player).guys >= crew)
                 winner = Result.ok(player);
             else
-                return Result.err("not enough astronaut");
+                return Result.err("non ci sono abbastanza astronauti");
         }
 
         register(player);
@@ -57,7 +57,7 @@ public class AbandonedShip extends Card {
     @Override
     public Result<CardOutput> play() {
         if(!ready())
-            return Result.err("not all players declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro scelta");
 
         CardOutput output = new CardOutput();
 

@@ -51,10 +51,10 @@ public class Pirates extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if (isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
 
         if (unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
 
         // if the player is disconnected, he's automatically defeated
         if(input.disconnected)
@@ -62,13 +62,13 @@ public class Pirates extends Card {
         else{
             //has the player dropped enough batteries?
             if(model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
-                return Result.err("battery required");
+                return Result.err("servono più batterie");
 
             double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
 
             if(power < piratePower) {
                 if(input.shieldFor.size() > model.getRemoved(player).battery)
-                    return Result.err("not enough battery required");
+                    return Result.err("non ci sono abbastanza batterie richieste");
 
                 useBattery.put(player, input.shieldFor);
                 shotPlayers.add(player);
@@ -91,7 +91,7 @@ public class Pirates extends Card {
     @Override
     public Result<CardOutput> play() {
         if (!ready())
-            return Result.err("not all player declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro decisione");
 
         CardOutput output = new CardOutput();
 

@@ -28,9 +28,9 @@ public class Space extends Card {
         //begin
         //this section is the same for almost every card.
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
         //end
 
         int power = player.getBoard().getEnginePower(model.getRemoved(player).battery);
@@ -50,7 +50,7 @@ public class Space extends Card {
     public Result<CardOutput> play() {
         //begin common part
         if(!ready())
-            return Result.err("not all player declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro decisione");
 
         enginePower.forEach((p, v) -> {
             if(v == 0)
