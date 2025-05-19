@@ -139,7 +139,7 @@ public abstract class Card implements Serializable {
 
     /**
      * Checks if two cards are equal.
-     * @param o
+     * @param o object to compare
      * @return
      */
     @Override
