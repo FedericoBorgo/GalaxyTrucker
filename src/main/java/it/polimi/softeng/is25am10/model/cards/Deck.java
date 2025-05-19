@@ -110,16 +110,30 @@ public class Deck extends Card implements Serializable {
         return res;
     }
 
+    /**
+     * Forwards player input to the active card.
+     * @param player the player that executes the action
+     * @param input
+     * @return
+     */
     @Override
     public Result<CardInput> set(Player player, CardInput input){
         return selectedCard.set(player, input);
     }
 
+    /**
+     * Check if the card is ready to be played.
+     * @return true if ready, false otherwise
+     */
     @Override
     public boolean ready(){
         return selectedCard.ready();
     }
 
+    /**
+     * Get the data of the card.
+     * @return the data
+     */
     @Override
     public CardData getData(){
         if(selectedCard == null)
@@ -127,6 +141,10 @@ public class Deck extends Card implements Serializable {
         return selectedCard.getData();
     }
 
+    /**
+     * Get the registered players
+     * @return the flight board
+     */
     @Override
     public List<Player> getRegistered(){
         return selectedCard.getRegistered();
@@ -137,6 +155,12 @@ public class Deck extends Card implements Serializable {
         deck.addAll(cards);
     }
 
+    /**
+     * The method ensures that two decks are considered equal only when they represent the exact
+     * same game state: same cards, same visible cards, same selected card, same players, and same flight board.
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
