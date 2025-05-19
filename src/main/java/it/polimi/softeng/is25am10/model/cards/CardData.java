@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class contains every data for every card.
+ * This class contains every possible piece of data for every card.
  */
 public class CardData implements Serializable {
     public final Card.Type type;
@@ -42,6 +42,12 @@ public class CardData implements Serializable {
         this.type = type;
         this.id = id;
     }
+
+    /**
+     * formats card information creating a comprehensive text description (builder) of the card that
+     * shows all its relevant attributes and effects.
+     * @return
+     */
 
     @Override
     public String toString() {
@@ -130,6 +136,15 @@ public class CardData implements Serializable {
         return builder.toString();
     }
 
+    /**
+     * This method is used to handle the card data and create the appropriate GUI elements.
+     * It creates a VBox container to hold UI components.
+     * Depending on the card type, it generates different interactive elements.
+     * this builds an interactive visual representation of the card.
+     * It positions elements appropriately and configures event handlers for user interactions based on card functionality.
+     * @param s the scene that has to be rendered
+     * @return
+     */
     public VBox handle(CardScene s){
         VBox vBox = new VBox();
 
