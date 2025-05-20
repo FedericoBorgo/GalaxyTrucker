@@ -69,8 +69,10 @@ public class TilesBoard implements Serializable {
         board[c.x()][c.y()] = tile;
     }
 
-    // Retrieves a tile from the board at the specified coordinates.
-    // If the specified coordinates are out of bounds, returns null.
+    /**
+     * Retrieves a tile from the board at the specified coordinates.
+     *  If the specified coordinates are out of bounds, returns null.
+     */
     private Tile get(Coordinate c) {
         return board[c.x()][c.y()];
     }
@@ -257,6 +259,11 @@ public class TilesBoard implements Serializable {
         return result;
     }
 
+    /**
+     * Mark the tiles that are reachable from the given coordinate.
+     * @param marked
+     * @param c
+     */
     private void mark(boolean[][] marked, Coordinate c) {
         if (marked[c.x()][c.y()] || !Tile.real(board[c.x()][c.y()]))
             return;
@@ -321,6 +328,10 @@ public class TilesBoard implements Serializable {
 
     }
 
+    /**
+     * Check if the tiles are placed correctly.
+     * @param result
+     */
     private void checkTiles(Set<Coordinate> result) {
         Coordinate.forEach(c -> {
             try {
@@ -344,6 +355,10 @@ public class TilesBoard implements Serializable {
         });
     }
 
+    /**
+     * Check if the connectors are placed correctly.
+     * @param result
+     */
     private void checkConnectors(Set<Coordinate> result) {
         Coordinate.forEach(c -> {
             try {
@@ -474,6 +489,11 @@ public class TilesBoard implements Serializable {
         return power.get();
     }
 
+    /**
+     * checks if the shields can defend the ship
+     * @param side
+     * @return
+     */
     private boolean doesShieldsCover(Tile.Side side){
         AtomicBoolean covered = new AtomicBoolean();
         covered.set(false);
@@ -489,6 +509,13 @@ public class TilesBoard implements Serializable {
         return covered.get();
     }
 
+    /**
+     * checks if the drills can defend the ship
+     * @param side
+     * @param where
+     * @param useBattery
+     * @return
+     */
     private boolean doesDrillsCover(Tile.Side side, int where, boolean useBattery){
         AtomicBoolean cover = new AtomicBoolean();
         cover.set(false);
@@ -522,6 +549,11 @@ public class TilesBoard implements Serializable {
         return cover.get();
     }
 
+    /**
+     * checks if the projectile will hit a tile
+     * @param p
+     * @return
+     */
     private Optional<Coordinate> whatWillHit(Projectile p){
         Coordinate c = null;
         switch(p.side()){
@@ -658,6 +690,10 @@ public class TilesBoard implements Serializable {
         });
     }
 
+    /**
+     * Draw the errors on the ship board's tiles.
+     * @param s
+     */
     public void drawErrors(CardScene s){
         Set<Coordinate> res = isOK();
 

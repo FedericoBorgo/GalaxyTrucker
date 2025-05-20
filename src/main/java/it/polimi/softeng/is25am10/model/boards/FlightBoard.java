@@ -82,7 +82,9 @@ public class FlightBoard implements Serializable {
         checkDuped();
     }
 
-    ///  normalize the offsets of the players
+    /**
+     *     normalize the offsets of the players
+     */
     private void shift(){
         if(offset.isEmpty())
             return;
@@ -182,12 +184,16 @@ public class FlightBoard implements Serializable {
         shift();
     }
 
-    ///  get the list of player quits
+    /**
+     *     get the list of player quits
+     */
     public List<Pawn> getQuitters() {
         return quitters;
     }
-
-    ///  check if the leader made a total lap over some player
+    /**
+     *
+     *check if the leader made a total lap over some player
+     */
     public void checkDuped(){
         for(int i = order.size()-1; i >= 0; i--)
             if(offset.get(i) <= -24)
@@ -220,6 +226,10 @@ public class FlightBoard implements Serializable {
         this.offset = offset;
     }
 
+    /**
+     * updates the clock (and hourglass) in the building scene
+     * @param b
+     */
     public void updateClock(Building b) {
         b.clock1.setVisible(false);
         b.clock2.setVisible(false);
@@ -232,6 +242,10 @@ public class FlightBoard implements Serializable {
         };
     }
 
+    /**
+     * draws the pawns' positions
+     * @param s
+     */
     public void drawPos(CardScene s){
         int pos = leaderPosition%24;
         FlightBoard.Pawn pawn;

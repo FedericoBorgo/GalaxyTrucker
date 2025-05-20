@@ -91,6 +91,12 @@ public class AlienBoard extends ElementsBoard{
         return type == Tile.Type.B_ADDON ? TextColor.ANSI.YELLOW : TextColor.ANSI.MAGENTA;
     }
 
+    /**
+     * Place the alien in the specified coordinate and handle the view.
+     * @param b
+     * @param c
+     * @param view
+     */
     public void placeAlien(Building b, Coordinate c, ImageView view){
         if(!cantPlace(c, 1)){
             b.dragSuccess.set(true);
