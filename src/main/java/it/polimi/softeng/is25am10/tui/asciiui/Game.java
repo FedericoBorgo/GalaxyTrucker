@@ -17,7 +17,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-
+/**
+ * This class is used to manage the game. It is the main class of the TUI.
+ */
 public class Game extends UnicastRemoteObject implements Callback {
     FrameGenerator frame;
     Map<String, Function<String, String>> executors = new HashMap<>();
@@ -540,21 +542,44 @@ public class Game extends UnicastRemoteObject implements Callback {
 
     // callbacks
 
+    /**
+     * receives the players from the server
+     * @param players
+     * @param quid
+     * @param disconnected
+     * @throws RemoteException
+     */
+
     @Override
     public synchronized void pushPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected) throws RemoteException {
         frame.drawPlayersName(players, quid, disconnected);
     }
 
+    /**
+     * asks the player how many players he wants to play with
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public synchronized int askHowManyPlayers() throws RemoteException {
         return frame.askHowManyPlayer();
     }
 
+    /**
+     * receives the seconds left from the server
+     * @param seconds
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushSecondsLeft(Integer seconds) throws RemoteException {
         frame.drawSecondsLeft(seconds);
     }
 
+    /**
+     * receives the state from the server
+     * @param state
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushState(State.Type state) throws RemoteException {
         this.state = state;
@@ -573,6 +598,11 @@ public class Game extends UnicastRemoteObject implements Callback {
         frame.drawState();
     }
 
+    /**
+     * receives the card data from the server
+     * @param card
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushCardData(CardData card) throws RemoteException {
         if(card == null)
@@ -583,6 +613,11 @@ public class Game extends UnicastRemoteObject implements Callback {
         frame.drawProjectile(card.projectiles);
     }
 
+    /**
+     * receives the card changes from the server and fixes the board
+     * @param output
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushCardChanges(CardOutput output) throws RemoteException {
         List<Coordinate> remove = output.killedCrew.getOrDefault(server.getPlayerName(), null);
@@ -612,22 +647,44 @@ public class Game extends UnicastRemoteObject implements Callback {
         frame.drawGoods(goodsReward);
     }
 
+    /**
+     * receives the wait from the server.
+     * @param name
+     * @param pawn
+     * @throws RemoteException
+     */
     @Override
     public synchronized void waitFor(String name, FlightBoard.Pawn pawn) throws RemoteException {
         frame.drawWaitFor(name, pawn);
     }
 
+    /**
+     * receives the handed tile from the server
+     * @param t
+     * @throws RemoteException
+     */
     @Override
     public synchronized void gaveTile(Tile t) throws RemoteException {
         openTiles.add(t);
         frame.drawOpenTiles();
     }
 
+    /**
+     * receives the tile from the server.
+     * @param t
+     * @throws RemoteException
+     */
     @Override
     public synchronized void gotTile(Tile t) throws RemoteException {
         openTiles.remove(t);
         frame.drawOpenTiles();
     }
+
+    /**
+     * receives the shipboard from the server.
+     * @param board
+     * @throws RemoteException
+     */
 
     @Override
     public synchronized void pushBoard(ShipBoard board) throws RemoteException {
@@ -637,17 +694,33 @@ public class Game extends UnicastRemoteObject implements Callback {
         frame.drawElements();
     }
 
+    /**
+     * receives flightboard from the server.
+     * @param board
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushFlight(FlightBoard board) throws RemoteException {
         this.flight = board;
         frame.drawFlight();
     }
 
+    /**
+     * Receives a ping from the server.
+     * @return
+     */
     @Override
     public synchronized int ping(){
         return 0;
     }
 
+    /**
+     * Recieves the placed tile from the server.
+     * @param c
+     * @param t
+     * @param r
+     * @throws RemoteException
+     */
     @Override
     public synchronized void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
         board.getTiles().getBooked().removeIf((tile) -> tile.equals(t));
@@ -656,12 +729,22 @@ public class Game extends UnicastRemoteObject implements Callback {
         frame.drawBooked();
     }
 
+    /**
+     * Recieves the booked tiles from the server.
+     * @param t
+     * @throws RemoteException
+     */
     @Override
     public synchronized void bookedTile(Tile t) throws RemoteException {
         board.getTiles().bookTile(t);
         frame.drawBooked();
     }
 
+    /**
+     * Recieves the removed tiles from the server.
+     * @param c
+     * @throws RemoteException
+     */
     @Override
     public synchronized void removed(Coordinate c) throws RemoteException{
         board.getTiles().remove(c);
@@ -669,16 +752,32 @@ public class Game extends UnicastRemoteObject implements Callback {
         frame.destroyed(c);
     }
 
+    /**
+     * Recieves the removed elements from the server.
+     * @param dropped
+     * @throws RemoteException
+     */
+
     @Override
     public synchronized void pushDropped(Model.Removed dropped) throws RemoteException {
         frame.drawDroppedItems(dropped);
     }
 
+    /**
+     * Recieves the cannons from the server.
+     * @param cannons
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushCannons(HashMap<Tile.Rotation, Integer> cannons) throws RemoteException {
         frame.drawCannonsToUse(cannons);
     }
 
+    /**
+     * Recieves the model from the server.
+     * @param m
+     * @throws RemoteException
+     */
     @Override
     public synchronized void pushModel(Model m) throws RemoteException {
         pushBoard(m.ship(server.getPlayerName()));
@@ -706,6 +805,11 @@ public class Game extends UnicastRemoteObject implements Callback {
         });
     }
 
+    /**
+     * Recieves cash from the server.
+     * @param cash
+     * @throws RemoteException
+     */
     @Override
     public void pushFinalCash(HashMap<String, Integer> cash) throws RemoteException {
         frame.pushFinalCash(cash);
