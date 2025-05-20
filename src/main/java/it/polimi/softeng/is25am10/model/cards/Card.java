@@ -74,6 +74,9 @@ public abstract class Card implements Serializable {
      * @return true if he's him, false if not
      */
     protected boolean unexpected(Player player) {
+        if(!flight.getOrder().contains(player.getPawn())) {
+            return true;
+        }
         return !registered.keySet().containsAll(flight.getOrder().subList(0, flight.getOrder().indexOf(player.getPawn())));
     }
 
