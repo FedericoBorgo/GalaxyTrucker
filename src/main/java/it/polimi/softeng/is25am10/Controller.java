@@ -65,6 +65,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
 
     private transient ExecutorService execService = null;
 
+    /**
+     * Main class of the controller. It creates the controller and starts the server.
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
         if(args.length > 0)
             Logger.SILENCE = Boolean.parseBoolean(args[0]);
@@ -90,6 +95,9 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         }
     }
 
+    /**
+     * Logs the state the game is in and carries out necessary changes to the model.
+     */
     void loadEvent(){
         // create the event notifier
         stateEvent = (m, state) -> {
@@ -170,6 +178,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         execService = Executors.newFixedThreadPool(8);
     }
 
+    /**
+     * Constructor of the controller.
+     * @param rmiPort
+     * @param socketPort1
+     * @param socketPort2
+     * @throws IOException
+     */
     private Controller(int rmiPort, int socketPort1, int socketPort2) throws IOException {
         super();
         loadEvent();
@@ -310,6 +325,10 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         notifyPlayers(m, null, m.getState());
     }
 
+    /**
+     * Send the final cash to every player connected to the game.
+     * @param m
+     */
     public void pushFinalCash(Model m){
         HashMap<String, Integer> cash = m.computeCash();
         notifyPlayers(m, null, cash);
@@ -419,6 +438,10 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         });
     }
 
+    /**
+     * Push the cannons to the players. Handles instances of disconnection.
+     * @param m
+     */
     public void pushCannons(Model m){
         m.getPlayers().forEach((name, _) -> {
             if(disconnected.get(m).contains(name))
@@ -449,6 +472,9 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         }
     }
 
+    /**
+     * When a player is disconnected, the game will play for him.
+     */
     private void handleAutomaticInput(){
         games.values().forEach(m -> {
             disconnected.get(m).forEach(name -> {
@@ -533,6 +559,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return getModel(name).setReady(name);
     }
 
+    /**
+     * This makes a player quit the game.
+     * @param name of the player calling the method
+     * @return result of the operation
+     */
     @Override
     public Result<String> quit(String name) {
         Result<String> res = getModel(name).quit(name);
@@ -543,6 +574,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Method used to set the tile in the given coordinates to the specified player's board.
+     * @param name
+     * @param c
+     * @param t
+     * @param rotation
+     * @return
+     */
     @Override
     public Result<Tile> setTile(String name, Coordinate c, Tile t, Tile.Rotation rotation) {
         Result<Tile> res = getModel(name).setTile(name, c, t, rotation);
@@ -555,6 +594,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Method used to book a tile for a player.
+     * @param name
+     * @param t
+     * @return
+     */
     @Override
     public Result<Tile> bookTile(String name, Tile t) {
         Result<Tile> res = getModel(name).bookTile(name, t);
@@ -567,6 +612,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Lets a player place a previously booked tile on his shipboard.
+     * @param name
+     * @param t
+     * @param rotation
+     * @param c
+     * @return
+     */
     @Override
     public Result<Tile> useBookedTile(String name, Tile t, Tile.Rotation rotation, Coordinate c) {
         Result<Tile> res = getModel(name).useBookedTile(name, t, rotation, c);
@@ -580,6 +633,14 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Method used to place a tile that wasn't booked on the shipboard.
+     * @param name
+     * @param t
+     * @param rotation
+     * @param c
+     * @return
+     */
     public Result<Tile> placeOpenTile(String name, Tile t, Tile.Rotation rotation, Coordinate c){
         Result<Tile> res = getTileFromSeen(name, t);
 
@@ -594,6 +655,12 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Method used to remove a tile from the player's shipboard at the given coordinates.
+     * @param name
+     * @param c
+     * @return
+     */
     @Override
     public Result<String> remove(String name, Coordinate c) {
         Result<String> res = getModel(name).remove(name, c);
@@ -608,42 +675,85 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Returns a player's removed items.
+     * @param name
+     * @return
+     */
     @Override
     public Model.Removed getRemoved(String name){
         return getModel(name).getRemoved(name);
     }
 
+    /**
+     * Method used to get the ship of a player.
+     * @param name
+     * @return
+     */
     @Override
     public ShipBoard getShip(String name) {
         return getModel(name).ship(name);
     }
 
+    /**
+     * Method used to get the initialized flight board of a player.
+     * @param name
+     * @return
+     */
     @Override
     public Result<String> init(String name, Result<Coordinate> purple, Result<Coordinate> brown) {
         return getModel(name).init(name, purple.isOk()? Optional.of(purple.getData()) : Optional.empty(),
                 brown.isOk()? Optional.of(brown.getData()) : Optional.empty());
     }
 
+    /**
+     * Method used to get the reward of a player.
+     * @param name
+     * @return
+     */
     @Override
     public List<GoodsBoard.Type> getReward(String name) {
         return getModel(name).getReward(name);
     }
 
+    /**
+     * Method used to place a reward on the player's board.
+     * @param name
+     * @param t
+     * @param c
+     * @return
+     */
     @Override
     public Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c) {
         return getModel(name).placeReward(name, t, c);
     }
 
+    /**
+     * Method used to drop a reward the player doesn't want.
+     * @param name
+     * @return
+     */
     @Override
     public Result<String> dropReward(String name){
         return getModel(name).dropReward(name);
     }
 
+    /**
+     * Method used to get the cash of a player.
+     * @param name
+     * @return
+     */
     @Override
     public int getCash(String name) {
         return getModel(name).getCash(name);
     }
 
+    /**
+     * Method used to drop a tile from the player's board at the given coordinates.
+     * @param name
+     * @param c
+     * @return
+     */
     @Override
     public Result<Integer> drop(String name, Coordinate c) {
         Result<Integer> res = getModel(name).drop(name, c);
@@ -656,6 +766,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * surrenders the goods in the given coordinates from the player's boards.
+     * @param name
+     * @param c
+     * @param t
+     * @return
+     */
     @Override
     public Result<Integer> drop(String name, Coordinate c, GoodsBoard.Type t) {
         Result<Integer> res = getModel(name).drop(name, c, t);
@@ -668,6 +785,13 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Method used to increase the number of cannons of a player.
+     * @param name
+     * @param r
+     * @param count
+     * @return
+     */
     @Override
     public Result<String> increaseCannon(String name, Tile.Rotation r, Integer count) {
         Result<String> res = getModel(name).increaseCannon(name, r, count);
@@ -681,6 +805,11 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return res;
     }
 
+    /**
+     * Method used to draw a tile from the deck. Calls {@code drawTile()} in {@code Model} class.
+     * @param name
+     * @return
+     */
     @Override
     public Result<Tile> drawTile(String name) {
         return getModel(name).drawTile(name);
@@ -789,11 +918,21 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         return getModel(name).getVisible();
     }
 
+    /**
+     * Method used to get the engine power of a player. Calls {@code getEnginePower()}.
+     * @param name
+     * @return
+     */
     @Override
     public int getEnginePower(String name) {
         return getModel(name).getEnginePower(name);
     }
 
+    /**
+     * Method used to get the cannon power of a player. Calls {@code getCannonPower()}.
+     * @param name
+     * @return
+     */
     @Override
     public double getCannonPower(String name) {
         return getModel(name).getCannonPower(name);

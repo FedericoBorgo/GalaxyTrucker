@@ -12,26 +12,16 @@ import java.io.*;
 
 public class Asciiui {
 
-
+    /**
+     * Main method to start the text base program
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-/*
-        try{
-            Controller.main(new String[]{"true"});
-        }catch(Exception _){}
-
-        String name = args[0];
-        String conn = args[1];
-
-        ClientInterface client = conn.equals("rmi")?
-                new RMIClient(name, "localhost", 1234) :
-                new SocketClient(name, "localhost", 1235, 1236);*/
 
         ClientInterface client = Config.getControls();
 
         Game game = new Game(client);
 
-        //new SocketClient("npc", "localhost", 1235, 1236).join(new PlaceholderCallback());
-
-        //AutoBuilder.initGame(game);
     }
 }

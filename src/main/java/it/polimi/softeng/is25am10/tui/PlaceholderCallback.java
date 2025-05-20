@@ -14,6 +14,9 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * This class implements the Callback interface and provides just a placeholder.
+ */
 public class PlaceholderCallback implements Callback {
 
     @Override
