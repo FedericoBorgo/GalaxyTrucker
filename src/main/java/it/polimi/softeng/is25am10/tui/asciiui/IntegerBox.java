@@ -9,6 +9,11 @@ public class IntegerBox extends TextBox {
         super(String.valueOf(defaultValue));
     }
 
+    /**
+     * Fetches user keystrokes and calls the methods to handle them.
+     * @param keyStroke
+     * @return
+     */
     @Override
     public synchronized Result handleKeyStroke(KeyStroke keyStroke) {
         if (keyStroke.getKeyType() == KeyType.Backspace || keyStroke.getKeyType() == KeyType.Delete ||
