@@ -19,7 +19,7 @@
          </image>
       </ImageView>
       <Button layoutX="703.0" layoutY="434.0" mnemonicParsing="false" onAction="#join" opacity="0.0" prefHeight="60.0" prefWidth="177.0" text="Button" />
-      <TextField fx:id="usernameField" layoutX="489.0" layoutY="68.0" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="user">
+      <TextField fx:id="usernameField" layoutX="489.0" layoutY="68.0" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="chiara">
          <font>
             <Font name="Orbitron Medium" size="19.0" />
          </font></TextField>
@@ -27,7 +27,7 @@
          <font>
             <Font name="Orbitron Medium" size="19.0" />
          </font></TextField>
-      <SplitMenuButton fx:id="connectionMenu" layoutX="488.0" layoutY="243.0" mnemonicParsing="false" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="RMI" wrapText="true">
+      <SplitMenuButton fx:id="connectionMenu" layoutX="488.0" layoutY="243.0" mnemonicParsing="false" opacity="0.75" prefHeight="48.0" prefWidth="383.0" text="SOCKET" wrapText="true">
         <items>
           <MenuItem fx:id="socketMenu" mnemonicParsing="false" onAction="#socket" text="SOCKET" />
           <MenuItem fx:id="rmiMenu" mnemonicParsing="false" onAction="#rmi" text="RMI" />
@@ -36,17 +36,17 @@
             <Font name="Orbitron Medium" size="19.0" />
          </font>
       </SplitMenuButton>
-      <TextField fx:id="port1" layoutX="369.0" layoutY="341.0" opacity="0.75" prefHeight="44.0" prefWidth="124.0" text="1234">
+      <TextField fx:id="port1" layoutX="369.0" layoutY="341.0" opacity="0.75" prefHeight="44.0" prefWidth="124.0" text="1235">
          <font>
             <Font name="Orbitron Medium" size="19.0" />
          </font></TextField>
-      <TextField fx:id="port2" layoutX="812.0" layoutY="338.0" opacity="0.75" prefHeight="48.0" prefWidth="123.0" text="1236" visible="false">
+      <TextField fx:id="port2" layoutX="812.0" layoutY="338.0" opacity="0.75" prefHeight="48.0" prefWidth="123.0" text="1236">
          <font>
             <Font name="Orbitron Medium" size="19.0" />
          </font></TextField>
       <Label fx:id="errLabel" layoutX="307.0" layoutY="494.0" prefHeight="52.0" prefWidth="516.0" textAlignment="CENTER" textFill="#e40505">
          <font>
-            <Font name="Sinhala Sangam MN" size="43.0" />
+            <Font name="Sinhala Sangam MN" size="35.0" />
          </font>
          <effect>
             <Glow level="0.52" />

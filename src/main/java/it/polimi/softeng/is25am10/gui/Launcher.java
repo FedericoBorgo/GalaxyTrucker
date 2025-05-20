@@ -19,6 +19,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -44,6 +45,9 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Launcher.stage = stage;
+
+        Font customFont = Font.loadFont(Launcher.class.getResourceAsStream("/gui/font.ttf"), 12);
+
         loadScene("/gui/welcome.fxml");
 
         stage.setTitle("Galaxy Trucker");

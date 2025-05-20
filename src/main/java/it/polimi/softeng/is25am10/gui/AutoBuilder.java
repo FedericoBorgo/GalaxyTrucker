@@ -41,7 +41,7 @@ public class AutoBuilder extends Thread{
         long start = System.currentTimeMillis();
 
         //places the tiles on the shipboard automatically and randomly
-        while(System.currentTimeMillis()-start < 5000){
+        while(System.currentTimeMillis()-start < 60000){
             Coordinate c = genRandomCoord();
             Tile t = genRandomTile();
             Tile.Rotation r = Tile.engine(t) ? Tile.Rotation.NONE : genRandomOri();

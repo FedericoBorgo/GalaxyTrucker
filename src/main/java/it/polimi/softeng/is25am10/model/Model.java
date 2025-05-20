@@ -110,7 +110,7 @@ public class Model implements Serializable {
      */
     private transient Timer timer;
     private transient TimerTask task;
-    public static final int TIMER_DELAY = 0;
+    public static final int TIMER_DELAY = 90;
     private int secondsLeft = TIMER_DELAY;
 
     public int phase = 0;
