@@ -25,7 +25,7 @@ public class Epidemic extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         // the input of the player does not matter
         register(player);
         return Result.ok(input);
@@ -39,7 +39,7 @@ public class Epidemic extends Card {
     public Result<CardOutput> play() {
         //begin common part
         if(!ready())
-            return Result.err("not all player declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro scelta");
         //end
 
         CardOutput output = new CardOutput();

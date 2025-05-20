@@ -57,9 +57,9 @@ public class Warzone extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
 
         if(input.shieldFor.size() > player.getBoard().getBattery().getTotal())
             return Result.err("not enough battery");
@@ -68,7 +68,7 @@ public class Warzone extends Card {
         int removedBattery = model.getRemoved(player).battery;
 
         if(requiredBattery > removedBattery)
-            return Result.err("not enough battery");
+            return Result.err("non ci sono abbastanza batterie");
 
         double cannonPower = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
         double enginePower = player.getBoard().getEnginePower(removedBattery-requiredBattery);
@@ -113,7 +113,7 @@ public class Warzone extends Card {
     @Override
     public Result<CardOutput> play() {
         if(!ready())
-            return Result.err("not ready");
+            return Result.err("non pronto");
 
         CardOutput output = new CardOutput();
 

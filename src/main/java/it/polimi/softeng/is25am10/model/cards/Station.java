@@ -34,16 +34,16 @@ public class Station extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
 
         //enough crew?
         if(input.accept) {
             int crew = player.getBoard().getAstronaut().getTotal();
 
             if (crew < this.crew)
-                return Result.err("not enough crew");
+                return Result.err("non hai abbastanza astronauti");
 
             winner = Result.ok(player);
         }
@@ -60,7 +60,7 @@ public class Station extends Card {
     @Override
     public Result<CardOutput> play() {
         if(!ready())
-            return Result.err("nobody chose yes");
+            return Result.err("nessun giocatore ha accettato");
 
         CardOutput output = new CardOutput();
 

@@ -137,6 +137,11 @@ public abstract class Card implements Serializable {
         return new ArrayList<>(registered.values());
     }
 
+    /**
+     * Checks if two cards are equal.
+     * @param o object to compare
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

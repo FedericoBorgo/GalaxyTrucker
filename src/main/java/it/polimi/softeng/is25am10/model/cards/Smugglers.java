@@ -41,13 +41,13 @@ public class Smugglers extends Card {
     @Override
     public Result<CardInput> set(Player player, CardInput input) {
         if(isRegistered(player))
-            return Result.err("player already registered");
+            return Result.err("il giocatore è già registrato");
         if(unexpected(player))
-            return Result.err("player choice is not in order");
+            return Result.err("la scelta del giocatore non è in ordine");
 
         if(!input.disconnected) {
             if (model.batteryForCannon(player.getName()) > model.getRemoved(player).battery)
-                return Result.err("not enough batteries used to activate the cannons");
+                return Result.err("non ci sono abbastanza batterie per attivare i cannoni");
 
             double power = player.getBoard().getCannonsPower(model.getCannonsToUse(player));
 
@@ -57,7 +57,7 @@ public class Smugglers extends Card {
                     winner = Result.ok(player);
 
             } else if (power < enemyPower && (model.getRemoved(player).goods < goods && model.getRemoved(player).goods + player.getBoard().getTotalGoods() >= goods))
-                    return Result.err("player did not give enough goods to the smugglers");
+                    return Result.err("il giocatore non ha dato abbastanza beni ai contrabandieri");
         }
         register(player);
         return Result.ok(input);
@@ -88,7 +88,7 @@ public class Smugglers extends Card {
     public Result<CardOutput> play() {
         // common part
         if(!ready())
-            return Result.err("not all players declared their decision");
+            return Result.err("non tutti i giocatori hanno dichiarato la loro decisione");
 
         CardOutput output = new CardOutput();
 
