@@ -68,7 +68,7 @@
         </ImageView>
       <Label fx:id="secondsLabel" layoutX="1000.0" layoutY="470.0" prefHeight="97.0" prefWidth="80.0" text="00" textFill="#f5f3f3">
          <font>
-            <Font name="System Bold" size="68.0" />
+            <Font name="System Bold" size="62.0" />
          </font>
       </Label>
       <Label fx:id="stateLabel" layoutX="315.0" layoutY="4.0" prefHeight="40.0" prefWidth="432.0" text="Aspettare giocatori" textFill="WHITE">
@@ -130,6 +130,9 @@
             </ImageView>
          </children>
       </Pane>
+      <Pane fx:id="cardPane0" layoutX="116.0" layoutY="421.0" prefHeight="117.0" prefWidth="71.0" />
+      <Pane fx:id="cardPane1" layoutX="251.0" layoutY="422.0" prefHeight="116.0" prefWidth="71.0" />
+      <Pane fx:id="cardPane2" layoutX="382.0" layoutY="423.0" prefHeight="116.0" prefWidth="71.0" />
 
     </children>
 </AnchorPane>

@@ -54,13 +54,18 @@ public class Model implements Serializable {
         public Removed(){
             reset();
         }
-        
+
         public void reset(){
             this.battery = 0;
             this.guys = 0;
             this.goods = 0;
         }
 
+        /**
+         * Check if the player is in debt.
+         * @param p the ship board of the player
+         * @return true if the player is in debt, false otherwise
+         */
         public boolean isDebt(ShipBoard p){
             if(p.getBattery().getTotal() + battery < 0)
                 battery = p.getBattery().getTotal();
@@ -73,6 +78,7 @@ public class Model implements Serializable {
 
             return battery < 0 || guys < 0 || goods < 0;
         }
+
 
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) return false;
@@ -126,6 +132,10 @@ public class Model implements Serializable {
         loadTimer();
     }
 
+    /**
+     * Loads the timer.
+     * The timer is used to count the time left for the players to build their ship.
+     */
     public void loadTimer(){
         timer = new Timer("CLOCK_TIMER");
         task = new TimerTask() {
@@ -209,7 +219,7 @@ public class Model implements Serializable {
 
     /**
      * Move the position of the timer only if it ended.
-     * If the timer finish in the last spot all the players
+     * If the timer finished in the last spot all the players
      * are set automatically to ready.
      * Can be called only in BUILDING state.
      * It eventually moves the BUILDING state to CHECKING or ALIEN.
@@ -284,6 +294,10 @@ public class Model implements Serializable {
             state.next(State.Type.ENDED);
     }
 
+    /**
+     * returns the quitting players.
+     * @return q the quitting players
+     */
     public HashSet<String> getQuit(){
         HashSet<String> q = new HashSet<>();
 
@@ -291,6 +305,11 @@ public class Model implements Serializable {
         return q;
     }
 
+    /**
+     * Computes the cash of the players.
+     * Can be called only in the ENDED state.
+     * @return a map containing the name of the player and their cash
+     */
     public HashMap<String, Integer> computeCash(){
         if(state.get() != State.Type.ENDED)
             return null;
@@ -411,7 +430,7 @@ public class Model implements Serializable {
     }
 
     /**
-     * Remove th ignore checks of the player.
+     * Remove the ignored checks of the player.
      * @param name
      */
     public void removeIgnore(String name){
@@ -419,7 +438,7 @@ public class Model implements Serializable {
             ignoreChecks.remove(name);
     }
     /**
-     * The player declare where to put the aliens.
+     * The player declares where to put the aliens.
      * Can be called only in the ALIEN state.
      * @param name name of the player that wants to place aliens
      * @param purple coordinate
@@ -442,10 +461,22 @@ public class Model implements Serializable {
         return Result.ok("");
     }
 
+    /**
+     * Returns the list of the goods that the player has earned.
+     * @param name
+     * @return
+     */
     public List<GoodsBoard.Type> getReward(String name){
         return get(name).getGoodsReward();
     }
 
+    /**
+     * Places a reward on the coordinate {@code c}, returns the number of goods.
+     * @param name
+     * @param t
+     * @param c
+     * @return res the number of goods
+     */
     public Result<Integer> placeReward(String name, GoodsBoard.Type t, Coordinate c){
         if(state.curr != State.Type.PLACE_REWARD)
             return Result.err("not place reward state");
@@ -458,6 +489,11 @@ public class Model implements Serializable {
         return res;
     }
 
+    /**
+     * The player doesn't accept the reward.
+     * @param name
+     * @return res
+     */
     public Result<String> dropReward(String name){
         if(state.curr != State.Type.PLACE_REWARD)
             return Result.err("not place reward state");
@@ -715,6 +751,10 @@ public class Model implements Serializable {
         return changes;
     }
 
+    /**
+     * Get the name of the next player to play.
+     * @return the name of the next player
+     */
     public String getNextToPlay(){
         try{
             List<Pawn> order = new ArrayList<>(flight.getOrder());
@@ -752,6 +792,7 @@ public class Model implements Serializable {
 
         return debt.get();
     }
+
 
     private CardOutput playCard(){
         CardOutput res = deck.play().getData();

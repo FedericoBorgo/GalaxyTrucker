@@ -45,6 +45,11 @@ public class CardOutput implements Serializable {
     public Map<String, List<GoodsBoard.Type>> rewards = new HashMap<>();
 
 
+    /**
+     * adds the coordinates that have been hit and destroyed
+     * @param name
+     * @param c
+     */
     public void addDestroyed(String name, Coordinate c){
         List<Coordinate> coordinates = removed.getOrDefault(name, null);
 
@@ -54,7 +59,12 @@ public class CardOutput implements Serializable {
         coordinates.add(c);
         removed.put(name, coordinates);
     }
-    
+
+    /**
+     * makes the changes when a card is played
+     * @param s
+     * @param name
+     */
     public void handleChanges(CardScene s, String name){
         if(cash.containsKey(name)){
             int cash = this.cash.get(name);

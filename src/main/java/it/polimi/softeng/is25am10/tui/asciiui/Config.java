@@ -43,6 +43,11 @@ public class Config {
     private static final List<Component> toRemove = List.of(socketPortLabel1, socketPortLabel2
             , rmiPortLabel, socketPort1, socketPort2, rmiPort);
 
+    /**
+     * Creates a TUI for the player to insert name, address, connection type and the ports.
+     * @return
+     * @throws IOException
+     */
     public static ClientInterface getControls() throws IOException {
         //create a terminal, associate a screen and create a window
         //inside the screen

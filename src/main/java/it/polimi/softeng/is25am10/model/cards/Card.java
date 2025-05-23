@@ -39,7 +39,7 @@ public abstract class Card implements Serializable {
         EPIDEMIC, METEORS, PLANETS, AB_SHIP, OPEN_SPACE, STARDUST, STATION, PIRATES, SMUGGLERS, SLAVERS, WAR_ZONE
     }
 
-    protected final Type type;
+    public final Type type;
 
     /**
      * Creates the card by giving the model from which to get player data, such as
@@ -74,6 +74,9 @@ public abstract class Card implements Serializable {
      * @return true if he's him, false if not
      */
     protected boolean unexpected(Player player) {
+        if(!flight.getOrder().contains(player.getPawn())) {
+            return true;
+        }
         return !registered.keySet().containsAll(flight.getOrder().subList(0, flight.getOrder().indexOf(player.getPawn())));
     }
 

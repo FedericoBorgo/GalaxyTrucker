@@ -115,6 +115,16 @@ public class Player implements Serializable {
         return cash == player.cash && pawn == player.pawn && Objects.equals(board, player.board) && Objects.equals(goodsReward, player.goodsReward) && Objects.equals(name, player.name);
     }
 
+    /**
+     *  Assigns values to help with displaying the players and their status.
+     * @param players
+     * @param quid
+     * @param disconnected
+     * @param yellowLabel
+     * @param redLabel
+     * @param blueLabel
+     * @param greenLabel
+     */
     static public void drawPlayers(HashMap<String, FlightBoard.Pawn> players, HashSet<String> quid, HashSet<String> disconnected,
                                    Label yellowLabel, Label redLabel, Label blueLabel, Label greenLabel) {
         players.forEach((name, pawn) -> {

@@ -37,6 +37,9 @@ public class State implements Serializable {
         return prev == state.prev && curr == state.curr;
     }
 
+    /**
+     * Enumerates the possible states of the game.
+     */
     public enum Type {
         JOINING,
         BUILDING,
@@ -67,6 +70,13 @@ public class State implements Serializable {
             };
         }
 
+        /**
+         * Sets the aliens and their data to where they are dragged and dropped.
+         * @param view
+         * @param pos
+         * @param clip
+         * @param texture
+         */
         private void registerAlien(ImageView view, Result<Coordinate> pos, String clip, String texture) {
             view.setOnDragDetected(event -> {
                 event.consume();
@@ -83,6 +93,10 @@ public class State implements Serializable {
             });
         }
 
+        /**
+         * Manages the visible content of the gui when the game is in the ALIEN_INPUT state.
+         * @param b
+         */
         public void apply(Building b) {
             if (this == State.Type.ALIEN_INPUT) {
                 b.pAlienView.setVisible(true);
@@ -101,6 +115,10 @@ public class State implements Serializable {
             }
         }
 
+        /**
+         * Manages some of the text of the gui when the game is in the BUILDING and ALIEN_INPUT states.
+          * @param b
+         */
         public void ready(Building b) {
             if (this == State.Type.BUILDING)
                 b.server.setReady().ifPresent(_ -> b.buildingLabel.setVisible(true));
@@ -113,6 +131,10 @@ public class State implements Serializable {
             }
         }
 
+        /**
+         * Manages the visible content of the gui when the game is in the CHECKING state.
+         * @param s
+         */
         public void apply(CardScene s) {
             if (this == State.Type.CHECKING) {
                 for (StackPane[] stackPane : s.stackPanes)

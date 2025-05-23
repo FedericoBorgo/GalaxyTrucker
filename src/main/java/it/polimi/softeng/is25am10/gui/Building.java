@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.model.*;
 import it.polimi.softeng.is25am10.model.boards.*;
+import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.model.cards.CardData;
 import it.polimi.softeng.is25am10.model.cards.CardOutput;
 import it.polimi.softeng.is25am10.network.Callback;
@@ -12,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -23,6 +25,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Building implements Callback {
     public ClientInterface server;
@@ -84,6 +87,9 @@ public class Building implements Callback {
 
     public Map<Rectangle, StackPane> rectangles = new HashMap<>();
     public StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+
+    @FXML
+    public Pane cardPane0, cardPane1, cardPane2;
 
     @FXML
     private void initialize(){
@@ -214,6 +220,36 @@ public class Building implements Callback {
             }
             else if(event.getCode() == KeyCode.C)
                 moveClock();
+        });
+
+        Pane[] cardPanes = new Pane[]{cardPane0, cardPane1, cardPane2};
+        AtomicInteger[] counters = new AtomicInteger[]{
+                new AtomicInteger(0),
+                new AtomicInteger(0),
+                new AtomicInteger(0)
+        };
+
+        server.getVisible().ifPresent(c -> {
+            for (int i = 0; i < 3; i++) {
+                Image img = Launcher.getImage("/cards/" + c[i][0].type.name()+ "/" + c[i][0].id + ".jpg");
+                ImageView imgView = new ImageView(img);
+                imgView.setFitHeight(cardPanes[i].getHeight());
+                imgView.setFitWidth(cardPanes[i].getWidth());
+                cardPanes[i].getChildren().add(imgView);
+
+                int finalI = i;
+                cardPanes[i].setOnMouseClicked(event -> {
+                    Image cardImg = Launcher.getImage("/cards/" + c[finalI][counters[finalI].get()].type.name()+ "/" + c[finalI][counters[finalI].get()].id + ".jpg");
+                    ImageView imageView = new ImageView(cardImg);
+                    imageView.setFitHeight(cardPanes[finalI].getHeight());
+                    imageView.setFitWidth(cardPanes[finalI].getWidth());
+                    cardPanes[finalI].getChildren().clear();
+                    cardPanes[finalI].getChildren().add(imageView);
+                    counters[finalI].set(counters[finalI].incrementAndGet()%3);
+                    event.consume();
+                });
+
+            }
         });
 
         //new AutoBuilder(this);

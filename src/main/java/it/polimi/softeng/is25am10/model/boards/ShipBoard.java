@@ -132,6 +132,12 @@ public class ShipBoard implements Serializable {
             brown.remove(c, 1);
     }
 
+    /**
+     * Check if there is someone at the specified coordinate that can be killed
+     *
+     * @param c
+     * @return
+     */
     private boolean toKill(Coordinate c){
         if(!thereIsSomeone(c))
             return false;

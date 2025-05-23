@@ -102,6 +102,11 @@ public class Tile implements Serializable {
         load(t, c);
     }
 
+    /**
+     * Loads the tile with a specified type and connector configuration.
+     * @param type
+     * @param connectors
+     */
     private void load(Type type, String connectors){
         this.type = type;
         HashMap<Side, ConnectorType> map = new HashMap<>();
@@ -139,6 +144,10 @@ public class Tile implements Serializable {
         return connectors;
     }
 
+    /**
+     * Retrieves the connector type associated with a specific side of the tile and sets a value to describe the tile's connectors
+     * @return
+     */
     public String connectorsToInt(){
         return "" + connectors.get(Side.UP).toInt() +
                 connectors.get(Side.RIGHT).toInt()+
@@ -278,6 +287,10 @@ public class Tile implements Serializable {
             };
         }
 
+        /**
+         * Gives the numbers of connectors related to a specific, previously enumerated, side of the tile.
+         * @return
+         */
         public int toInt(){
             return switch (this){
                 case ONE_PIPE -> 1;

@@ -96,7 +96,9 @@ public class GoodsBoard extends ElementsBoard{
         };
     }
 
-    // Returns the number of boxes of other colors on this tile
+    /**
+     *     Returns the number of boxes of other colors on this tile
+      */
     private int getNBox(Coordinate c){
         int total = 0;
 

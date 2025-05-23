@@ -19,7 +19,7 @@
       <VBox fx:id="resBox" layoutX="14.0" layoutY="14.0" prefHeight="385.0" prefWidth="357.0" />
       <Text fx:id="disconnected" fill="#dd0000" layoutX="41.0" layoutY="568.0" strokeType="OUTSIDE" strokeWidth="0.0" text="DISCONNESSO DAL SERVER" visible="false" wrappingWidth="998.1300010681152">
          <font>
-            <Font size="48.0" />
+            <Font name="Orbitron Medium" size="48.0" />
          </font>
       </Text>
    </children>
