@@ -7,14 +7,17 @@ import it.polimi.softeng.is25am10.network.Callback;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -23,8 +26,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -92,6 +97,13 @@ public class CardScene implements Callback {
     public Text cashText;
 
     @FXML
+    private Button readyButton;
+    @FXML
+    private Button quitButton;
+    @FXML
+    private Button drawButton;
+
+    @FXML
     void initialize() {
         posPanes = new Pane[]{posPane0, posPane1, posPane2, posPane3, posPane4, posPane5, posPane6,
         posPane7, posPane8, posPane9, posPane10, posPane11, posPane12, posPane13, posPane14, posPane15,
@@ -132,6 +144,7 @@ public class CardScene implements Callback {
         stateLabel.setText(state);
         nameLabel.setText(server.getPlayerName());
 
+        // saves shipboard from Building to CardScene
         Coordinate.forEach(c ->  {
             Result<Tile> res = ship.getTiles().getTile(c);
 
@@ -378,7 +391,147 @@ public class CardScene implements Callback {
             }
         });
 
+        // EventHandler per visualizzare la nave di altri giocatori
+        redLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            String playerName = redLabel.getText();
+            if (!playerName.isEmpty()) {
+                ShipBoard otherShip = server.getShip(playerName);
+                showOtherShip(playerName, otherShip);
+            }
+        });
+        yellowLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            String playerName = yellowLabel.getText();
+            if (!playerName.isEmpty()) {
+                ShipBoard otherShip = server.getShip(playerName);
+                showOtherShip(playerName, otherShip);
+            }
+        });
+        greenLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            String playerName = greenLabel.getText();
+            if (!playerName.isEmpty()) {
+                ShipBoard otherShip = server.getShip(playerName);
+                showOtherShip(playerName, otherShip);
+            }
+        });
+        blueLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            String playerName = blueLabel.getText();
+            if (!playerName.isEmpty()) {
+                ShipBoard otherShip = server.getShip(playerName);
+                showOtherShip(playerName, otherShip);
+            }
+        });
     }
+
+    public void showOtherShip(String shipOwner, ShipBoard otherShip) {
+        if (shipOwner.equals(server.getPlayerName())) {
+            // La funzione sta venendo chiamata per visualizzare la propria nave, non necessario
+            return;
+        }
+        try {
+            // Carica il file FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/viewShip.fxml"));
+            Parent root = loader.load();
+
+            // Trova i nodi usando gli fx:id
+            GridPane shipPaneView = (GridPane) root.lookup("#shipPaneView");
+            Label specialState = (Label) root.lookup("#specialState");
+
+            if (shipPaneView == null || specialState == null || nameLabel == null) {
+                throw new IllegalStateException("Uno o più elementi non trovati nell'FXML: shipPane, specialState, nameLabel");
+            }
+
+            // Scena e finestra
+            Scene scene = new Scene(root, 1080, 601);
+            Stage stage = new Stage();
+            stage.setTitle("Galaxy Trucker - Visualizzatore navi");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.show();
+
+            // Scritte nel gioco
+            specialState.setText("Visualizzazione nave di " + shipOwner);
+
+            // Usa le dimensioni specificate nell'FXML
+            double shipPaneWidth = shipPaneView.getWidth(); // 504.0;
+            double shipPaneHeight = shipPaneView.getPrefHeight(); // 365.0;
+
+            // Ricopia nave
+            Map<Coordinate, ImageView> images = new HashMap<>();
+            Text[][] counters = new Text[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+            StackPane[][] stackPanes = new StackPane[TilesBoard.BOARD_WIDTH][TilesBoard.BOARD_HEIGHT];
+            Map<Coordinate, List<Pos>> freeContainers = new HashMap<>();
+
+            Coordinate.forEach(c -> {
+                Result<Tile> res = otherShip.getTiles().getTile(c);
+                if (res.isErr()) {
+                    return;
+                }
+                Tile t = res.getData();
+                Tile.Rotation r = otherShip.getTiles().getRotation(c);
+                ImageView view;
+                if (!Tile.real(t)) {
+                    return;
+                }
+                if (t.getType() == Tile.Type.C_HOUSE) {
+                    view = new ImageView(Launcher.getCHouse(players.get(shipOwner)));
+                } else {
+                    view = new ImageView(Launcher.getImage(t));
+                }
+                view.setFitHeight(shipPaneHeight / 5);
+                view.setFitWidth(shipPaneWidth / 7);
+                view.setPreserveRatio(true);
+                view.setRotate(r.toInt() * 90);
+
+                stackPanes[c.x()][c.y()] = new StackPane();
+                shipPaneView.add(view, c.x(), c.y());
+                shipPaneView.add(stackPanes[c.x()][c.y()], c.x(), c.y());
+                images.put(c, view);
+
+                if (Tile.box(t)) {
+                    freeContainers.put(c, new ArrayList<>(List.of(Pos.TOP_LEFT, Pos.TOP_RIGHT, Pos.BOTTOM_RIGHT)));
+                }
+            });
+
+            // Gestisce astronauti, batterie e alieni
+            List<Pair<Map<Coordinate, Integer>, String>> boards = new ArrayList<>();
+            boards.add(new Pair<>(otherShip.getAstronaut().getPositions(), "astronaut"));
+            boards.add(new Pair<>(otherShip.getBattery().getPositions(), "battery"));
+            boards.add(new Pair<>(otherShip.getPurple().getPositions(), "purple"));
+            boards.add(new Pair<>(otherShip.getBrown().getPositions(), "brown"));
+
+            boards.forEach(pair -> {
+                String type = pair.getValue();
+                pair.getKey().forEach((c, qty) -> {
+                    StackPane cell = stackPanes[c.x()][c.y()];
+                    if (cell == null) {
+                        return;
+                    }
+                    ImageView view = new ImageView(Launcher.getImage("/gui/textures/" + type + ".png"));
+                    Text count = new Text(qty.toString() + "x");
+                    count.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
+                    count.setFill(Color.BLACK);
+                    count.setStroke(Color.WHITE);
+                    count.setStrokeWidth(2);
+
+                    view.setFitHeight(shipPaneHeight / 7);
+                    view.setFitWidth(shipPaneWidth / 7);
+                    view.setPreserveRatio(true);
+
+                    cell.getChildren().add(view);
+                    cell.getChildren().add(count);
+                    StackPane.setAlignment(view, Pos.CENTER);
+                    StackPane.setAlignment(count, Pos.BOTTOM_RIGHT);
+                    counters[c.x()][c.y()] = count;
+                });
+            });
+
+        } catch (Exception e) {
+            if (errLabel != null) {
+                errLabel.setText("Errore: impossibile visualizzare la nave di " + shipOwner + ". Dettaglio: " + e.getMessage());
+            }
+        }
+    }
+
 
     public void removeOne(Coordinate c){
         int val = counters[c.x()][c.y()].getText().charAt(0) - '0';

@@ -141,7 +141,6 @@ public class Launcher extends Application {
         return new Image(Building.class.getResource(path).toExternalForm());
     }
 
-
     public static Optional<Pair<Coordinate, String>> getCoordinate(DragEvent event, GridPane ship, AtomicBoolean success){
         Dragboard db = event.getDragboard();
         event.setDropCompleted(true);

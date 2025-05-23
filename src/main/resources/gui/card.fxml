@@ -100,7 +100,7 @@
       </GridPane>
       <Pane fx:id="cardPane" layoutX="709.0" layoutY="116.0" prefHeight="207.0" prefWidth="126.0" />
       <Button fx:id="drawButton" layoutX="695.0" layoutY="66.0" mnemonicParsing="false" onAction="#drawCard" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="drawButton" />
-      <Button layoutX="872.0" layoutY="71.0" mnemonicParsing="false" onAction="#ready" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="ready" />
+      <Button fx:id="readyButton" layoutX="872.0" layoutY="71.0" mnemonicParsing="false" onAction="#ready" opacity="0.0" prefHeight="40.0" prefWidth="152.0" text="ready" />
       <Label fx:id="errLabel" layoutX="672.0" layoutY="314.0" prefHeight="47.0" prefWidth="394.0" textFill="#e9baf8">
          <font>
             <Font name="System Bold" size="23.0" />
@@ -195,7 +195,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <Button layoutX="941.0" layoutY="566.0" mnemonicParsing="false" onAction="#quit" opacity="0.0" prefHeight="40.0" prefWidth="135.0" text="Button" />
+      <Button fx:id="quitButton" layoutX="941.0" layoutY="566.0" mnemonicParsing="false" onAction="#quit" opacity="0.0" prefHeight="40.0" prefWidth="135.0" text="Button" />
 
     </children>
 </AnchorPane>

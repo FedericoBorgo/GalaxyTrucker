@@ -66,6 +66,10 @@ public abstract class ClientInterface extends Thread{
         return call(name);
     }
 
+    public ShipBoard getShip(String playerName) {
+        return call(playerName);
+    }
+
     public Result<String> init(Result<Coordinate> purple, Result<Coordinate> brown) {
         return call(name, purple, brown);
     }
