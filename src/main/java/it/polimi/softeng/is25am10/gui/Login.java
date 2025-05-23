@@ -2,6 +2,7 @@ package it.polimi.softeng.is25am10.gui;
 
 import it.polimi.softeng.is25am10.model.Result;
 import it.polimi.softeng.is25am10.model.boards.FlightBoard;
+import it.polimi.softeng.is25am10.model.cards.Card;
 import it.polimi.softeng.is25am10.network.ClientInterface;
 import it.polimi.softeng.is25am10.network.rmi.RMIClient;
 import it.polimi.softeng.is25am10.network.socket.SocketClient;
@@ -15,6 +16,13 @@ import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 /**
  * Controller of the login screen, manages the entire process in the gui.
@@ -31,6 +39,22 @@ public class Login {
 
     @FXML
     Label errLabel;
+
+    @FXML
+    private void initialize(){
+        try {
+            FileInputStream in = new FileInputStream("config.json");
+            JSONObject json = new JSONObject(Card.dump(in));
+            in.close();
+            usernameField.setText(json.getString("username"));
+            addressField.setText(json.getString("address"));
+            port1.setText(json.getString("port1"));
+            port2.setText(json.getString("port2"));
+            playersField.setText(json.getString("players"));
+            connectionMenu.setText(json.getString("connection"));
+            port2.setVisible(connectionMenu.getText().equals("SOCKET"));
+        } catch (Exception _) {}
+    }
 
     @FXML
     private void join(){
@@ -83,9 +107,18 @@ public class Login {
             else{
                 FlightBoard.Pawn pawn = res.getData();
                 building.config(pawn, name, server, handler.getValue());
+
+                FileOutputStream on = new FileOutputStream("config.json");
+                JSONObject json = new JSONObject();
+                json.put("username", name);
+                json.put("address", address);
+                json.put("port1", String.valueOf(port1));
+                json.put("port2", String.valueOf(port2));
+                json.put("players", String.valueOf(players));
+                json.put("connection", connectionMenu.getText());
+                on.write(json.toString().getBytes());
+                on.close();
             }
-
-
         }catch (Exception _){
 
             errLabel.setText("Impossibile connettersi al server");
