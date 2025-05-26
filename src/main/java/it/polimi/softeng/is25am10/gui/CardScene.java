@@ -398,6 +398,7 @@ public class CardScene implements Callback {
                 ShipBoard otherShip = server.getShip(playerName);
                 showOtherShip(playerName, otherShip);
             }
+            e.consume();
         });
         yellowLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             String playerName = yellowLabel.getText();
@@ -405,6 +406,7 @@ public class CardScene implements Callback {
                 ShipBoard otherShip = server.getShip(playerName);
                 showOtherShip(playerName, otherShip);
             }
+            e.consume();
         });
         greenLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             String playerName = greenLabel.getText();
@@ -412,6 +414,7 @@ public class CardScene implements Callback {
                 ShipBoard otherShip = server.getShip(playerName);
                 showOtherShip(playerName, otherShip);
             }
+            e.consume();
         });
         blueLabel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             String playerName = blueLabel.getText();
@@ -419,15 +422,19 @@ public class CardScene implements Callback {
                 ShipBoard otherShip = server.getShip(playerName);
                 showOtherShip(playerName, otherShip);
             }
+            e.consume();
         });
     }
 
+    List<String> openViews = Collections.synchronizedList(new ArrayList<>());
+
     public void showOtherShip(String shipOwner, ShipBoard otherShip) {
-        if (shipOwner.equals(server.getPlayerName())) {
-            // La funzione sta venendo chiamata per visualizzare la propria nave, non necessario
+        if (openViews.contains(shipOwner) || shipOwner.equals(server.getPlayerName())) {
+            System.out.println("Player already seen");
             return;
         }
         try {
+            openViews.add(shipOwner);
             // Carica il file FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/viewShip.fxml"));
             Parent root = loader.load();
@@ -447,6 +454,12 @@ public class CardScene implements Callback {
             stage.setScene(scene);
             stage.setResizable(false);
             stage.show();
+
+            stage.setOnCloseRequest(e -> {
+                openViews.remove(shipOwner);
+                stage.close();
+                e.consume();
+            });
 
             // Scritte nel gioco
             specialState.setText("Visualizzazione nave di " + shipOwner);

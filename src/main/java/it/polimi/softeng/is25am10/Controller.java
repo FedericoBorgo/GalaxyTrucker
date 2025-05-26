@@ -132,7 +132,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
      */
     void loadController(int rmiPort, int socketPort1, int socketPort2) throws IOException {
         callbacks = new ConcurrentHashMap<>();
-
+        execService = Executors.newFixedThreadPool(8);
         // open RMI server
         Registry registry = LocateRegistry.createRegistry(rmiPort);
         registry.rebind("controller", this);
@@ -153,7 +153,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
         new Timer("BACKUP_TIMER").scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                //backup();
+                backup();
             }
         }, 0, 5000);
 
@@ -174,8 +174,6 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
                 handleAutomaticInput();
             }
         }, 0, 2000);
-
-        execService = Executors.newFixedThreadPool(8);
     }
 
     /**
@@ -527,6 +525,7 @@ public class Controller extends UnicastRemoteObject implements RMIInterface, Ser
             controller.games.values().forEach(model -> {
                 model.loadTimer();
                 model.setEvent(controller.stateEvent);
+                model.state.executor = Executors.newSingleThreadExecutor();
             });
             controller.loadController(rmiPort, socketPort1, socketPort2);
         } catch (IOException | ClassNotFoundException e) {

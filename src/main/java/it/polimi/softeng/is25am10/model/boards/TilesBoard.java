@@ -668,6 +668,7 @@ public class TilesBoard implements Serializable {
     public void drawErrors(Building s){
         Set<Coordinate> res = isOK();
 
+        s.shipFixText.setVisible(false);
         s.rectangles.forEach((r, p) -> p.getChildren().remove(r));
 
         if(res.isEmpty()){
@@ -685,6 +686,8 @@ public class TilesBoard implements Serializable {
             rect.setFill(Color.web("rgb(255, 0, 0)", 0.3));
             rect.setStroke(Color.RED);
             rect.setStrokeWidth(1);
+            if(s.stackPanes[c.x()][c.y()] == null)
+                return;
             s.stackPanes[c.x()][c.y()].getChildren().add(rect);
             s.rectangles.put(rect, s.stackPanes[c.x()][c.y()]);
         });

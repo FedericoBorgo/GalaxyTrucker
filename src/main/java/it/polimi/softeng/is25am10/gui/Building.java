@@ -375,7 +375,7 @@ public class Building implements Callback {
     }
 
     @Override
-    public void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
+    public synchronized void placeTile(Coordinate c, Tile t, Tile.Rotation r) throws RemoteException {
         ImageView view = Launcher.getView(t);
         resizeForShip(view);
         view.setRotate(r.toInt()*90);
