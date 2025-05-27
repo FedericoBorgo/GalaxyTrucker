@@ -841,8 +841,6 @@ public class Model implements Serializable {
     }
 
     public Result<Card[][]> getVisible(){
-        if(state.get() != State.Type.BUILDING)
-            return Result.err("not BUILDING state");
         return Result.ok(deck.getVisible());
     }
     //end cards section

@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
@@ -39,6 +40,9 @@ public class Login {
 
     @FXML
     Label errLabel;
+
+    @FXML
+    CheckBox box;
 
     @FXML
     private void initialize(){
@@ -107,6 +111,9 @@ public class Login {
             else{
                 FlightBoard.Pawn pawn = res.getData();
                 building.config(pawn, name, server, handler.getValue());
+
+                if(box.isSelected())
+                    new AutoBuilder(building);
 
                 FileOutputStream on = new FileOutputStream("config.json");
                 JSONObject json = new JSONObject();
