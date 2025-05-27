@@ -1,0 +1,29 @@
+<map id="it.polimi.softeng.is25am10.model.cards.Card" name="it.polimi.softeng.is25am10.model.cards.Card">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1657,126,1960,555"/>
+<area shape="rect" id="Node000003" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1AbandonedShip.html" title=" " alt="" coords="5,651,278,829"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1643,361,1320,398,927,454,732,487,553,524,403,564,341,584,291,606,256,627,223,653,220,649,253,622,288,601,339,579,401,558,552,519,731,482,926,448,1319,393,1642,356"/>
+<area shape="rect" id="Node000004" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Deck.html" title=" " alt="" coords="302,603,608,877"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1642,357,1430,382,1305,402,1170,428,1031,461,891,501,753,549,621,606,609,612,606,608,619,601,751,544,889,496,1030,455,1169,423,1304,397,1430,377,1642,351"/>
+<area shape="rect" id="Node000005" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Epidemic.html" title=" " alt="" coords="632,651,905,829"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1643,370,1484,403,1299,452,1202,483,1104,518,1009,559,919,606,885,628,854,653,850,649,882,623,916,601,1007,555,1102,514,1200,478,1297,446,1483,398,1642,365"/>
+<area shape="rect" id="Node000006" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Meteors.html" title=" " alt="" coords="929,628,1202,852"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1644,401,1544,440,1435,488,1323,543,1216,606,1182,631,1179,626,1214,601,1320,538,1432,483,1542,435,1642,396"/>
+<area shape="rect" id="Node000007" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Pirates.html" title=" " alt="" coords="1227,640,1499,840"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1648,487,1514,605,1474,642,1470,638,1511,601,1644,483"/>
+<area shape="rect" id="Node000008" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Planets.html" title=" " alt="" coords="1524,651,1797,829"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1726,570,1696,652,1691,650,1721,568"/>
+<area shape="rect" id="Node000009" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Slavers.html" title=" " alt="" coords="1821,651,2094,829"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1896,568,1927,650,1922,652,1891,570"/>
+<area shape="rect" id="Node000010" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Smugglers.html" title=" " alt="" coords="2119,651,2391,829"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1972,482,2107,601,2160,649,2157,653,2104,605,1969,486"/>
+<area shape="rect" id="Node000011" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Space.html" title=" " alt="" coords="2416,651,2689,829"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1974,395,2075,435,2185,482,2297,538,2404,601,2466,649,2463,653,2402,606,2295,543,2182,487,2072,439,1972,400"/>
+<area shape="rect" id="Node000012" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Stardust.html" title=" " alt="" coords="2713,651,2986,829"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1975,365,2134,398,2320,446,2418,477,2515,513,2611,555,2702,601,2736,623,2768,649,2764,653,2733,628,2699,606,2608,559,2513,518,2416,483,2319,451,2133,403,1974,370"/>
+<area shape="rect" id="Node000013" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Station.html" title=" " alt="" coords="3011,651,3283,829"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1975,349,2188,372,2315,391,2450,417,2590,450,2730,491,2868,541,2999,601,3034,623,3067,649,3064,653,3031,627,2996,606,2866,546,2729,496,2588,455,2449,422,2314,397,2187,377,1974,354"/>
+<area shape="rect" id="Node000014" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Warzone.html" title=" " alt="" coords="3308,651,3581,829"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1974,339,2095,343,2239,352,2401,367,2576,391,2758,424,2943,469,3124,528,3211,562,3296,601,3332,623,3365,649,3362,653,3329,627,3294,606,3209,567,3122,533,2941,474,2757,429,2575,396,2400,372,2238,357,2094,348,1974,344"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1765,5,1852,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1811,92,1811,126,1806,126,1806,92"/>
+</map>

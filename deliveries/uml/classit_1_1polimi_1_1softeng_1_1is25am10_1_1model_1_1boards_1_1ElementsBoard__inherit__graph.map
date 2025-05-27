@@ -1,0 +1,13 @@
+<map id="it.polimi.softeng.is25am10.model.boards.ElementsBoard" name="it.polimi.softeng.is25am10.model.boards.ElementsBoard">
+<area shape="rect" id="Node000001" title=" " alt="" coords="463,126,744,528"/>
+<area shape="rect" id="Node000003" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1AlienBoard.html" title=" " alt="" coords="5,576,287,754"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="452,442,267,578,264,574,449,438"/>
+<area shape="rect" id="Node000004" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1AstronautBoard.html" title=" " alt="" coords="311,598,592,732"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="509,542,484,599,479,597,505,540"/>
+<area shape="rect" id="Node000005" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1BatteryBoard.html" title=" " alt="" coords="616,598,898,732"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="703,540,729,597,725,599,698,542"/>
+<area shape="rect" id="Node000006" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1GoodsBoard.html" title=" " alt="" coords="921,587,1203,743"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="758,438,959,585,956,589,755,442"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="560,5,647,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="606,92,606,126,601,126,601,92"/>
+</map>

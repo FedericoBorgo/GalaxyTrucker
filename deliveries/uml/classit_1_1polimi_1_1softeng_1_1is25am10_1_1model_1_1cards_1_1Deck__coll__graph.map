@@ -1,0 +1,21 @@
+<map id="it.polimi.softeng.is25am10.model.cards.Deck" name="it.polimi.softeng.is25am10.model.cards.Deck">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,2846,311,3119"/>
+<area shape="rect" id="Node000002" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Card.html" title=" " alt="" coords="142,2434,444,2796"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,2811,211,2847,206,2845,219,2809"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="272,148,359,220"/>
+<area shape="poly" id="edge11_Node000001_Node000003" title=" " alt="" coords="271,232,219,292,165,369,142,413,123,459,111,506,106,555,106,2616,114,2734,131,2845,125,2846,108,2734,101,2616,101,555,105,505,118,457,137,410,160,366,214,289,267,229"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="299,235,270,320,234,433,200,561,175,692,161,813,151,936,143,1185,148,1433,162,1674,184,1900,209,2107,236,2287,260,2434,255,2434,230,2288,204,2108,178,1901,157,1674,142,1433,138,1185,146,935,156,812,170,692,195,560,229,431,264,318,294,233"/>
+<area shape="rect" id="Node000004" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1FlightBoard.html" title=" " alt="" coords="175,692,456,1094"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="318,235,318,692,313,692,313,235"/>
+<area shape="rect" id="Node000005" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1Model.html" title=" " alt="" coords="363,1118,596,2369"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="336,233,366,318,401,431,435,560,461,692,484,904,496,1118,490,1118,479,904,456,692,430,561,396,433,361,320,331,235"/>
+<area shape="rect" id="Node000006" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1State.html" title=" " alt="" coords="515,445,748,668"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="359,229,498,385,546,443,542,446,493,388,355,233"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="306,1094,305,1118,296,1477,293,1835,293,2417,288,2417,287,1835,291,1477,300,1118,300,1094"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="365,2289,338,2418,332,2417,360,2288"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="620,668,564,1102,559,1101,615,667"/>
+<area shape="rect" id="Node000007" href="$enumit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1State_1_1Type.html" title=" " alt="" coords="515,5,748,363"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="634,363,634,428,629,428,629,363"/>
+<area shape="rect" id="Node000008" href="$enumit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Card_1_1Type.html" title=" " alt="" coords="620,1587,893,1900"/>
+<area shape="poly" id="edge10_Node000002_Node000008" title=" " alt="" coords="751,1900,737,2010,711,2131,692,2194,670,2255,643,2314,611,2370,579,2413,542,2453,501,2488,460,2520,456,2516,498,2484,538,2449,575,2410,607,2367,638,2312,665,2253,687,2192,706,2130,732,2009,746,1899"/>
+</map>

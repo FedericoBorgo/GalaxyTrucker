@@ -1,0 +1,10 @@
+<map id="it.polimi.softeng.is25am10.model.Model" name="it.polimi.softeng.is25am10.model.Model">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,733,239,1984"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="58,148,144,220"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,235,113,733,108,733,99,235"/>
+<area shape="rect" id="Node000003" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1State.html" title=" " alt="" coords="139,445,372,668"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="116,234,134,295,158,362,196,444,191,446,153,364,129,297,111,235"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,668,232,717,226,716,234,668"/>
+<area shape="rect" id="Node000004" href="$enumit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1State_1_1Type.html" title=" " alt="" coords="168,5,402,363"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="273,363,268,429,263,428,268,362"/>
+</map>

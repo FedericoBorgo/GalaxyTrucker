@@ -1,0 +1,7 @@
+<map id="it.polimi.softeng.is25am10.gui.CardScene" name="it.polimi.softeng.is25am10.gui.CardScene">
+<area shape="rect" id="Node000001" title=" " alt="" coords="22,665,234,2630"/>
+<area shape="rect" id="Node000002" href="$interfaceit_1_1polimi_1_1softeng_1_1is25am10_1_1network_1_1Callback.html" title=" " alt="" coords="5,126,251,617"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,632,131,665,126,665,126,632"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="97,5,159,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="131,93,131,126,126,126,126,93"/>
+</map>

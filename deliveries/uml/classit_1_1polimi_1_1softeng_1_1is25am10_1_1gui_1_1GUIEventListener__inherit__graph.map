@@ -1,0 +1,10 @@
+<map id="it.polimi.softeng.is25am10.gui.GUIEventListener" name="it.polimi.softeng.is25am10.gui.GUIEventListener">
+<area shape="rect" id="Node000001" title=" " alt="" coords="89,665,301,1223"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,335,158,408"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,422,142,665,137,666,89,423"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="244,5,306,78"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,91,223,127,213,169,205,224,194,358,190,512,190,665,185,665,185,512,189,358,199,223,207,168,218,125,235,89"/>
+<area shape="rect" id="Node000004" href="$interfaceit_1_1polimi_1_1softeng_1_1is25am10_1_1network_1_1Callback.html" title=" " alt="" coords="232,126,478,617"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="290,91,298,125,293,126,284,92"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="285,632,275,666,270,665,280,631"/>
+</map>

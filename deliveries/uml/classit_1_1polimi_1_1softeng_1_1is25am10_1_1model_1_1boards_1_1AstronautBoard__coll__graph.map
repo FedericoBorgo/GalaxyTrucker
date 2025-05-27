@@ -1,0 +1,10 @@
+<map id="it.polimi.softeng.is25am10.model.boards.AstronautBoard" name="it.polimi.softeng.is25am10.model.boards.AstronautBoard">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,1157,287,1291"/>
+<area shape="rect" id="Node000002" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1ElementsBoard.html" title=" " alt="" coords="5,728,287,1108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,1123,149,1157,144,1157,144,1123"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="98,5,184,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="144,93,148,728,142,728,138,93"/>
+<area shape="rect" id="Node000004" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1TilesBoard.html" title=" " alt="" coords="163,127,444,663"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="166,90,182,126,178,128,161,92"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="225,664,211,712,206,711,220,662"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="it.polimi.softeng.is25am10.Controller" name="it.polimi.softeng.is25am10.Controller">
+<area shape="rect" id="Node000001" title=" " alt="" coords="223,911,412,2027"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,458,158,530"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,544,172,862,226,1083,221,1084,167,863,91,545"/>
+<area shape="rect" id="Node000003" href="$interfaceit_1_1polimi_1_1softeng_1_1is25am10_1_1network_1_1rmi_1_1RMIInterface.html" title=" " alt="" coords="182,126,454,863"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="320,877,320,911,315,911,315,877"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="287,5,348,78"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="320,93,320,126,315,126,315,93"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="477,458,564,530"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="517,545,498,688,468,863,415,1106,409,1105,463,862,492,688,512,545"/>
+</map>
