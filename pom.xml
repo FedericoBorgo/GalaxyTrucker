@@ -127,7 +127,36 @@
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>Main</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>GalaxyTrucker</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>it.polimi.softeng.is25am10.Main</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <source>24</source>
+                </configuration>
             </plugin>
 
             <plugin>

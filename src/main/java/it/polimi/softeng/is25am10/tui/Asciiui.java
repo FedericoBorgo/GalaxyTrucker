@@ -18,10 +18,6 @@ public class Asciiui {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-
-        ClientInterface client = Config.getControls();
-
-        Game game = new Game(client);
-
+        new Game(Config.getControls());
     }
 }
