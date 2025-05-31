@@ -31,4 +31,31 @@ class TilesCollectionTest {
         assertTrue(tilesCollection.getSeen().isEmpty());
     }
 
+    @Test
+    void testGetEmpty() {
+        // 156 Tiles for collection, 4 of them are C_HOUSE
+        for (int i = 0; i < 152; i++) {
+            Tile tile = tilesCollection.getNew();
+            assertNotNull(tile);
+        }
+
+        // Now it should return null
+        Tile emptyTile = tilesCollection.getNew();
+        assertNull(emptyTile);
+    }
+
+    @Test
+    void testEquals() {
+        TilesCollection anotherCollection = new TilesCollection();
+        assertFalse(tilesCollection.equals(anotherCollection));
+        assertFalse(tilesCollection.equals(null));
+        assertTrue(tilesCollection.equals(tilesCollection));
+    }
+
+    @Test
+    void connectorTypeTest(){
+        assertEquals('o', Tile.ConnectorType.ONE_PIPE.toChar());
+        assertEquals(Tile.ConnectorType.UNIVERSAL, Tile.ConnectorType.fromChar('u'));
+    }
+
 }
