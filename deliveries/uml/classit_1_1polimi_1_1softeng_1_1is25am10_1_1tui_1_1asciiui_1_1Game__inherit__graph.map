@@ -1,9 +1,0 @@
-<map id="it.polimi.softeng.is25am10.tui.asciiui.Game" name="it.polimi.softeng.is25am10.tui.asciiui.Game">
-<area shape="rect" id="Node000001" title=" " alt="" coords="45,665,340,2100"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,335,158,408"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,422,116,665,111,665,84,423"/>
-<area shape="rect" id="Node000003" href="$interfaceit_1_1polimi_1_1softeng_1_1is25am10_1_1network_1_1Callback.html" title=" " alt="" coords="182,126,427,617"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="278,632,274,666,269,665,273,631"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="274,5,335,78"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="307,93,307,126,302,126,302,93"/>
-</map>

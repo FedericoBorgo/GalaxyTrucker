@@ -1,9 +1,0 @@
-<map id="it.polimi.softeng.is25am10.network.ClientInterface" name="it.polimi.softeng.is25am10.network.ClientInterface">
-<area shape="rect" id="Node000001" title=" " alt="" coords="170,126,416,974"/>
-<area shape="rect" id="Node000003" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1network_1_1rmi_1_1RMIClient.html" title=" " alt="" coords="5,1034,277,1168"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,990,162,1034,157,1033,169,988"/>
-<area shape="rect" id="Node000004" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1network_1_1socket_1_1SocketClient.html" title=" " alt="" coords="301,1022,592,1179"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="418,988,428,1022,422,1023,413,989"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="265,5,321,78"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="296,93,296,126,290,126,290,93"/>
-</map>

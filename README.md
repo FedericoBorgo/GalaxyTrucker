@@ -32,8 +32,8 @@ RMI: 1234 <br/>
 Socket: 1235 1236
 
 # TODO
-UML alto livello <br/>
+UML dettagliato client <br/>
+UML alto livello server e client <br/>
 UML protocollo di comunicazione <br/>
-AutoBuilder <br/>
 Screenshot Intellij <br/>
 Più test

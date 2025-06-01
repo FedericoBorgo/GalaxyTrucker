@@ -1,7 +1,0 @@
-<map id="it.polimi.softeng.is25am10.model.cards.Smugglers" name="it.polimi.softeng.is25am10.model.cards.Smugglers">
-<area shape="rect" id="Node000001" title=" " alt="" coords="20,603,293,782"/>
-<area shape="rect" id="Node000002" href="$classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Card.html" title=" " alt="" coords="5,126,308,555"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,570,159,603,154,603,154,570"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="113,5,200,78"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="159,92,159,126,154,126,154,92"/>
-</map>

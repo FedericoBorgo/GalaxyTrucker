@@ -1,8 +1,0 @@
-var searchData=
-[
-  ['elementsboard_0',['ElementsBoard',['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1ElementsBoard.html#aa2be6364ade453265c83a14f44144115',1,'it.polimi.softeng.is25am10.model.boards.ElementsBoard.ElementsBoard(TilesBoard tiles)'],['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1ElementsBoard.html#a6de6b4103cbf6f4ff79c5e885959bdf3',1,'it.polimi.softeng.is25am10.model.boards.ElementsBoard.ElementsBoard(TilesBoard tiles, boolean removeCheck)']]],
-  ['engine_1',['engine',['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1Tile.html#a0c24b9b8fb310de00560416c13079340',1,'it::polimi::softeng::is25am10::model::Tile']]],
-  ['epidemic_2',['epidemic',['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1boards_1_1ShipBoard.html#a2b866b1a3c92c91914c2e99ae00ccc0b',1,'it::polimi::softeng::is25am10::model::boards::ShipBoard']]],
-  ['equals_3',['equals',['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Card.html#a9e30e843ac56cea7dce84dfc7ce19209',1,'it.polimi.softeng.is25am10.model.cards.Card.equals()'],['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1cards_1_1Deck.html#a6fd4f4915383a9eadc4609839621e4ca',1,'it.polimi.softeng.is25am10.model.cards.Deck.equals()']]],
-  ['err_4',['err',['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1Result.html#a808d3b9ec241ea725cfdf4eb38c870f3',1,'it.polimi.softeng.is25am10.model.Result.err(String reason)'],['../classit_1_1polimi_1_1softeng_1_1is25am10_1_1model_1_1Result.html#a394f364de72cebcc550f16b19bcc4a1c',1,'it.polimi.softeng.is25am10.model.Result.err()']]]
-];
