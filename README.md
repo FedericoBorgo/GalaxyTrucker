@@ -21,7 +21,7 @@ GUI
 java -jar GalaxyTrucker.jar -g
 ```
 
-TUI ([Guida Galattica](guida_galattica.md))
+TUI ([Guida Galattica](deliveries/guida_galattica_tui.md))
 ```
 java -jar GalaxyTrucker.jar -t
 ```
@@ -32,8 +32,8 @@ RMI: 1234 <br/>
 Socket: 1235 1236
 
 # TODO
-UML dettagliato client <br/>
-UML alto livello server e client <br/>
+Presentazione <br/>
+UML alto livello server<br/>
 UML protocollo di comunicazione <br/>
 Screenshot Intellij <br/>
 Più test
