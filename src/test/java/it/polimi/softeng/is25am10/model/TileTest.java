@@ -102,5 +102,8 @@ class TileTest {
         assertEquals(Arrays.asList(Tile.Side.RIGHT, Tile.Side.DOWN), Tile.shieldCoverage(Tile.Rotation.CLOCK));
         assertEquals(Arrays.asList(Tile.Side.DOWN, Tile.Side.LEFT), Tile.shieldCoverage(Tile.Rotation.DOUBLE));
         assertEquals(Arrays.asList(Tile.Side.LEFT, Tile.Side.UP), Tile.shieldCoverage(Tile.Rotation.INV));
+
+        Tile battery2 = new Tile("BATTERY_2 ssss");
+        assertEquals(Tile.Type.BATTERY_2, battery2.getType());
     }
 }

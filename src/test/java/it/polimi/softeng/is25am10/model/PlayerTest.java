@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class playerTest {
+public class PlayerTest {
     private String name = "TestPlayer1";
     Player player1 = new Player(name, FlightBoard.Pawn.RED);
     private String name2 = "TestPlayer2";
