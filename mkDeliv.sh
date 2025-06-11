@@ -2,9 +2,9 @@
 
 echo "Cleaning"
 mvn clean > /dev/null 2>/dev/null
-rm deliveries/GalaxyTrucker.jar > /dev/null 2> /dev/null
-rm -r deliveries/apidocs > /dev/null 2> /dev/null
-rm -r deliveries/javadoc > /dev/null 2> /dev/null
+rm deliverables/GalaxyTrucker.jar > /dev/null 2> /dev/null
+rm -r deliverables/apidocs > /dev/null 2> /dev/null
+rm -r deliverables/javadoc > /dev/null 2> /dev/null
 
 echo "Generating Jar"
 out=$(mvn package 2>/dev/null)
@@ -22,10 +22,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "Moving to deliveries"
+echo "Moving to deliverables"
 
-cp target/GalaxyTrucker.jar deliveries
-cp -r target/site/apidocs deliveries
-mv deliveries/apidocs deliveries/javadoc
+cp target/GalaxyTrucker.jar deliverables
+cp -r target/site/apidocs deliverables
+mv deliverables/apidocs deliverables/javadoc
 
 echo "Done"

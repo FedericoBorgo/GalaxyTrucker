@@ -1,5 +1,0 @@
-Server: java -jar GalaxyTrucker.jar -s
-TUI: java -jar GalaxyTrucker.jar -t
-GUI: java -jar GalaxyTrucker.jar -g
-
-Javadoc: javadoc/index.html

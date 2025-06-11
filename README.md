@@ -34,6 +34,3 @@ Socket: 1235 1236
 # TODO
 Presentazione <br/>
 UML alto livello server<br/>
-UML protocollo di comunicazione <br/>
-Screenshot Intellij <br/>
-Più test
