@@ -107,6 +107,7 @@ public class DeckTest {
         testDeck.set(player1, CardInput.disconnected());
         testDeck.ready();
         cardDataTest = testDeck.getData();
+        testModel.setInput("testPlayer1", null);
         cardDataTest.toString();
         testDeck.play();
 
