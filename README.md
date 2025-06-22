@@ -30,7 +30,3 @@ java -jar GalaxyTrucker.jar -t
 ### Porte
 RMI: 1234 <br/>
 Socket: 1235 1236
-
-# TODO
-Presentazione <br/>
-UML alto livello server<br/>
