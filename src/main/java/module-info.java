@@ -23,5 +23,5 @@ module it.polimi.softeng.is25am10 {
     opens it.polimi.softeng.is25am10.tui.asciiui to javafx.fxml;
 
     exports it.polimi.softeng.is25am10.gui;
-    opens it.polimi.softeng.is25am10.gui to javafx.fxml;
+    opens it.polimi.softeng.is25am10.gui to javafx.fxml, javafx.graphics, javafx.controls;
 }
