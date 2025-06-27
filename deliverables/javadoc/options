@@ -1,0 +1,28 @@
+--class-path
+'/home/fede/.m2/repository/org/openjfx/javafx-controls/23.0.2/javafx-controls-23.0.2.jar:/home/fede/.m2/repository/org/openjfx/javafx-graphics/23.0.2/javafx-graphics-23.0.2.jar:/home/fede/.m2/repository/org/openjfx/javafx-fxml/23.0.2/javafx-fxml-23.0.2.jar:/home/fede/.m2/repository/org/openjfx/javafx-base/23.0.2/javafx-base-23.0.2.jar:/home/fede/.m2/repository/org/jetbrains/annotations/26.0.2/annotations-26.0.2.jar'
+--module-path
+'/home/fede/.m2/repository/org/openjfx/javafx-controls/23.0.2/javafx-controls-23.0.2-linux.jar:/home/fede/.m2/repository/com/googlecode/lanterna/lanterna/3.1.2/lanterna-3.1.2.jar:/home/fede/.m2/repository/org/openjfx/javafx-graphics/23.0.2/javafx-graphics-23.0.2-win.jar:/home/fede/.m2/repository/org/openjfx/javafx-base/23.0.2/javafx-base-23.0.2-linux.jar:/home/fede/.m2/repository/org/json/json/20240303/json-20240303.jar:/home/fede/.m2/repository/org/openjfx/javafx-fxml/23.0.2/javafx-fxml-23.0.2-linux.jar:/home/fede/.m2/repository/org/controlsfx/controlsfx/11.2.1/controlsfx-11.2.1.jar:/home/fede/IdeaProjects/IS25-AM10/target/classes'
+--patch-module
+it.polimi.softeng.is25am10='/home/fede/IdeaProjects/IS25-AM10/src/main/java:/home/fede/IdeaProjects/IS25-AM10/target/generated-sources/annotations'
+-encoding
+'UTF-8'
+-protected
+-source
+'24'
+--module-source-path
+'/home/fede/IdeaProjects/IS25-AM10/target/site/apidocs/src'
+-author
+-bottom
+'Copyright &#169; 2025. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/fede/IdeaProjects/IS25-AM10/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'IS25-AM10 1 API'
+-use
+-version
+-windowtitle
+'IS25-AM10 1 API'

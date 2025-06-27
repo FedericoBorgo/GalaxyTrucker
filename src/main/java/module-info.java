@@ -11,6 +11,12 @@ module it.polimi.softeng.is25am10 {
     requires com.googlecode.lanterna;
     requires java.desktop;
 
+    opens it.polimi.softeng.is25am10.model.boards to javafx.fxml;
+    exports it.polimi.softeng.is25am10.model.boards;
+    opens it.polimi.softeng.is25am10.model.cards to javafx.fxml;
+    exports it.polimi.softeng.is25am10.model.cards;
+    opens it.polimi.softeng.is25am10.model to javafx.fxml;
+    exports it.polimi.softeng.is25am10.model;
     opens it.polimi.softeng.is25am10 to javafx.fxml;
     exports it.polimi.softeng.is25am10;
     exports it.polimi.softeng.is25am10.network;

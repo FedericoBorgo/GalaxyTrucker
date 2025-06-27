@@ -1,6 +1,9 @@
 module:it.polimi.softeng.is25am10
 it.polimi.softeng.is25am10
 it.polimi.softeng.is25am10.gui
+it.polimi.softeng.is25am10.model
+it.polimi.softeng.is25am10.model.boards
+it.polimi.softeng.is25am10.model.cards
 it.polimi.softeng.is25am10.network
 it.polimi.softeng.is25am10.network.rmi
 it.polimi.softeng.is25am10.tui
